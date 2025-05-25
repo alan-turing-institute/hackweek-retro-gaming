@@ -1,0 +1,4 @@
+[project]
+name = "pygame-playground"
+version = "0.1.0"
+dependencies = ["pygame", "ruff", "mypy"]
