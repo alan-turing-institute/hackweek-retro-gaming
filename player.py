@@ -78,7 +78,7 @@ class PlayerLivesView:
 
     def render(self, surface: Surface):
         x: int = 8
-        for life in range(0, self.player.model.lives):
+        for _ in range(0, self.player.model.lives):
             surface.blit(self.image, (x, 8, 32, 32))
             x += 40
 
