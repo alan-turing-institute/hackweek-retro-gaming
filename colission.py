@@ -1,6 +1,7 @@
 import pygame
 from bullet import BulletController
 from game import Game, GameState
+from interstitial import InterstitialState
 from pygame.surface import Surface
 from pygame.mixer import Sound
 
@@ -26,7 +27,7 @@ class ExplosionModelList:
         self.explosions: list[ExplosionModel] = []
         self.game: Game = game
 
-    def add(self, explosion: tuple, next_state: None):
+    def add(self, explosion: tuple, next_state: GameState):
         x, y, frames, speed = explosion
 
         explosion_model: ExplosionModel = ExplosionModel(
@@ -87,18 +88,64 @@ class CollisionController:
 
     def __init__(
         self,
-        game,
+        game: Game,
         swarm: SwarmController,
         player: PlayerController,
         explosion_controller,
         play_state,
     ) -> None:
-        self.swarm = swarm
+        self.swarm: SwarmController = swarm
         self.player: PlayerController = player
-        self.game = game
+        self.game: Game = game
         self.bullet_controller: BulletController = player.bullets
         self.enemy_bullets: BulletController = swarm.bullets
-        self.explosion_controller = explosion_controller
-        self.play_game_state = play_state
+        self.explosion_controller: ExplosionController = explosion_controller
+        self.play_game_state: GameState = play_state
         self.alien_dead_sound: Sound = pygame.mixer.Sound("sound/aliendie.wav")
         self.player_die: Sound = pygame.mixer.Sound("sound/playerdie.wav")
+
+    def update(self, game_time):
+        aliens: list = []
+        bullets: list = []
+
+        for bullet in self.bullet_controller.bullets:
+            if bullets.count(bullet) == 0:
+                continue
+            else:
+                for invader in self.swarm.invaders:
+                    if invader.hit(bullet.x + 3, bbullet.y + 3, 8, 12):
+                        aliens.append(invader)
+                        bullet.append(bullet)
+                        break
+
+        for bullet in bullets:
+            self.bullet_controller.remove_bullet(bullet)
+
+        for invader in aliens:
+            self.swarm.invaders.remove(invader)
+            self.player.model.score += 10 * (invader.alientype + 1)
+            self.explosion_controller.list.add((invader.x, invader.y, 6, 50))
+            self.alien_dead_sound.play()
+
+        player_hit: bool = False
+        for bullet in self.enemy_bullets.bullets:
+            if self.player.hit(bullet.x + 3, bullet.y + 3, 8, 12):
+                self.player.model.lives -= 1
+                player_hit = True
+                break
+
+        if player_hit:
+            self.enemy_bullets.clear()
+            self.player.bullets.clear()
+
+            if self.player.model.lives > 0:
+                self.player.pause(True)
+
+                get_ready_state: InterstitialState = InterstitialState(
+                    self.game, "Get ready!", 2000, self.play_game_state
+                )
+                self.explosion_controller.list.add(
+                    (self.player.model.x, self.player.model.y, 6, 50), get_ready_state
+                )
+                
+            self.player_die.play()
