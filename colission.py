@@ -111,14 +111,14 @@ class CollisionController:
         bullets: list = []
 
         for bullet in self.bullet_controller.bullets:
-            if bullets.count(bullet) == 0:
+            if bullets.count(bullet) > 0:
                 continue
-            else:
-                for invader in self.swarm.invaders:
-                    if invader.hit(bullet.x + 3, bullet.y + 3, 8, 12):
-                        aliens.append(invader)
-                        bullets.append(bullet)
-                        break
+
+            for invader in self.swarm.invaders:
+                if invader.hit(bullet.x + 3, bullet.y + 3, 8, 12):
+                    aliens.append(invader)
+                    bullets.append(bullet)
+                    break
 
         for bullet in bullets:
             self.bullet_controller.remove_bullet(bullet)
