@@ -7,24 +7,60 @@ import sys
 
 
 class GameState:
+
     def __init__(self, game: "Game") -> None:
+        """
+        Represents a game state, and manages a specific game function
+
+        :param game: The game instance.
+        """
         self.game: "Game" = game
 
     def on_enter(self, previous_state: "GameState | None"):
+        """
+        Called by the game instance when entering a state for the first time.
+
+        :param previous_state: The previous state.
+        :returns: None
+        """
         pass
 
     def on_exit(self):
+        """
+        Called by the game instance when leaving the state. Useful for cleanup and any other tasks before leaving the state.
+
+        :param None
+        :returns: None
+        """
         pass
 
     def update(self, game_time: int):
+        """
+        Called by the game instance to update the state.
+
+        :param game_time: Game time in milliseconds since the last call.
+        :returns: None
+        """
         pass
 
     def draw(self, surface: Surface):
+        """
+        Called by the game instance to draw the state.
+
+        :param surface: The current drawing surface.
+        :returns: None
+        """
         pass
 
 
 class Game:
     def __init__(self, game_name: str, width: int, height: int):
+        """
+        Manages the game states, that determine what's on screen and that update over time.
+
+        :param game_name: Name of the game. It's shown in the window's title bar.
+        :returns: None
+        """
         pygame.init()
         pygame.display.set_caption(game_name)
 
@@ -34,6 +70,12 @@ class Game:
         self.current_state: GameState | None = None
 
     def change_state(self, new_state: GameState | None):
+        """
+        Transitions from one state to another. It will also call on_exit() on the existing state.
+
+        :param new_state: If provided, its on_enter() method will be called. If None, the game will terminate.
+        :returns: None
+        """
         if self.current_state is not None:
             self.current_state.on_exit()
 
@@ -46,6 +88,9 @@ class Game:
         new_state.on_enter(old_state)
 
     def run(self, initial_state: GameState | None):
+        """
+        Main game loop. Handles event management, state update and display.
+        """
         self.change_state(initial_state)
 
         while True:
