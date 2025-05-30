@@ -1,4 +1,4 @@
-from game import Game
+from framework import Game
 from interstitial import InterstitialState
 from invadersgame import PlayGameState
 from menu import MainMenuState

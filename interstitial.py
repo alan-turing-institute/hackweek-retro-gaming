@@ -1,5 +1,5 @@
 from pygame import Surface
-from game import GameState, Game
+from framework import GameState, Game
 from bitmapfont import BitmapFont
 
 

@@ -1,4 +1,4 @@
-from game import Game, GameState
+from framework import Game, GameState
 from swarm import SwarmController, InvaderView
 from player import PlayerController, PlayerView, PlayerLivesView
 from bullet import BulletView

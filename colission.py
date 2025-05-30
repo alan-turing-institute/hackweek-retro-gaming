@@ -1,6 +1,6 @@
 import pygame
 from bullet import BulletController
-from game import Game, GameState
+from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame.surface import Surface
 from pygame.mixer import Sound

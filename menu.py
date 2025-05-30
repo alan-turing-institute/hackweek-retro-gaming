@@ -1,4 +1,4 @@
-from game import Game, GameState
+from framework import Game, GameState
 from bitmapfont import BitmapFont
 import pygame
 from pygame.key import ScancodeWrapper
