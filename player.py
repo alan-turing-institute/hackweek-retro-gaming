@@ -10,7 +10,6 @@ from bitmapfont import BitmapFont
 
 
 class PlayerModel:
-
     def __init__(self, x, y) -> None:
         self.x = x
         self.y = y
@@ -21,9 +20,7 @@ class PlayerModel:
 
 
 class PlayerController:
-
     def __init__(self, x, y) -> None:
-
         self.model: PlayerModel = PlayerModel(x, y)
         self.is_paused: bool = False
         self.bullets: BulletController = BulletController(speed=-200)
@@ -60,8 +57,7 @@ class PlayerController:
 
 
 class PlayerView:
-
-    def __init__(self, player: PlayerController, img_path) -> None:
+    def __init__(self, player: PlayerController, img_path: str) -> None:
         self.player: PlayerController = player
         self.image: Surface = pygame.image.load(img_path)
 
@@ -70,7 +66,6 @@ class PlayerView:
 
 
 class PlayerLivesView:
-
     def __init__(self, player: PlayerController, img_path: str) -> None:
         self.player: PlayerController = player
         self.image: Surface = pygame.image.load(img_path)
@@ -103,13 +98,11 @@ if __name__ == "__main__":
                 pygame.quit()
                 sys.exit()
 
-            
         player.update(fps_clock.get_time())
 
         surface.fill(black)
         player_view.render(surface)
         player_lives_view.render(surface)
-        
+
         pygame.display.update()
         fps_clock.tick(30)
-

@@ -10,7 +10,6 @@ from swarm import SwarmController
 
 
 class ExplosionModel:
-
     def __init__(self, x, y, max_frames, speed, next_state: GameState | None) -> None:
         self.x = x
         self.y = y
@@ -22,12 +21,11 @@ class ExplosionModel:
 
 
 class ExplosionModelList:
-
     def __init__(self, game: Game) -> None:
         self.explosions: list[ExplosionModel] = []
         self.game: Game = game
 
-    def add(self, explosion: tuple, next_state: GameState):
+    def add(self, explosion: tuple, next_state: GameState=None):
         x, y, frames, speed = explosion
 
         explosion_model: ExplosionModel = ExplosionModel(
@@ -45,18 +43,24 @@ class ExplosionModelList:
         for explosion in kill_list:
             if next_state is None and explosion.next_state is not None:
                 next_state = explosion.next_state
+            self.explosions.remove(explosion)
 
         if next_state is not None:
             self.game.change_state(next_state)
 
 
 class ExplosionView:
-
-    def __init__(self, explosions, explosion_img, width, height) -> None:
+    def __init__(
+        self,
+        explosions: list[ExplosionModel],
+        explosion_img: str,
+        width: int,
+        height: int,
+    ) -> None:
         self.image: Surface = pygame.image.load(explosion_img)
         self.image.set_colorkey((255, 0, 255))
 
-        self.explosions = explosions
+        self.explosions: list[ExplosionModel] = explosions
         self.width = width
         self.height = height
 
@@ -70,7 +74,6 @@ class ExplosionView:
 
 
 class ExplosionController:
-
     def __init__(self, game: Game) -> None:
         self.list: ExplosionModelList = ExplosionModelList(game)
 
@@ -85,7 +88,6 @@ class ExplosionController:
 
 
 class CollisionController:
-
     def __init__(
         self,
         game: Game,
@@ -104,7 +106,7 @@ class CollisionController:
         self.alien_dead_sound: Sound = pygame.mixer.Sound("sound/aliendie.wav")
         self.player_die: Sound = pygame.mixer.Sound("sound/playerdie.wav")
 
-    def update(self, game_time):
+    def update(self, game_time) -> None:
         aliens: list = []
         bullets: list = []
 
@@ -113,9 +115,9 @@ class CollisionController:
                 continue
             else:
                 for invader in self.swarm.invaders:
-                    if invader.hit(bullet.x + 3, bbullet.y + 3, 8, 12):
+                    if invader.hit(bullet.x + 3, bullet.y + 3, 8, 12):
                         aliens.append(invader)
-                        bullet.append(bullet)
+                        bullets.append(bullet)
                         break
 
         for bullet in bullets:
@@ -123,7 +125,7 @@ class CollisionController:
 
         for invader in aliens:
             self.swarm.invaders.remove(invader)
-            self.player.model.score += 10 * (invader.alientype + 1)
+            self.player.model.score += 10 * (invader.alien_type + 1)
             self.explosion_controller.list.add((invader.x, invader.y, 6, 50))
             self.alien_dead_sound.play()
 
@@ -147,5 +149,5 @@ class CollisionController:
                 self.explosion_controller.list.add(
                     (self.player.model.x, self.player.model.y, 6, 50), get_ready_state
                 )
-                
+
             self.player_die.play()
