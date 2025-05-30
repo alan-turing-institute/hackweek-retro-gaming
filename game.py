@@ -54,14 +54,14 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-                game_time: int = self.fps_clock.get_time()
-                if self.current_state is not None:
-                    self.current_state.update(game_time)
+            game_time: int = self.fps_clock.get_time()
+            if self.current_state is not None:
+                self.current_state.update(game_time)
 
-                self.main_window.fill(self.background)
+            self.main_window.fill(self.background)
 
-                if self.current_state is not None:
-                    self.current_state.draw(self.main_window)
+            if self.current_state is not None:
+                self.current_state.draw(self.main_window)
 
-                pygame.display.update()
-                self.fps_clock.tick(30)
+            pygame.display.update()
+            self.fps_clock.tick(30)
