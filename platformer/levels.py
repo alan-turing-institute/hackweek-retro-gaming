@@ -1,4 +1,4 @@
-from player import Player
+from platplayer import Player
 
 
 class Level:

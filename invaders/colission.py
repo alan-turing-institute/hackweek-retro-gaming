@@ -25,7 +25,7 @@ class ExplosionModelList:
         self.explosions: list[ExplosionModel] = []
         self.game: Game = game
 
-    def add(self, explosion: tuple, next_state: GameState=None):
+    def add(self, explosion: tuple, next_state: GameState | None = None):
         x, y, frames, speed = explosion
 
         explosion_model: ExplosionModel = ExplosionModel(
