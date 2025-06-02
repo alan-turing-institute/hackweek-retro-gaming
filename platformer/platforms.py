@@ -3,7 +3,7 @@ from spritesheet import SpriteSheet
 from pygame.surface import Surface
 from pygame import Rect
 from pygame.sprite import Sprite
-from player import Player
+from platplayer import Player
 from levels import Level
 
 
