@@ -5,7 +5,7 @@ from interstitial import InterstitialState
 from pygame.surface import Surface
 from pygame.mixer import Sound
 
-from player import PlayerController
+from invplayer import PlayerController
 from swarm import SwarmController
 
 
