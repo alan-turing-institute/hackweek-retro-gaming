@@ -5,6 +5,7 @@ from spritesheet import SpriteSheet
 from pygame.sprite import Sprite
 from platforms import MovingPlatform
 import constants
+from typing import Any
 
 
 class Player(pygame.sprite.Sprite):
@@ -19,7 +20,7 @@ class Player(pygame.sprite.Sprite):
 
         self.direction: str = "R"
 
-        self.level = None
+        self.level: Any = None
 
         sprite_sheet: SpriteSheet = SpriteSheet("img/p1_walk.png")
         image: Surface = sprite_sheet.get_image(0, 0, 66, 90)
@@ -65,7 +66,7 @@ class Player(pygame.sprite.Sprite):
     def update(self) -> None:
         self.calculate_gravity()
 
-        self.rect.x += self.change_x
+        self.rect.x += self.change_x  # type: ignore
 
         if self.level is not None:
             position: int = self.rect.x + self.level.world_shift
@@ -76,7 +77,7 @@ class Player(pygame.sprite.Sprite):
                 frame_index = (position // 30) % len(self.walking_frames_left)
                 self.image = self.walking_frames_left[frame_index]
 
-            block_hist_list: list[Sprite] = pygame.sprite.spritecollide(
+            block_hist_list: list = pygame.sprite.spritecollide(
                 self, self.level.platform_list, False
             )
             for block in block_hist_list:
@@ -85,8 +86,8 @@ class Player(pygame.sprite.Sprite):
                 elif self.change_x < 0:
                     self.rect.left = block.rect.right
 
-            self.rect.y += self.change_y
-            block_hist_list: list[Sprite] = pygame.sprite.spritecollide(
+            self.rect.y += self.change_y  # type: ignore
+            block_hist_list = pygame.sprite.spritecollide(
                 self, self.level.platform_list, False
             )
 

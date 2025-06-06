@@ -17,7 +17,7 @@ class Level:
 
         self.platform_list: Group = Group()
         self.enemy_list: Group = Group()
-        self.player: Player = player
+        self.player: Player | None = player
 
     def update(self):
         self.platform_list.update()

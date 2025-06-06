@@ -3,6 +3,7 @@ from spritesheet import SpriteSheet
 from pygame.surface import Surface
 from pygame import Rect
 from pygame.sprite import Sprite
+from typing import Any
 
 GRASS_LEFT: tuple[int, int, int, int] = (576, 720, 70, 70)
 GRASS_RIGHT: tuple[int, int, int, int] = (576, 576, 70, 70)
@@ -26,7 +27,7 @@ class Platform(Sprite):
         )
 
         self.rect: Rect = self.image.get_rect()
-        self.player = None
+        self.player: Any = None
 
 
 class MovingPlatform(Platform):
@@ -41,7 +42,7 @@ class MovingPlatform(Platform):
         self.boundary_left: int = 0
         self.boundary_right: int = 0
 
-        self.level = None
+        self.level: Any = None
 
     def update(self) -> None:
         self.rect.x += self.change_x
