@@ -30,13 +30,13 @@ class Vector2(object):
         v = self._v
         try:
             x, y = v
-            l = length / sqrt(x * x + y * y)
+            new_length = length / sqrt(x * x + y * y)
         except ZeroDivisionError:
             v[0] = 0.0
             v[1] = 0.0
             return self
-        v[0] *= l
-        v[1] *= l
+        v[0] *= new_length
+        v[1] *= new_length
 
     length = property(_get_length, _set_length, None, "Length of the vector")
 
@@ -89,7 +89,7 @@ class Vector2(object):
     def set_x(self, x):
         try:
             self._v[0] = 1.0 * x
-        except:
+        except:  # noqa: E722
             raise TypeError("Must be a number")
 
     x = property(get_x, set_x, None, "x component.")
@@ -100,7 +100,7 @@ class Vector2(object):
     def set_y(self, y):
         try:
             self._v[1] = 1.0 * y
-        except:
+        except:  # noqa: E722
             raise TypeError("Must be a number")
 
     y = property(get_y, set_y, None, "y component.")
@@ -304,10 +304,10 @@ class Vector2(object):
         """Normalises this vector."""
         v = self._v
         x, y = v
-        l = sqrt(x * x + y * y)
+        new_length = sqrt(x * x + y * y)
         try:
-            v[0] /= l
-            v[1] /= l
+            v[0] /= new_length
+            v[1] /= new_length
         except ZeroDivisionError:
             v[0] = 0.0
             v[1] = 0.0
@@ -317,8 +317,8 @@ class Vector2(object):
 
     def get_normalised(self):
         x, y = self._v
-        l = sqrt(x * x + y * y)
-        return Vector2.from_floats(x / l, y / l)
+        new_length = sqrt(x * x + y * y)
+        return Vector2.from_floats(x / new_length, y / new_length)
 
     get_normalized = get_normalised
 
