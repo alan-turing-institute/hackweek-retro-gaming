@@ -54,6 +54,51 @@ class StateMachine:
         self.active_state.entry_actions()
 
 
+class World:
+    def __init__(self) -> None:
+        self.entities: dict[int, GameEntitity] = {}
+        self.entity_id: int = 0
+
+        self.background: Surface = pygame.surface.Surface(SCREEN_SIZE).convert()
+        self.background.fill((255, 255, 255))
+        pygame.draw.circle(self.background, (200, 255, 200), NEST_POSITION, NEST_SIZE)
+
+    def add_entity(self, entity: "GameEntitity"):
+        self.entities[self.entity_id] = entity
+        entity.id = self.entity_id
+        self.entity_id += 1
+
+    def remove_entity(self, entity: "GameEntitity"):
+        del self.entities[entity.id]
+
+    def get(self, entity_id: int | None):
+        if entity_id in self.entities:
+            return self.entities[entity_id]
+        else:
+            return None
+
+    def process(self, time_passsed: int) -> None:
+        time_passed_seconds: float = time_passsed / 1000.0
+        for entity in list(self.entities.values()):
+            entity.process(time_passed_seconds)
+
+    def render(self, surface: Surface):
+        surface.blit(self.background, (0, 0))
+        for entity in self.entities.values():
+            entity.render(surface)
+
+    def get_close_entity(self, name, location, e_range=100):
+        location_vector: Vector2 = Vector2(*location)
+
+        for entity in self.entities.values():
+            if entity.name == name:
+                distance = location_vector.get_distance_to(entity.location)
+                if distance < e_range:
+                    return entity
+
+        return None
+
+
 class GameEntitity:
     def __init__(self, world: "World", name: str, image: Surface) -> None:
         self.world: "World" = world
@@ -128,51 +173,6 @@ class Spider(GameEntitity):
             return
 
         super().process(time_passed)
-
-
-class World:
-    def __init__(self) -> None:
-        self.entities: dict[int, GameEntitity] = {}
-        self.entity_id: int = 0
-
-        self.background: Surface = pygame.surface.Surface(SCREEN_SIZE).convert()
-        self.background.fill((255, 255, 255))
-        pygame.draw.circle(self.background, (200, 255, 200), NEST_POSITION, NEST_SIZE)
-
-    def add_entity(self, entity: GameEntitity):
-        self.entities[self.entity_id] = entity
-        entity.id = self.entity_id
-        self.entity_id += 1
-
-    def remove_entity(self, entity: GameEntitity):
-        del self.entities[entity.id]
-
-    def get(self, entity_id: int | None):
-        if entity_id in self.entities:
-            return self.entities[entity_id]
-        else:
-            return None
-
-    def process(self, time_passsed: int) -> None:
-        time_passed_seconds: float = time_passsed / 1000.0
-        for entity in list(self.entities.values()):
-            entity.process(time_passed_seconds)
-
-    def render(self, surface: Surface):
-        surface.blit(self.background, (0, 0))
-        for entity in self.entities.values():
-            entity.render(surface)
-
-    def get_close_entity(self, name, location, e_range=100) -> GameEntitity | None:
-        location_vector: Vector2 = Vector2(*location)
-
-        for entity in self.entities.values():
-            if entity.name == name:
-                distance = location_vector.get_distance_to(entity.location)
-                if distance < e_range:
-                    return entity
-
-        return None
 
 
 class AntStateExploring(State):
@@ -291,7 +291,7 @@ class AntStateHunting(State):
         return None
 
     def entry_actions(self) -> None:
-        self.speed = 160 + randint(0, 50)
+        self.ant.speed = 160 + randint(0, 50)
 
     def exit_actions(self) -> None:
         self.got_kill = False
