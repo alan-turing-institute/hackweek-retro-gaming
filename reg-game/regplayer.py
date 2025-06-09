@@ -1,4 +1,5 @@
 from bullet import BulletController
+
 import pygame
 from pygame.key import ScancodeWrapper
 from pygame.locals import K_RIGHT, K_LEFT, K_SPACE
