@@ -2,9 +2,11 @@ from framework import Game
 from interstitial import InterstitialState
 from reg_game import PlayGameState
 from menu import MainMenuState
+from config import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
-reg_game: Game = Game("The REG Game", 800, 600)
+
+reg_game: Game = Game("The REG Game", SCREEN_WIDTH, SCREEN_HEIGHT)
 main_menu_state: MainMenuState = MainMenuState(reg_game)
 game_over_state: InterstitialState = InterstitialState(
     reg_game, "G A M E  O V E R !", 5000, main_menu_state
