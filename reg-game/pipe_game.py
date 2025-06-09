@@ -8,7 +8,7 @@ pygame.init()
 # Game Constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-BOARD_SIZE = 10
+BOARD_SIZE = 6
 if BOARD_SIZE < 3:
     raise ValueError("Board size must be at least 3x3 for a playable game.")
 PIPE_SIZE = min(SCREEN_WIDTH, SCREEN_HEIGHT) // BOARD_SIZE  # Size of each pipe square
@@ -32,7 +32,7 @@ clock = pygame.time.Clock()
 class Pipe:
     """Represents a single pipe segment on the board."""
 
-    def __init__(self, type, rotation=0):
+    def __init__(self, type: str, rotation: int = 0):
         # type can be:
         # 'straight': | or -
         # 'corner': L-shaped
@@ -159,7 +159,7 @@ class Pipe:
 class Board:
     """Manages the grid of pipes and game logic."""
 
-    def __init__(self, size):
+    def __init__(self, size: int):
         self.size = size
         self.grid = [[None for _ in range(size)] for _ in range(size)]
         # Start in top-left corner or adjacent
@@ -171,13 +171,13 @@ class Board:
         )
         self._initialize_board()
 
-    def is_valid_move(self, rows, cols, r, c, visited):
+    def is_valid_move(self, rows: int, cols: int, r: int, c: int, visited: set):
         """
         Checks if a cell is within grid boundaries and has not been visited.
         """
         return 0 <= r < rows and 0 <= c < cols and (r, c) not in visited
 
-    def find_random_path(self, rows, cols, start, end):
+    def find_random_path(self, rows: int, cols: int, start: tuple, end: tuple):
         """
         Randomly generates a path between start and end points on a grid.
         """
@@ -322,7 +322,7 @@ class Board:
 
         self.check_connections()  # Initial check to set up colours
 
-    def _get_pipe_type_and_rotation(self, dir1, dir2):
+    def _get_pipe_type_and_rotation(self, dir1: str, dir2: str) -> tuple[str, int]:
         """Helper to determine pipe type and rotation for a segment of the path."""
         dirs = tuple(sorted([dir1, dir2]))
 
@@ -363,7 +363,7 @@ class Board:
 
         return None, None, None
 
-    def rotate_pipe(self, row, col):
+    def rotate_pipe(self, row: int, col: int):
         """Rotates the pipe at the given grid coordinates."""
         # Only allow rotation if it's not a start/end point AND not an empty pipe
         current_pipe = self.grid[row][col]
