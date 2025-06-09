@@ -28,7 +28,9 @@ class PlayGameState(GameState):
 
         self.player_controller = PlayerController(0, 540)
 
-        player_renderer = PlayerView(self.player_controller, "img/ship.png")
+        player_renderer = PlayerView(
+            self.player_controller, "img/pixel_character_dark_blue.png"
+        )
         lives_renderer = PlayerLivesView(self.player_controller, "img/ship.png")
         bullet_renderer = BulletView(self.player_controller.bullets, "img/bullet.png")
         alien_bullet_renderer = BulletView(

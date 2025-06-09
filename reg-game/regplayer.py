@@ -1,10 +1,19 @@
 from bullet import BulletController
 import pygame
 from pygame.key import ScancodeWrapper
-from pygame.locals import K_RIGHT, K_LEFT, K_SPACE, QUIT
+from pygame.locals import K_RIGHT, K_LEFT, K_SPACE
 from pygame.surface import Surface
 
 from bitmapfont import BitmapFont
+from spritesheet import SpriteSheet
+
+
+PLAYER_SIZE: tuple[int, int] = (32, 32)
+
+PLAYER_SPRITESHEET_X: int = 0
+PLAYER_SPRITESHEET_Y: int = 0
+PLAYER_SPRITESHEET_WIDTH: int = 48
+PLAYER_SPRITESHEET_HEIGHT: int = 48
 
 
 class PlayerModel:
@@ -55,12 +64,26 @@ class PlayerController:
 
 
 class PlayerView:
-    def __init__(self, player: PlayerController, img_path: str) -> None:
-        self.player: PlayerController = player
-        self.image: Surface = pygame.image.load(img_path)
+    def __init__(self, player: PlayerController, sprite_sheet_path: str) -> None:
+        self.player_controller: PlayerController = player
+
+        sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
+        original_image = sprite_sheet.get_image(
+            x=PLAYER_SPRITESHEET_X,
+            y=PLAYER_SPRITESHEET_Y,
+            width=PLAYER_SPRITESHEET_WIDTH,
+            height=PLAYER_SPRITESHEET_HEIGHT,
+        )
+
+        self.image: Surface = pygame.transform.scale(
+            surface=original_image, size=PLAYER_SIZE
+        )
 
     def render(self, surface: Surface):
-        surface.blit(self.image, (self.player.model.x, self.player.model.y, 32, 32))
+        surface.blit(
+            self.image,
+            (self.player_controller.model.x, self.player_controller.model.y, 32, 32),
+        )
 
 
 class PlayerLivesView:
