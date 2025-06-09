@@ -1,8 +1,15 @@
 from bullet import BulletController
 from pygame.surface import Surface
 import pygame
+import random
 
 
+class MaisyModel:
+    def __init__(self, x, y) -> None:
+        self.x = x
+        self.y = y
+
+ 
 class InvaderModel:
     def __init__(self, x: int, y: int, alien_type: int) -> None:
         self.x: int = x
@@ -24,6 +31,13 @@ class InvaderModel:
             and y + height <= self.y + 32
         )
 
+class MaisyController:
+    def __init__(self, window_width, window_height):
+        self.widow_width = window_width
+        self.window_height = window_height
+    
+        self.hackers: list[MaisyModel] = []
+        self.speed = 3
 
 class SwarmController:
     def __init__(self, screen_width, offset_y, initial_frame_ticks) -> None:
@@ -127,7 +141,9 @@ class SwarmController:
 
         return left_most, bottom_most, width, height
 
-
+class MaisyView:
+    pass
+        
 class InvaderView:
     def __init__(self, swarm: SwarmController, img_path: str) -> None:
         self.image: Surface = pygame.image.load(img_path)

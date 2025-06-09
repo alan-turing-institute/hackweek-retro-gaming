@@ -1,5 +1,5 @@
 from framework import Game, GameState
-from enemy import SwarmController, InvaderView
+from enemy import SwarmController, InvaderView, MaisyController
 from regplayer import PlayerController, PlayerView, PlayerLivesView
 from bullet import BulletView
 from colission import ExplosionController, CollisionController, ExplosionView
@@ -24,7 +24,9 @@ class PlayGameState(GameState):
 
     def initialise(self):
         self.swarm_controller = SwarmController(800, 48, self.swarm_speed)
+        self.maisy_controller = MaisyController(800, 600) #TODO read this from the game
         swarm_renderer = InvaderView(self.swarm_controller, "img/invaders.png")
+
 
         self.player_controller = PlayerController(0, 540)
 
