@@ -1,20 +1,25 @@
-from framework import Game, GameState
-from bitmapfont import BitmapFont
 import pygame
-from pygame.key import ScancodeWrapper
-from pygame.locals import K_UP, K_DOWN, K_SPACE
-from pygame.surface import Surface
+from bitmapfont import BitmapFont
+from config import (
+    MENU_BACKGROUND_PATH,
+    MENU_BACKGROUND_POSITION,
+    MENU_BACKGROUND_SCALE_FACTOR,
+    MENU_FONT_IMG,
+    MENU_ITEMS,
+    MENU_TITLE,
+)
+from framework import Game, GameState
 from pygame.image import load
+from pygame.key import ScancodeWrapper
+from pygame.locals import K_DOWN, K_SPACE, K_UP
+from pygame.surface import Surface
 from pygame.transform import scale_by
-
-from config import MENU_FONT_IMG, MENU_ITEMS, MENU_TITLE, MENU_BACKGROUND_PATH, MENU_BACKGROUND_POSITION, MENU_BACKGROUND_SCALE_FACTOR
 
 
 class MainMenuState(GameState):
-
     def __init__(self, game: Game) -> None:
         super().__init__(game)
-    
+
         self.play_game_state: GameState | None = None
         self.font: BitmapFont = BitmapFont(str(MENU_FONT_IMG), 12, 12)
         self.index: int = 0
@@ -54,8 +59,10 @@ class MainMenuState(GameState):
 
     def draw(self, surface: Surface) -> None:
         self.font.centre(surface, MENU_TITLE, 48)
-        surface.blit(scale_by(self.background, MENU_BACKGROUND_SCALE_FACTOR),
-                     MENU_BACKGROUND_POSITION)
+        surface.blit(
+            scale_by(self.background, MENU_BACKGROUND_SCALE_FACTOR),
+            MENU_BACKGROUND_POSITION,
+        )
         count: int = 0
         y = surface.get_rect().height - len(self.menu_items) * 160
 

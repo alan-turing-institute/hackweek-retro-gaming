@@ -1,8 +1,8 @@
-from framework import Game, GameState
-from bitmapfont import BitmapFont
 import pygame
+from bitmapfont import BitmapFont
+from framework import Game, GameState
 from pygame.key import ScancodeWrapper
-from pygame.locals import K_UP, K_DOWN, K_SPACE
+from pygame.locals import K_DOWN, K_SPACE, K_UP
 from pygame.surface import Surface
 
 

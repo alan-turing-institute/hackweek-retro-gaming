@@ -1,10 +1,9 @@
-from framework import Game, GameState
-from enemy import MaisyController, MaisyView
-from regplayer import PlayerController, PlayerView, PlayerLivesView
 from bullet import BulletView
 from colission import ExplosionController, ExplosionView
-from interstitial import InterstitialState
 from config import SCREEN_WIDTH
+from enemy import MaisyController, MaisyView
+from framework import Game, GameState
+from regplayer import PlayerController, PlayerLivesView, PlayerView
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -16,7 +15,7 @@ class PlayGameState(GameState):
         self.controllers: list | None = None
         self.renderers: list | None = None
         self.player_controller = None
-        
+
         self.game_over_state = game_over_state
 
         self.initialise()
@@ -26,8 +25,9 @@ class PlayGameState(GameState):
             self.player_controller.pause(False)
 
     def initialise(self):
-        self.maisy_controller = MaisyController(800, 600) #TODO read this from the game
-
+        self.maisy_controller = MaisyController(
+            800, 600
+        )  # TODO read this from the game
 
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
 
@@ -66,7 +66,6 @@ class PlayGameState(GameState):
             and self.player_controller.model.lives == 0
         ):
             self.game.change_state(self.game_over_state)
-
 
     def draw(self, surface):
         if self.renderers is not None:

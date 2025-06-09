@@ -1,9 +1,10 @@
+import sys
+from random import randint
+
+import pygame
 from pygame.surface import Surface
 from pygame.time import Clock
 from vector2 import Vector2
-import pygame
-from random import randint
-import sys
 
 SCREEN_SIZE: tuple[int, int] = (640, 480)
 NEST_POSITION: tuple[int, int] = (320, 240)

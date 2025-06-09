@@ -3,7 +3,6 @@ from interstitial import InterstitialState
 from invadersgame import PlayGameState
 from menu import MainMenuState
 
-
 invaders_game: Game = Game("Invaders", 800, 600)
 main_menu_state: MainMenuState = MainMenuState(invaders_game)
 game_over_state: InterstitialState = InterstitialState(
