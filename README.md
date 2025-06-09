@@ -8,4 +8,3 @@ For playing with PyGame
 ## Ants State Machine
 
 ![Ants State Machine](ants/img/state_machine.jpg "Invaders state machine")
-

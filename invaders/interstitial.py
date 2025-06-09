@@ -1,6 +1,6 @@
-from pygame import Surface
-from framework import GameState, Game
 from bitmapfont import BitmapFont
+from framework import Game, GameState
+from pygame import Surface
 
 
 class InterstitialState(GameState):

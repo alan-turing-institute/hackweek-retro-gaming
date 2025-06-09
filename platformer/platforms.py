@@ -1,9 +1,10 @@
+from typing import Any
+
 import pygame
-from spritesheet import SpriteSheet
-from pygame.surface import Surface
 from pygame import Rect
 from pygame.sprite import Sprite
-from typing import Any
+from pygame.surface import Surface
+from spritesheet import SpriteSheet
 
 GRASS_LEFT: tuple[int, int, int, int] = (576, 720, 70, 70)
 GRASS_RIGHT: tuple[int, int, int, int] = (576, 576, 70, 70)

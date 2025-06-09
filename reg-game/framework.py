@@ -1,13 +1,13 @@
-import pygame
-from pygame.time import Clock
-from pygame.surface import Surface
-from pygame.locals import QUIT
-from pygame import Color
 import sys
+
+import pygame
+from pygame import Color
+from pygame.locals import QUIT
+from pygame.surface import Surface
+from pygame.time import Clock
 
 
 class GameState:
-
     def __init__(self, game: "Game") -> None:
         """
         Represents a game state, and manages a specific game function

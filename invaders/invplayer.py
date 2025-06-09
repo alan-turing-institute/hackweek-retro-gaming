@@ -1,12 +1,13 @@
 import sys
-from bullet import BulletController
+
 import pygame
+from bitmapfont import BitmapFont
+from bullet import BulletController
+from pygame import Color
 from pygame.key import ScancodeWrapper
-from pygame.locals import K_RIGHT, K_LEFT, K_SPACE, QUIT
+from pygame.locals import K_LEFT, K_RIGHT, K_SPACE, QUIT
 from pygame.surface import Surface
 from pygame.time import Clock
-from pygame import Color
-from bitmapfont import BitmapFont
 
 
 class PlayerModel:

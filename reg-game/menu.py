@@ -1,25 +1,31 @@
-from framework import Game, GameState
-from bitmapfont import BitmapFont
 import pygame
+from bitmapfont import BitmapFont
+from config import (
+    MENU_BACKGROUND_PATH,
+    MENU_BACKGROUND_POSITION,
+    MENU_BACKGROUND_SCALE_FACTOR,
+    MENU_FONT_IMG,
+    MENU_ITEMS,
+    MENU_TITLE,
+)
+from framework import Game, GameState
+from pygame.image import load
 from pygame.key import ScancodeWrapper
-from pygame.locals import K_UP, K_DOWN, K_SPACE
+from pygame.locals import K_DOWN, K_SPACE, K_UP
 from pygame.surface import Surface
-
-from config import MENU_FONT_IMG
-from config import MENU_ITEMS
+from pygame.transform import scale_by
 
 
 class MainMenuState(GameState):
-
     def __init__(self, game: Game) -> None:
         super().__init__(game)
-        print(MENU_FONT_IMG)
-    
+
         self.play_game_state: GameState | None = None
         self.font: BitmapFont = BitmapFont(str(MENU_FONT_IMG), 12, 12)
         self.index: int = 0
         self.input_tick: int = 0
         self.menu_items: tuple[str, ...] = MENU_ITEMS
+        self.background: Surface = load(MENU_BACKGROUND_PATH).convert()
 
     def set_play_state(self, state) -> None:
         self.play_game_state = state
@@ -52,7 +58,11 @@ class MainMenuState(GameState):
                 self.game.change_state(self.play_game_state)
 
     def draw(self, surface: Surface) -> None:
-        self.font.centre(surface, "Invaders! From Space", 48)
+        self.font.centre(surface, MENU_TITLE, 48)
+        surface.blit(
+            scale_by(self.background, MENU_BACKGROUND_SCALE_FACTOR),
+            MENU_BACKGROUND_POSITION,
+        )
         count: int = 0
         y = surface.get_rect().height - len(self.menu_items) * 160
 

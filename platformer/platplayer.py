@@ -1,11 +1,12 @@
-import pygame
-from pygame.surface import Surface
-from pygame import Rect
-from spritesheet import SpriteSheet
-from pygame.sprite import Sprite
-from platforms import MovingPlatform
-import constants
 from typing import Any
+
+import constants
+import pygame
+from platforms import MovingPlatform
+from pygame import Rect
+from pygame.sprite import Sprite
+from pygame.surface import Surface
+from spritesheet import SpriteSheet
 
 
 class Player(pygame.sprite.Sprite):

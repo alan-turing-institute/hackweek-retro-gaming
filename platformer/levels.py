@@ -1,11 +1,11 @@
-from platplayer import Player
-from pygame.sprite import Group
-from constants import BLUE
-from pygame.surface import Surface
-import pygame
 import constants
 import platforms
-from platforms import Platform, MovingPlatform
+import pygame
+from constants import BLUE
+from platforms import MovingPlatform, Platform
+from platplayer import Player
+from pygame.sprite import Group
+from pygame.surface import Surface
 
 
 class Level:

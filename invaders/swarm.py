@@ -1,6 +1,6 @@
+import pygame
 from bullet import BulletController
 from pygame.surface import Surface
-import pygame
 
 
 class InvaderModel:
