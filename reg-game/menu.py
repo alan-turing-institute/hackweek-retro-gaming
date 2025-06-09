@@ -5,40 +5,21 @@ from pygame.key import ScancodeWrapper
 from pygame.locals import K_UP, K_DOWN, K_SPACE
 from pygame.surface import Surface
 
-from dataclasses import dataclass
-from typing import Sequence, Literal
-from os import PathLike
+from config import MENU_FONT_IMG
+from config import MENU_ITEMS
 
-MENU_ITEMS: Literal = ("Start", "Resume", "Quit")
 
-MENU_BACKGROUND: PathLike = "assets/img/2010-08-03_British_Library_exterior_02.jpg"
-
-@dataclass
 class MainMenuState(GameState):
 
-    play_game_state: GameState | None = None
-    font: BitmapFont = BitmapFont("assets/img/2010-08-03_British_Library_exterior_02.jpg", 12, 12)
-    index: int = 0
-    input_tick: int = 0
-    menu_items: Sequence[str] = MENU_ITEMS
-
-    # def __init__(self, game: Game) -> None:
-    #     super().__init__(game)
-    #
-    #     self.play_game_state: GameState | None = None
-    #     self.font: BitmapFont = BitmapFont("img/fasttracker2-style_12x12.png", 12, 12)
-    #     self.index: int = 0
-    #     self.input_tick: int = 0
-    #     self.menu_items: list[str] = ["Start game", "Quit"]
-
-    def __post_init__(self, game: Game) -> None:
+    def __init__(self, game: Game) -> None:
         super().__init__(game)
-        #
-        # self.play_game_state: GameState | None = None
-        # self.font: BitmapFont = BitmapFont("img/fasttracker2-style_12x12.png", 12, 12)
-        # self.index: int = 0
-        # self.input_tick: int = 0
-        # self.menu_items: list[str] = ["Start game", "Quit"]
+        print(MENU_FONT_IMG)
+    
+        self.play_game_state: GameState | None = None
+        self.font: BitmapFont = BitmapFont(str(MENU_FONT_IMG), 12, 12)
+        self.index: int = 0
+        self.input_tick: int = 0
+        self.menu_items: tuple[str, ...] = MENU_ITEMS
 
     def set_play_state(self, state) -> None:
         self.play_game_state = state

@@ -2,6 +2,7 @@ from pygame import Surface
 from framework import GameState, Game
 from bitmapfont import BitmapFont
 
+from config import MENU_FONT_IMG
 
 class InterstitialState(GameState):
     def __init__(
@@ -13,7 +14,7 @@ class InterstitialState(GameState):
         super().__init__(game)
 
         self.next_state: GameState | None = next_state
-        self.font: BitmapFont = BitmapFont("img/fasttracker2-style_12x12.png", 12, 12)
+        self.font: BitmapFont = BitmapFont(str(MENU_FONT_IMG), 12, 12)
         self.message: str = message
         self.wait_timer: int = wait_time_ms
 
