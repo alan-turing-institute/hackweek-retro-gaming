@@ -8,7 +8,7 @@ from bitmapfont import BitmapFont
 from spritesheet import SpriteSheet
 
 
-PLAYER_SIZE: tuple[int, int] = (32, 32)
+PLAYER_SIZE: tuple[int, int] = (96, 96)
 
 PLAYER_SPRITESHEET_X: int = 0
 PLAYER_SPRITESHEET_Y: int = 0
@@ -82,7 +82,12 @@ class PlayerView:
     def render(self, surface: Surface):
         surface.blit(
             self.image,
-            (self.player_controller.model.x, self.player_controller.model.y, 32, 32),
+            (
+                self.player_controller.model.x,
+                self.player_controller.model.y,
+                PLAYER_SPRITESHEET_WIDTH,
+                PLAYER_SPRITESHEET_HEIGHT,
+            ),
         )
 
 
