@@ -5,8 +5,7 @@ from pygame.key import ScancodeWrapper
 from pygame.locals import K_UP, K_DOWN, K_SPACE
 from pygame.surface import Surface
 
-from config import MENU_FONT_IMG
-from config import MENU_ITEMS
+from config import MENU_FONT_IMG, MENU_ITEMS, MENU_TITLE
 
 
 class MainMenuState(GameState):
@@ -52,7 +51,7 @@ class MainMenuState(GameState):
                 self.game.change_state(self.play_game_state)
 
     def draw(self, surface: Surface) -> None:
-        self.font.centre(surface, "Invaders! From Space", 48)
+        self.font.centre(surface, MENU_TITLE, 48)
         count: int = 0
         y = surface.get_rect().height - len(self.menu_items) * 160
 
