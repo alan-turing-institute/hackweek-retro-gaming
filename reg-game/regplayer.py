@@ -13,6 +13,8 @@ PLAYER_SPRITESHEET_Y: int = 0
 PLAYER_SPRITE_WIDTH: int = 48
 PLAYER_SPRITE_HEIGHT: int = 48
 
+NUMBER_OF_SPRITES: int = 8
+
 
 class PlayerModel:
     def __init__(self, x, y) -> None:
@@ -81,11 +83,12 @@ class PlayerView:
 
         sprite_surfaces: list[Surface] = [
             self.sprite_sheet.get_image(
-                x=PLAYER_SPRITESHEET_X,
+                x=column_offset * PLAYER_SPRITE_WIDTH,
                 y=PLAYER_SPRITE_HEIGHT * row_offset,
                 width=PLAYER_SPRITE_WIDTH,
                 height=PLAYER_SPRITE_HEIGHT,
             )
+            for column_offset in range(0, NUMBER_OF_SPRITES)
         ]
 
         return [
@@ -111,10 +114,17 @@ class PlayerView:
         ]
 
     def render(self, surface: Surface):
+        list_index: int = 0
         if self.player_controller.model.direction == "RIGHT":
-            self.image = self.walking_frames_right[0]
+            list_index = int(self.player_controller.model.x) % len(
+                self.walking_frames_right
+            )
+            self.image = self.walking_frames_right[list_index]
         elif self.player_controller.model.direction == "LEFT":
-            self.image = self.walking_frames_left[0]
+            list_index = int(self.player_controller.model.x) % len(
+                self.walking_frames_left
+            )
+            self.image = self.walking_frames_left[list_index]
 
         surface.blit(
             self.image,
