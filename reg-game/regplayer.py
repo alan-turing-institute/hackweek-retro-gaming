@@ -12,8 +12,8 @@ PLAYER_SIZE: tuple[int, int] = (96, 96)
 
 PLAYER_SPRITESHEET_X: int = 0
 PLAYER_SPRITESHEET_Y: int = 0
-PLAYER_SPRITESHEET_WIDTH: int = 48
-PLAYER_SPRITESHEET_HEIGHT: int = 48
+PLAYER_SPRITE_WIDTH: int = 48
+PLAYER_SPRITE_HEIGHT: int = 48
 
 
 class PlayerModel:
@@ -24,6 +24,8 @@ class PlayerModel:
         self.lives: int = 3
         self.score: int = 0
         self.speed: int = 100
+
+        self.direction: str = "RIGHT"
 
 
 class PlayerController:
@@ -45,8 +47,10 @@ class PlayerController:
 
         if keys[K_RIGHT] and self.model.x < (800 - 32):
             self.model.x += (game_time / 1000.0) * self.model.speed
+            self.model.direction = "RIGHT"
         elif keys[K_LEFT] and self.model.x > 0:
             self.model.x -= (game_time / 1000.0) * self.model.speed
+            self.model.direction = "LEFT"
 
         if keys[K_SPACE] and self.bullets.can_fire():
             x = self.model.x + 9
@@ -67,26 +71,62 @@ class PlayerView:
     def __init__(self, player: PlayerController, sprite_sheet_path: str) -> None:
         self.player_controller: PlayerController = player
 
-        sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
-        original_image = sprite_sheet.get_image(
-            x=PLAYER_SPRITESHEET_X,
-            y=PLAYER_SPRITESHEET_Y,
-            width=PLAYER_SPRITESHEET_WIDTH,
-            height=PLAYER_SPRITESHEET_HEIGHT,
-        )
+        self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
 
-        self.image: Surface = pygame.transform.scale(
-            surface=original_image, size=PLAYER_SIZE
-        )
+        self.walking_frames_left: list[Surface] = self.get_walking_frames_left()
+        self.walking_frames_right: list[Surface] = self.get_walking_frames_right()
+
+        self.image: Surface = self.walking_frames_right[0]
+
+    def get_walking_frames_left(self) -> list[Surface]:
+        row_offset: int = 2
+
+        sprite_surfaces: list[Surface] = [
+            self.sprite_sheet.get_image(
+                x=PLAYER_SPRITESHEET_X,
+                y=PLAYER_SPRITE_HEIGHT * row_offset,
+                width=PLAYER_SPRITE_WIDTH,
+                height=PLAYER_SPRITE_HEIGHT,
+            )
+        ]
+
+        return [
+            pygame.transform.scale(surface, size=PLAYER_SIZE)
+            for surface in sprite_surfaces
+        ]
+
+    def get_walking_frames_right(self) -> list[Surface]:
+
+        row_offset: int = 3
+
+        sprite_surfaces: list[Surface] = [
+            self.sprite_sheet.get_image(
+                x=PLAYER_SPRITESHEET_X,
+                y=PLAYER_SPRITE_HEIGHT * row_offset,
+                width=PLAYER_SPRITE_WIDTH,
+                height=PLAYER_SPRITE_HEIGHT,
+            )
+        ]
+
+        return [
+            pygame.transform.scale(surface, size=PLAYER_SIZE)
+            for surface in sprite_surfaces
+        ]
 
     def render(self, surface: Surface):
+
+        if self.player_controller.model.direction == "RIGHT":
+            self.image = self.walking_frames_right[0]
+        elif self.player_controller.model.direction == "LEFT":
+            self.image = self.walking_frames_left[0]
+
         surface.blit(
             self.image,
             (
                 self.player_controller.model.x,
                 self.player_controller.model.y,
-                PLAYER_SPRITESHEET_WIDTH,
-                PLAYER_SPRITESHEET_HEIGHT,
+                PLAYER_SPRITE_WIDTH,
+                PLAYER_SPRITE_HEIGHT,
             ),
         )
 
