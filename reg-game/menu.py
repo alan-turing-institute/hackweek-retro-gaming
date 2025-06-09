@@ -5,21 +5,26 @@ from pygame.key import ScancodeWrapper
 from pygame.locals import K_UP, K_DOWN, K_SPACE
 from pygame.surface import Surface
 
+from config import MENU_FONT_IMG
+from config import MENU_ITEMS
+
 
 class MainMenuState(GameState):
+
     def __init__(self, game: Game) -> None:
         super().__init__(game)
-
+        print(MENU_FONT_IMG)
+    
         self.play_game_state: GameState | None = None
-        self.font: BitmapFont = BitmapFont("img/fasttracker2-style_12x12.png", 12, 12)
+        self.font: BitmapFont = BitmapFont(str(MENU_FONT_IMG), 12, 12)
         self.index: int = 0
         self.input_tick: int = 0
-        self.menu_items: list[str] = ["Start game", "Quit"]
+        self.menu_items: tuple[str, ...] = MENU_ITEMS
 
-    def set_play_state(self, state):
+    def set_play_state(self, state) -> None:
         self.play_game_state = state
 
-    def update(self, game_time: int):
+    def update(self, game_time: int) -> None:
         keys: ScancodeWrapper = pygame.key.get_pressed()
 
         if keys[K_UP] or keys[K_DOWN] and self.input_tick == 0:
@@ -46,8 +51,8 @@ class MainMenuState(GameState):
             elif self.index == 0:
                 self.game.change_state(self.play_game_state)
 
-    def draw(self, surface: Surface):
-        self.font.centre(surface, "The REG Game", 48)
+    def draw(self, surface: Surface) -> None:
+        self.font.centre(surface, "Invaders! From Space", 48)
         count: int = 0
         y = surface.get_rect().height - len(self.menu_items) * 160
 

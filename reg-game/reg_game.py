@@ -4,6 +4,10 @@ from regplayer import PlayerController, PlayerView, PlayerLivesView
 from bullet import BulletView
 from colission import ExplosionController, CollisionController, ExplosionView
 from interstitial import InterstitialState
+from config import SCREEN_WIDTH
+
+PLAYER_X: int = SCREEN_WIDTH // 2
+PLAYER_Y: int = 500
 
 
 class PlayGameState(GameState):
@@ -26,9 +30,11 @@ class PlayGameState(GameState):
         self.swarm_controller = SwarmController(800, 48, self.swarm_speed)
         swarm_renderer = InvaderView(self.swarm_controller, "img/invaders.png")
 
-        self.player_controller = PlayerController(0, 540)
+        self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
 
-        player_renderer = PlayerView(self.player_controller, "img/ship.png")
+        player_renderer = PlayerView(
+            self.player_controller, "img/pixel_character_dark_blue.png"
+        )
         lives_renderer = PlayerLivesView(self.player_controller, "img/ship.png")
         bullet_renderer = BulletView(self.player_controller.bullets, "img/bullet.png")
         alien_bullet_renderer = BulletView(
@@ -88,5 +94,6 @@ class PlayGameState(GameState):
             self.game.change_state(level_up_message)
 
     def draw(self, surface):
-        for view in self.renderers:
-            view.render(surface)
+        if self.renderers is not None:
+            for view in self.renderers:
+                view.render(surface)
