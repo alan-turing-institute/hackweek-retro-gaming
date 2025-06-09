@@ -2,6 +2,14 @@ from pygame.surface import Surface
 from bullet import BulletController
 import pygame
 import random
+from spritesheet import SpriteSheet
+
+PLAYER_SIZE: tuple[int, int] = (96, 96)
+
+PLAYER_SPRITESHEET_X: int = 0
+PLAYER_SPRITESHEET_Y: int = 0
+PLAYER_SPRITE_WIDTH: int = 48
+PLAYER_SPRITE_HEIGHT: int = 48
 
 class MaisyModel:
     def __init__(self, x, y) -> None:
@@ -9,8 +17,8 @@ class MaisyModel:
         self.y = y
         self.dx = 0
         self.dy = 0
-        self.width = 40
-        self.height = 20
+        self.width = 48
+        self.height = 48
         self.colour = (0, 128, 255)
 
 
@@ -38,21 +46,87 @@ class MaisyController:
             hacker.y += hacker.dy * self.speed
 
             # Keep maisy in bounds and bounce
-            if hacker.x < 0 or hacker.x > self.window_width - hacker.width:
+            half_size = (int(0.5*hacker.width), int(0.5*hacker.height))
+            x_min = (0 - half_size[0])
+            x_max = (self.window_width - hacker.width)
+
+            y_min = (0 - half_size[1])
+            y_max = (self.window_height - half_size[1])
+            if hacker.x < x_min or hacker.x > x_max:
                 hacker.dx *= -1
-                hacker.x = max(0, min(self.window_width - hacker.width, hacker.x))
-            if hacker.y < 0 or hacker.y > self.window_height - hacker.height:
+                if hacker.x < 0:
+                    hacker.x = max(0, min(self.window_width - hacker.width, hacker.x))
+                else:
+                    hacker.x = max(0, min(self.window_width + hacker.width, hacker.x))
+            if hacker.y < y_min or hacker.y > y_max:
                 hacker.dy *= -1
                 hacker.y = max(0, min(self.window_height - hacker.height, hacker.y))
 
 
 class MaisyView:
-    def __init__(self, hacker_controller: MaisyController) -> None:
+    def __init__(self, hacker_controller: MaisyController, sprite_sheet_path: str) -> None:
         self.hackers = hacker_controller
-    
+        self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
+
+        self.walking_frames_left: list[Surface] = self.get_walking_frames_left()
+        self.walking_frames_right: list[Surface] = self.get_walking_frames_right()
+
+    def get_walking_frames_left(self) -> list[Surface]:
+        row_offset: int = 2
+
+        sprite_surfaces: list[Surface] = [
+            self.sprite_sheet.get_image(
+                x=PLAYER_SPRITESHEET_X,
+                y=PLAYER_SPRITE_HEIGHT * row_offset,
+                width=PLAYER_SPRITE_WIDTH,
+                height=PLAYER_SPRITE_HEIGHT,
+            )
+        ]
+
+        return [
+            pygame.transform.scale(surface, size=PLAYER_SIZE)
+            for surface in sprite_surfaces
+        ]
+
+    def get_walking_frames_right(self) -> list[Surface]:
+
+        row_offset: int = 3
+
+        sprite_surfaces: list[Surface] = [
+            self.sprite_sheet.get_image(
+                x=PLAYER_SPRITESHEET_X,
+                y=PLAYER_SPRITE_HEIGHT * row_offset,
+                width=PLAYER_SPRITE_WIDTH,
+                height=PLAYER_SPRITE_HEIGHT,
+            )
+        ]
+
+        return [
+            pygame.transform.scale(surface, size=PLAYER_SIZE)
+            for surface in sprite_surfaces
+        ]
+
     def render(self, surface: Surface):
         for hackerview in self.hackers.hacker_models:
-            pygame.draw.rect(surface, hackerview.colour, (hackerview.x, hackerview.y, hackerview.width, hackerview.height))
+
+            if hackerview.dx >= 0:
+                self.image = self.walking_frames_right[0]
+            else:
+                self.image = self.walking_frames_left[0]
+
+            surface.blit(
+                self.image,
+                (
+                    hackerview.x,
+                    hackerview.y,
+                    PLAYER_SPRITE_WIDTH,
+                    PLAYER_SPRITE_HEIGHT,
+                ),
+            )
+
+    # def render(self, surface: Surface):
+    #     for hackerview in self.hackers.hacker_models:
+    #         pygame.draw.rect(surface, hackerview.colour, (hackerview.x, hackerview.y, hackerview.width, hackerview.height))
 
 class InvaderModel:
     def __init__(self, x: int, y: int, alien_type: int) -> None:

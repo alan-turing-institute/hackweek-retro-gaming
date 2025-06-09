@@ -34,7 +34,7 @@ class PlayGameState(GameState):
         player_renderer = PlayerView(
             self.player_controller, "img/pixel_character_dark_blue.png"
         )
-        maisy_renderer = MaisyView(self.maisy_controller)
+        maisy_renderer = MaisyView(self.maisy_controller, "img/pixel_character_pale_yellow.png")
         lives_renderer = PlayerLivesView(self.player_controller, "img/ship.png")
         bullet_renderer = BulletView(self.player_controller.bullets, "img/bullet.png")
         explosion_controller = ExplosionController(self.game)
