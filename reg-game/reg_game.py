@@ -1,6 +1,6 @@
 from bullet import BulletView
 from colission import ExplosionController, ExplosionView
-from config import SCREEN_WIDTH
+from config import PLAYER_SPRITE_SHEET_PATH, SCREEN_WIDTH
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
@@ -31,9 +31,7 @@ class PlayGameState(GameState):
 
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
 
-        player_renderer = PlayerView(
-            self.player_controller, "img/pixel_character_dark_blue.png"
-        )
+        player_renderer = PlayerView(self.player_controller, PLAYER_SPRITE_SHEET_PATH)
         maisy_renderer = MaisyView(
             self.maisy_controller, "img/pixel_character_pale_yellow.png"
         )
