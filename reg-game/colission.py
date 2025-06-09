@@ -1,12 +1,11 @@
 import pygame
 from bullet import BulletController
+from enemy import SwarmController
 from framework import Game, GameState
 from interstitial import InterstitialState
-from pygame.surface import Surface
 from pygame.mixer import Sound
-
+from pygame.surface import Surface
 from regplayer import PlayerController
-from enemy import SwarmController
 
 
 class ExplosionModel:

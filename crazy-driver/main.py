@@ -1,9 +1,10 @@
-import pygame
-from pygame.time import Clock
-from pygame.surface import Surface
-import sys
-from pygame.sprite import Sprite
 import random
+import sys
+
+import pygame
+from pygame.sprite import Sprite
+from pygame.surface import Surface
+from pygame.time import Clock
 
 BLACK: tuple[int, int, int] = (0, 0, 0)
 WHITE: tuple[int, int, int] = (255, 255, 255)

@@ -1,7 +1,8 @@
-from pygame.surface import Surface
-from bullet import BulletController
-import pygame
 import random
+
+import pygame
+from bullet import BulletController
+from pygame.surface import Surface
 from spritesheet import SpriteSheet
 
 PLAYER_SIZE: tuple[int, int] = (96, 96)
@@ -10,6 +11,7 @@ PLAYER_SPRITESHEET_X: int = 0
 PLAYER_SPRITESHEET_Y: int = 0
 PLAYER_SPRITE_WIDTH: int = 48
 PLAYER_SPRITE_HEIGHT: int = 48
+
 
 class MaisyModel:
     def __init__(self, x, y) -> None:
@@ -26,17 +28,19 @@ class MaisyController:
     def __init__(self, window_width, window_height):
         self.window_width = window_width
         self.window_height = window_height
-    
+
         self.hacker_models = [
-            MaisyModel(x=random.randint(0,self.window_width),
-                       y = random.randint(0, self.window_height))
-                       for _ in range(3)
+            MaisyModel(
+                x=random.randint(0, self.window_width),
+                y=random.randint(0, self.window_height),
+            )
+            for _ in range(3)
         ]
         self.speed = 3
 
     def update(self, _game_time):
         for hacker in self.hacker_models:
-            # Change direction sometimes
+            # Change direction sometimes
             if random.random() < 0.02:
                 hacker.dx = random.choice([-1, 0, 1])
                 hacker.dy = random.choice([-1, 0, 1])
@@ -46,12 +50,12 @@ class MaisyController:
             hacker.y += hacker.dy * self.speed
 
             # Keep maisy in bounds and bounce
-            half_size = (int(0.5*hacker.width), int(0.5*hacker.height))
-            x_min = (0 - half_size[0])
-            x_max = (self.window_width - hacker.width)
+            half_size = (int(0.5 * hacker.width), int(0.5 * hacker.height))
+            x_min = 0 - half_size[0]
+            x_max = self.window_width - hacker.width
 
-            y_min = (0 - half_size[1])
-            y_max = (self.window_height - half_size[1])
+            y_min = 0 - half_size[1]
+            y_max = self.window_height - half_size[1]
             if hacker.x < x_min or hacker.x > x_max:
                 hacker.dx *= -1
                 if hacker.x < 0:
@@ -64,7 +68,9 @@ class MaisyController:
 
 
 class MaisyView:
-    def __init__(self, hacker_controller: MaisyController, sprite_sheet_path: str) -> None:
+    def __init__(
+        self, hacker_controller: MaisyController, sprite_sheet_path: str
+    ) -> None:
         self.hackers = hacker_controller
         self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
 
@@ -89,7 +95,6 @@ class MaisyView:
         ]
 
     def get_walking_frames_right(self) -> list[Surface]:
-
         row_offset: int = 3
 
         sprite_surfaces: list[Surface] = [
@@ -108,7 +113,6 @@ class MaisyView:
 
     def render(self, surface: Surface):
         for hackerview in self.hackers.hacker_models:
-
             if hackerview.dx >= 0:
                 self.image = self.walking_frames_right[0]
             else:
@@ -127,6 +131,7 @@ class MaisyView:
     # def render(self, surface: Surface):
     #     for hackerview in self.hackers.hacker_models:
     #         pygame.draw.rect(surface, hackerview.colour, (hackerview.x, hackerview.y, hackerview.width, hackerview.height))
+
 
 class InvaderModel:
     def __init__(self, x: int, y: int, alien_type: int) -> None:
@@ -148,6 +153,7 @@ class InvaderModel:
             and x + width <= self.x + 32
             and y + height <= self.y + 32
         )
+
 
 class SwarmController:
     def __init__(self, screen_width, offset_y, initial_frame_ticks) -> None:

@@ -1,8 +1,8 @@
-from pygame import Surface
-from framework import GameState, Game
 from bitmapfont import BitmapFont
-
 from config import MENU_FONT_IMG
+from framework import Game, GameState
+from pygame import Surface
+
 
 class InterstitialState(GameState):
     def __init__(
