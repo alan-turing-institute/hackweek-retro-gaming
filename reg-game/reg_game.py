@@ -1,6 +1,6 @@
 from framework import Game, GameState
 from enemy import SwarmController, InvaderView
-from invplayer import PlayerController, PlayerView, PlayerLivesView
+from regplayer import PlayerController, PlayerView, PlayerLivesView
 from bullet import BulletView
 from colission import ExplosionController, CollisionController, ExplosionView
 from interstitial import InterstitialState
