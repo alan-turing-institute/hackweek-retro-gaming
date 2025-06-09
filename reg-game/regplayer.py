@@ -5,15 +5,12 @@ from pygame.key import ScancodeWrapper
 from pygame.locals import K_LEFT, K_RIGHT, K_SPACE
 from pygame.surface import Surface
 from spritesheet import SpriteSheet
+from config import PLAYER_SPRITE_WIDTH, PLAYER_SPRITE_HEIGHT, NUMBER_OF_SPRITES
 
-PLAYER_SIZE: tuple[int, int] = (96, 96)
+PLAYER_SIZE: tuple[int, int] = (48, 48)
 
 PLAYER_SPRITESHEET_X: int = 0
 PLAYER_SPRITESHEET_Y: int = 0
-PLAYER_SPRITE_WIDTH: int = 48
-PLAYER_SPRITE_HEIGHT: int = 48
-
-NUMBER_OF_SPRITES: int = 8
 
 
 class PlayerModel:
@@ -73,7 +70,7 @@ class PlayerView:
 
         self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
         self.moving_frames_right: list[Surface] = self.sprite_sheet.get_frames_in_row(
-            row_offset=3,
+            row_offset=2,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
             number_of_sprites=NUMBER_OF_SPRITES,
@@ -81,7 +78,7 @@ class PlayerView:
         )
 
         self.moving_frames_left: list[Surface] = self.sprite_sheet.get_frames_in_row(
-            row_offset=2,
+            row_offset=3,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
             number_of_sprites=NUMBER_OF_SPRITES,
