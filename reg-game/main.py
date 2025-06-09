@@ -1,10 +1,8 @@
+from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import Game
 from interstitial import InterstitialState
-from reg_game import PlayGameState
 from menu import MainMenuState
-from config import SCREEN_WIDTH, SCREEN_HEIGHT
-
-
+from reg_game import PlayGameState
 
 reg_game: Game = Game("The REG Game", SCREEN_WIDTH, SCREEN_HEIGHT)
 main_menu_state: MainMenuState = MainMenuState(reg_game)

@@ -1,9 +1,9 @@
-import pygame
 import constants
-from pygame.surface import Surface
-from pygame.sprite import Group
+import pygame
+from levels import FirstLevel, Level, SecondLevel
 from platplayer import Player
-from levels import Level, FirstLevel, SecondLevel
+from pygame.sprite import Group
+from pygame.surface import Surface
 from pygame.time import Clock
 
 

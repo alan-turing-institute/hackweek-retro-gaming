@@ -2,10 +2,9 @@ import pygame
 from bullet import BulletController
 from framework import Game, GameState
 from interstitial import InterstitialState
-from pygame.surface import Surface
-from pygame.mixer import Sound
-
 from invplayer import PlayerController
+from pygame.mixer import Sound
+from pygame.surface import Surface
 from swarm import SwarmController
 
 

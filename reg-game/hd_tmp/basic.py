@@ -1,7 +1,7 @@
-import pygame
-import sys
 import random
-from pygame.surface import Surface
+import sys
+
+import pygame
 
 pygame.init()
 
@@ -15,6 +15,7 @@ CHAR_SIZE = 20
 char_x, char_y = WIDTH // 2, HEIGHT // 2
 CHAR_COLOR = (0, 128, 255)
 SPEED = 5
+
 
 # ---------
 class MaisyModel:
@@ -32,7 +33,7 @@ class MaisyModel:
     def move(self):
         """Move a random direction and stay in bounds"""
         self.speed = 3
-        # Change direction sometimes
+        # Change direction sometimes
         if random.random() < 0.02:
             self.dx = random.choice([-1, 0, 1])
             self.dy = random.choice([-1, 0, 1])
@@ -52,12 +53,14 @@ class MaisyModel:
     def draw(self, win):
         pygame.draw.rect(win, (255, 255, 0), (self.x, self.y, self.width, self.height))
 
-    
+
 # ---------
 
 
 # Create maisy instance
-maisy = MaisyModel(random.randint(0, WIDTH - 20), random.randint(0, HEIGHT - 20), win=WIN)
+maisy = MaisyModel(
+    random.randint(0, WIDTH - 20), random.randint(0, HEIGHT - 20), win=WIN
+)
 
 clock = pygame.time.Clock()
 
@@ -86,7 +89,6 @@ while running:
     # Keep character in bounds
     char_x = max(0, min(WIDTH - CHAR_SIZE, char_x))
     char_y = max(0, min(HEIGHT - CHAR_SIZE, char_y))
-
 
     # Drawing
     WIN.fill((30, 30, 30))  # Background color

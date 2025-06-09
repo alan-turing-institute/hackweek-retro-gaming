@@ -1,6 +1,8 @@
-from pygame.surface import Surface
-import pygame
 import random
+
+import pygame
+from pygame.surface import Surface
+
 
 # Maisy is a hacker putting malware onto the terminals in the power station
 class MaisyModel:

@@ -1,13 +1,10 @@
-from bullet import BulletController
-
 import pygame
-from pygame.key import ScancodeWrapper
-from pygame.locals import K_RIGHT, K_LEFT, K_SPACE
-from pygame.surface import Surface
-
 from bitmapfont import BitmapFont
+from bullet import BulletController
+from pygame.key import ScancodeWrapper
+from pygame.locals import K_LEFT, K_RIGHT, K_SPACE
+from pygame.surface import Surface
 from spritesheet import SpriteSheet
-
 
 PLAYER_SIZE: tuple[int, int] = (96, 96)
 
@@ -97,7 +94,6 @@ class PlayerView:
         ]
 
     def get_walking_frames_right(self) -> list[Surface]:
-
         row_offset: int = 3
 
         sprite_surfaces: list[Surface] = [
@@ -115,7 +111,6 @@ class PlayerView:
         ]
 
     def render(self, surface: Surface):
-
         if self.player_controller.model.direction == "RIGHT":
             self.image = self.walking_frames_right[0]
         elif self.player_controller.model.direction == "LEFT":
