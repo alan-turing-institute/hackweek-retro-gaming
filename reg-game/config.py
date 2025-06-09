@@ -9,3 +9,6 @@ MENU_BACKGROUND_POSITION: tuple[int, int] = (-180, -180)
 MENU_BACKGROUND_SCALE_FACTOR: float = 0.3
 
 MENU_ITEMS: tuple[str, ...] = ("Start", "Resume", "Quit")
+
+SCREEN_WIDTH: int = 800
+SCREEN_HEIGHT: int = 600
