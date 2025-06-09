@@ -1,51 +1,28 @@
 
-from enum import Enum
+from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from random import randint
 
-class Direction(Enum):
-    NORTH = "north"
-    SOUTH = "south"
-    EAST = "east"
-    WEST = "west"
+terminal_img = "img/CommTerminal.png"
 
-class Background:
-    def __init__(self, image_path):
-        self.image_path = image_path
+def generate_room(n_terminals, room_size=(SCREEN_WIDTH, SCREEN_HEIGHT)):
 
-    def __str__(self):
-        return f"Background(image_path={self.image_path})"
+    terminal_width = 32
+    terminal_height = 32
 
-class Room:
-    def __init__(self, name, description):
-        self.name = name
-        self.description = description
-        self.exits = {}
-        self.background = None
+    max_y = SCREEN_HEIGHT - terminal_height
+    min_y = 0 + terminal_height
+    max_x = SCREEN_WIDTH - terminal_width
+    min_x = 0 + terminal_width
 
-    def set_exit(self, direction: Direction, room):
-        self.exits[direction] = room
+    terminals = {}
+    for i in range(n_terminals):
+        terminal_name = f"Terminal {i + 1 }"
+        terminal_location = (
+            randint(min_x, max_x),
+            randint(min_y, max_y)
+        )
+        terminals[terminal_name] = terminal_location
 
-    def get_exit(self, direction):
-        return self.exits.get(direction)
+    return terminals
 
-    def set_background(self, background):
-        self.background = background
-
-    def __str__(self):
-        return f"{self.name}: {self.description}"
-
-def generate_map(n_rooms):
-    rooms = []
-    for i in range(n_rooms):
-        name = f"Room {i + 1}"
-        description = f"This is the description of {name}."
-        room = Room(name, description)
-        room.set_background("img/player_spritesheet.png")
-        rooms.append(room)
-
-    # Set exits between rooms
-    for i in range(n_rooms - 1):
-        rooms[i].set_exit(Direction.NORTH, rooms[i + 1])
-        rooms[i + 1].set_exit(Direction.SOUTH, rooms[i])
-
-    return rooms
-
+print(generate_room(2))
