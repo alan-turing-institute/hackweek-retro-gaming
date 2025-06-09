@@ -101,11 +101,12 @@ class PlayerView:
 
         sprite_surfaces: list[Surface] = [
             self.sprite_sheet.get_image(
-                x=PLAYER_SPRITESHEET_X,
+                x=column_offset * PLAYER_SPRITE_WIDTH,
                 y=PLAYER_SPRITE_HEIGHT * row_offset,
                 width=PLAYER_SPRITE_WIDTH,
                 height=PLAYER_SPRITE_HEIGHT,
             )
+            for column_offset in range(0, NUMBER_OF_SPRITES)
         ]
 
         return [
