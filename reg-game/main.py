@@ -1,29 +1,19 @@
-import pygame
-from pygame.surface import Surface
-from pygame.time import Clock
-import sys
-
-SCREEN_SIZE: tuple[int, int] = (640, 480)
-FRAME_RATE: int = 30
+from framework import Game
+from interstitial import InterstitialState
+from reg_game import PlayGameState
+from menu import MainMenuState
 
 
-def main() -> None:
-    pygame.init()
-    clock: Clock = Clock()
+reg_game: Game = Game("The REG Game", 800, 600)
+main_menu_state: MainMenuState = MainMenuState(reg_game)
+game_over_state: InterstitialState = InterstitialState(
+    reg_game, "G A M E  O V E R !", 5000, main_menu_state
+)
+play_game_state: PlayGameState = PlayGameState(reg_game, game_over_state)
+get_ready_state: InterstitialState = InterstitialState(
+    reg_game, "Get ready!!", 2000, play_game_state
+)
 
-    screen: Surface = pygame.display.set_mode(SCREEN_SIZE)
-    pygame.display.set_caption("The REG Game")
+main_menu_state.set_play_state(get_ready_state)
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-        time_passed: int = clock.tick(FRAME_RATE)
-
-        pygame.display.update()
-
-
-if __name__ == "__main__":
-    main()
+reg_game.run(main_menu_state)
