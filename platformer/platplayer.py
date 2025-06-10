@@ -64,7 +64,7 @@ class Player(pygame.sprite.Sprite):
         self.image: Surface = self.walking_frames_right[0]
         self.rect: Rect = self.image.get_rect()
 
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         self.calculate_gravity()
 
         self.rect.x += self.change_x  # type: ignore

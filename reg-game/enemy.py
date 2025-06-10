@@ -30,7 +30,7 @@ class MaisyController:
         ]
         self.speed = 3
 
-    def update(self, _game_time):
+    def update(self, _game_time, *args, **kwargs):
         for hacker in self.hacker_models:
             # Change direction sometimes
             if random.random() < 0.02:
@@ -119,7 +119,7 @@ class SwarmController:
                 )
                 self.invaders.append(invader)
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         self.bullets.update(game_time)
         self.frame_count -= game_time
         move_sideways: bool = True

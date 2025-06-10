@@ -1,6 +1,6 @@
 from bullet import BulletView
 from colission import ExplosionController, ExplosionView
-from config import SCREEN_WIDTH, PLAYER_SPRITE_SHEET_PATH
+from config import PLAYER_SPRITE_SHEET_PATH, SCREEN_WIDTH
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
@@ -54,7 +54,7 @@ class PlayGameState(GameState):
             self.maisy_controller,
         ]
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         if self.controllers is not None:
             for controller in self.controllers:
                 controller.update(game_time)

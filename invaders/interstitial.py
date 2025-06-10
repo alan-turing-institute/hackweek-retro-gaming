@@ -17,7 +17,7 @@ class InterstitialState(GameState):
         self.message: str = message
         self.wait_timer: int = wait_time_ms
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         """
         Waits until the timer runs down. When timer reaches zero, game moves to the next state.
 

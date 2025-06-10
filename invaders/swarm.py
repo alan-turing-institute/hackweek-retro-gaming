@@ -59,7 +59,7 @@ class SwarmController:
                 )
                 self.invaders.append(invader)
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         self.bullets.update(game_time)
         self.frame_count -= game_time
         move_sideways: bool = True
