@@ -1,8 +1,14 @@
 from bullet import BulletView
-from config import PLAYER_SPRITE_SHEET_PATH, SCREEN_WIDTH, LIVES_SPRITE_SHEET_PATH
+from config import (
+    PLAYER_SPRITE_SHEET_PATH,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    LIVES_SPRITE_SHEET_PATH,
+)
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
+from collision import CollisionController
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
