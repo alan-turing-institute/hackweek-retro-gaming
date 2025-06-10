@@ -12,3 +12,9 @@ MENU_ITEMS: tuple[str, ...] = ("Start", "Resume", "Quit")
 
 SCREEN_WIDTH: int = 800
 SCREEN_HEIGHT: int = 600
+
+PLAYER_SIZE: tuple[int, int] = (48, 48)
+PLAYER_SPRITE_SHEET_PATH: str = "img/24by24ModernRPGGuy.png"
+PLAYER_SPRITE_HEIGHT: int = 24
+PLAYER_SPRITE_WIDTH: int = 24
+NUMBER_OF_SPRITES: int = 4

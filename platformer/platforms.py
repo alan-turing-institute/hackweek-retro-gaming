@@ -45,7 +45,7 @@ class MovingPlatform(Platform):
 
         self.level: Any = None
 
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         self.rect.x += self.change_x
 
         if self.player is not None:

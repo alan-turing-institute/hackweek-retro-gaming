@@ -1,13 +1,10 @@
 import random
-import sys
 
 import pygame
+from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from framework import Game, GameState
+from pygame.surface import Surface
 
-pygame.init()
-
-# Game Constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
 BOARD_SIZE = 6
 if BOARD_SIZE < 3:
     raise ValueError("Board size must be at least 3x3 for a playable game.")
@@ -23,10 +20,6 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 PATH_HIGHLIGHT_colour = (0, 150, 0)
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Pipe Puzzle Game")
-clock = pygame.time.Clock()
 
 
 class Pipe:
@@ -171,13 +164,15 @@ class Board:
         )
         self._initialize_board()
 
-    def is_valid_move(self, rows: int, cols: int, r: int, c: int, visited: set):
+    def is_valid_move(self, rows: int, cols: int, r: int, c: int, visited: set) -> bool:
         """
         Checks if a cell is within grid boundaries and has not been visited.
         """
         return 0 <= r < rows and 0 <= c < cols and (r, c) not in visited
 
-    def find_random_path(self, rows: int, cols: int, start: tuple, end: tuple):
+    def find_random_path(
+        self, rows: int, cols: int, start: tuple, end: tuple
+    ) -> list[tuple[int, int]]:
         """
         Randomly generates a path between start and end points on a grid.
         """
@@ -300,7 +295,10 @@ class Board:
                 pipe_type_and_rot = self._get_pipe_type_and_rotation(
                     incoming_dir, outgoing_dir
                 )
-                self.grid[r][c] = Pipe(pipe_type_and_rot[0], pipe_type_and_rot[1])
+                self.grid[r][c] = Pipe(
+                    pipe_type_and_rot[0],
+                    rotation=pipe_type_and_rot[1],
+                )
 
         # 3. Fill the rest of the board with random pipes or empty cells
         path_visited = set(self.solution_path)
@@ -308,10 +306,11 @@ class Board:
             for c in range(self.size):
                 if (r, c) not in path_visited:
                     if random.random() < empty_cell_probability:
-                        self.grid[r][c] = Pipe("empty")
+                        self.grid[r][c] = Pipe("empty", rotation=0)
                     else:
                         self.grid[r][c] = Pipe(
-                            random.choice(pipe_types), random.choice([0, 90, 180, 270])
+                            random.choice(pipe_types),
+                            rotation=random.choice([0, 90, 180, 270]),
                         )
                 else:
                     # For path cells, apply a random rotation to make it a puzzle,
@@ -354,7 +353,9 @@ class Board:
         )
         return ("t_joint", random.choice([0, 90]))
 
-    def get_pipe_at_coords(self, mouse_x, mouse_y):
+    def get_pipe_at_coords(
+        self, mouse_x: int, mouse_y: int
+    ) -> tuple[Pipe | None, int | None, int | None]:
         """Converts screen coordinates to grid coordinates and returns the pipe."""
         col = (mouse_x - MARGIN_X) // PIPE_SIZE
         row = (mouse_y - MARGIN_Y) // PIPE_SIZE
@@ -363,7 +364,7 @@ class Board:
 
         return None, None, None
 
-    def rotate_pipe(self, row: int, col: int):
+    def rotate_pipe(self, row: int, col: int) -> bool:
         """Rotates the pipe at the given grid coordinates."""
         # Only allow rotation if it's not a start/end point AND not an empty pipe
         current_pipe = self.grid[row][col]
@@ -458,7 +459,7 @@ class Board:
 
         return is_game_won
 
-    def draw(self, surface):
+    def draw(self, surface: Surface):
         """Draws all pipes on the board."""
         for r in range(self.size):
             for c in range(self.size):
@@ -469,7 +470,7 @@ class Board:
                 # Draw thin black grid lines for better visualization
                 pygame.draw.rect(surface, BLACK, (x, y, PIPE_SIZE, PIPE_SIZE), 1)
 
-    def draw_hover_highlight(self, surface, mouse_x, mouse_y):
+    def draw_hover_highlight(self, surface: Surface, mouse_x: int, mouse_y: int):
         """Draws a highlight rectangle over the pipe currently being hovered."""
         pipe, row, col = self.get_pipe_at_coords(mouse_x, mouse_y)
         # Only highlight if it's not a start/end point and not an empty pipe
@@ -485,53 +486,55 @@ class Board:
             )
 
 
-def game_loop():
-    board = Board(BOARD_SIZE)
-    running = True
-    game_won = False
+class PipeGameState(GameState):
+    def __init__(
+        self, game: Game, game_over_state: GameState | None = None, board_size: int = 6
+    ):
+        if board_size < 3:
+            raise ValueError("Board size must be at least 3x3 for a playable game.")
+        super().__init__(game)
+        self.board_size = board_size
+        self.game_over_state = game_over_state
 
-    # Set up font for "You Win!" text
-    font = pygame.font.Font(None, 74)
-    win_text = font.render("You Win!", True, BLUE)
-    win_text_rect = win_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+    def on_enter(self, previous_state: GameState | None):
+        self.board = Board(self.board_size)
+        self.game_won = False
 
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left mouse click
-                    mouse_x, mouse_y = event.pos
-                    pipe, row, col = board.get_pipe_at_coords(mouse_x, mouse_y)
-                    # Only allow pipe rotation if a pipe was clicked and the game hasn't been won
-                    # and the clicked pipe is not an empty cell
-                    # Rotate_pipe updates colours and returns win status
-                    if pipe and not game_won:
-                        game_won = board.rotate_pipe(row, col)
+    def on_exit(self):
+        self.board = None
+        self.game_won = False
 
-        # Drawing operations for each frame
-        screen.fill(WHITE)
+    def update(self, game_time: int, pos: tuple[int, int] | None, *args, **kwargs):
+        if pos is None:
+            return
 
-        board.draw(screen)
+        # Extract mouse position from the provided tuple
+        mouse_x, mouse_y = pos
+        pipe, row, col = self.board.get_pipe_at_coords(mouse_x, mouse_y)
 
-        # Draw hover highlight only if the game is not yet won
-        if not game_won:
+        # Only allow pipe rotation if a pipe was clicked and the game hasn't been won
+        # and the clicked pipe is not an empty cell
+        # Rotate_pipe updates colours and returns win status
+        if pipe and not self.game_won:
+            self.game_won = self.board.rotate_pipe(row, col)
+
+    def draw(self, surface: Surface):
+        surface.fill(WHITE)
+        self.board.draw(surface)
+
+        # Draw hover highlight if the game is not won
+        if not self.game_won:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            board.draw_hover_highlight(screen, mouse_x, mouse_y)
+            self.board.draw_hover_highlight(surface, mouse_x, mouse_y)
 
-        # Display "You Win!" text if the game is won
-        if game_won:
-            screen.blit(win_text, win_text_rect)
+        # Display text if the game is won
+        winning_text = "Hacker stopped!"
+        if self.game_won:
+            font = pygame.font.Font(None, 74)
+            win_text = font.render(winning_text, True, BLUE)
+            win_text_rect = win_text.get_rect(
+                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+            )
+            surface.blit(win_text, win_text_rect)
 
         pygame.display.flip()
-
-        # Limit frame rate to 60 frames per second
-        clock.tick(60)
-
-    # Quit Pygame and exit the system
-    pygame.quit()
-    sys.exit()
-
-
-if __name__ == "__main__":
-    game_loop()

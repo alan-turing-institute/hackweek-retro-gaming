@@ -34,7 +34,7 @@ class GameState:
         """
         pass
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         """
         Called by the game instance to update the state.
 
@@ -94,14 +94,20 @@ class Game:
         self.change_state(initial_state)
 
         while True:
+            # position of a mouse click (needed for some games which rely on mouse click inputs)
+            # pygame.event.get clears the event queue so we would miss events if we read them in the update
+            pos = None
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Left mouse click
+                        pos = event.pos
 
             game_time: int = self.fps_clock.get_time()
             if self.current_state is not None:
-                self.current_state.update(game_time)
+                self.current_state.update(game_time, pos)
 
             self.main_window.fill(self.background)
 

@@ -30,7 +30,7 @@ class BulletController:
     def remove_bullet(self, bullet: BulletModel):
         self.bullets.remove(bullet)
 
-    def update(self, game_time) -> None:
+    def update(self, game_time, *args, **kwargs) -> None:
         kill_list: list[BulletModel] = []
 
         if self.countdown > 0:
