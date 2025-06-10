@@ -1,9 +1,9 @@
 from bullet import BulletView
-from config import PLAYER_SPRITE_SHEET_PATH, SCREEN_WIDTH
+from collision import CollisionController
+from config import PLAYER_SPRITE_SHEET_PATH, SCREEN_HEIGHT, SCREEN_WIDTH
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
-from collision import CollisionController
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -29,7 +29,7 @@ class PlayGameState(GameState):
 
     def initialise(self):
         self.maisy_controller = MaisyController(
-            800, 600
+            SCREEN_WIDTH, SCREEN_HEIGHT
         )  # TODO read this from the game
 
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)

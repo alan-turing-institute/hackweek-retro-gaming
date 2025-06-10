@@ -1,4 +1,5 @@
 import random
+import time
 
 import pygame
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
@@ -642,19 +643,41 @@ class PipeGameState(GameState):
             mouse_x, mouse_y = pygame.mouse.get_pos()
             self.board.draw_hover_highlight(surface, mouse_x, mouse_y)
 
+        pygame.display.flip()
+
         # Display text if the game is won
         if self.game_won:
-            if self.play_game_state is not None:
-                get_ready_state: InterstitialState = InterstitialState(
-                    self.game, "Hacker stopped!", 2000, self.play_game_state
-                )
-                self.game.change_state(get_ready_state)
-                return
+            time.sleep(1)
+            self.end_game()
 
-            game_over_state: InterstitialState = InterstitialState(
-                self.game, "You won!", 2000, self.game_over_state
+    def end_game(self):
+        if self.play_game_state is not None:
+            # Move player in opposite direction in play_game_state
+            if self.play_game_state.player_controller.player_model.direction == "RIGHT":
+                self.play_game_state.player_controller.player_model.direction = "LEFT"
+                self.play_game_state.player_controller.player_model.x -= 50
+            elif (
+                self.play_game_state.player_controller.player_model.direction == "LEFT"
+            ):
+                self.play_game_state.player_controller.player_model.direction = "RIGHT"
+                self.play_game_state.player_controller.player_model.x += 50
+            elif self.play_game_state.player_controller.player_model.direction == "UP":
+                self.play_game_state.player_controller.player_model.direction = "DOWN"
+                self.play_game_state.player_controller.player_model.y -= 50
+            elif (
+                self.play_game_state.player_controller.player_model.direction == "DOWN"
+            ):
+                self.play_game_state.player_controller.player_model.direction = "UP"
+                self.play_game_state.player_controller.player_model.y += 50
+
+            get_ready_state: InterstitialState = InterstitialState(
+                self.game, "Hacker stopped!", 2000, self.play_game_state
             )
-            self.game.change_state(game_over_state)
+            self.game.change_state(get_ready_state)
             return
 
-        pygame.display.flip()
+        game_over_state: InterstitialState = InterstitialState(
+            self.game, "You won!", 2000, self.game_over_state
+        )
+        self.game.change_state(game_over_state)
+        return
