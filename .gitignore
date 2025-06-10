@@ -176,3 +176,6 @@ cython_debug/
 
 # UV but just for now
 uv.lock
+
+# Misc
+.DS_Store
