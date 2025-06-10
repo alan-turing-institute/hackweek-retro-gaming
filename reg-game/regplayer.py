@@ -8,6 +8,10 @@ from config import (
     PLAYER_SPRITE_WIDTH,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
+    LIVES_SPRITE_WIDTH,
+    LIVES_SPRITE_HEIGHT,
+    LIVES_MESSAGE_X,
+    LIVES_MESSAGE_Y,
 )
 from pygame.key import ScancodeWrapper
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_SPACE, K_UP
@@ -152,7 +156,15 @@ class PlayerView:
 class PlayerLivesView:
     def __init__(self, player: PlayerController, img_path: str) -> None:
         self.player: PlayerController = player
-        self.image: Surface = pygame.image.load(img_path)
+
+        sprite_sheet: SpriteSheet = SpriteSheet(img_path)
+        self.image: Surface = sprite_sheet.get_image(
+            x=LIVES_SPRITE_WIDTH * 3,
+            y=0,
+            width=LIVES_SPRITE_WIDTH,
+            height=LIVES_SPRITE_HEIGHT,
+        )
+
         self.font: BitmapFont = BitmapFont("img/fasttracker2-style_12x12.png", 12, 12)
 
     def render(self, surface: Surface):
@@ -162,5 +174,8 @@ class PlayerLivesView:
             x += 40
 
         self.font.draw(
-            surface, "1UP SCORE: " + str(self.player.player_model.score), 160, 12
+            surface,
+            "1UP SCORE: " + str(self.player.player_model.score),
+            LIVES_MESSAGE_X,
+            LIVES_MESSAGE_Y,
         )
