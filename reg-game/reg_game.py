@@ -9,6 +9,7 @@ from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
 from collision import CollisionController
+from backgroundmusic import MusicPlayer
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -33,6 +34,8 @@ class PlayGameState(GameState):
             self.player_controller.pause(False)
 
     def initialise(self):
+        self.music_player = MusicPlayer()
+        self.music_player.start()
         self.maisy_controller = MaisyController(
             SCREEN_WIDTH, SCREEN_HEIGHT
         )  # TODO read this from the game
