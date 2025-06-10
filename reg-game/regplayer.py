@@ -1,19 +1,18 @@
 import pygame
 from bitmapfont import BitmapFont
 from bullet import BulletController
-from pygame.key import ScancodeWrapper
-from pygame.locals import K_LEFT, K_RIGHT, K_SPACE, K_UP, K_DOWN
-from pygame.surface import Surface
-from spritesheet import SpriteSheet
 from config import (
-    PLAYER_SPRITE_WIDTH,
-    PLAYER_SPRITE_HEIGHT,
     NUMBER_OF_SPRITES,
+    PLAYER_SIZE,
+    PLAYER_SPRITE_HEIGHT,
+    PLAYER_SPRITE_WIDTH,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    PLAYER_SIZE,
 )
-
+from pygame.key import ScancodeWrapper
+from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_SPACE, K_UP
+from pygame.surface import Surface
+from spritesheet import SpriteSheet
 
 PLAYER_SPRITESHEET_X: int = 0
 PLAYER_SPRITESHEET_Y: int = 0
@@ -41,7 +40,7 @@ class PlayerController:
     def pause(self, is_paused: bool):
         self.is_paused = is_paused
 
-    def update(self, game_time: int) -> None:
+    def update(self, game_time: int, *args, **kwargs) -> None:
         self.bullets.update(game_time)
         if self.is_paused:
             return

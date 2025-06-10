@@ -49,7 +49,7 @@ class PlayGameState(GameState):
             self.maisy_controller,
         ]
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         if self.controllers is not None:
             for controller in self.controllers:
                 controller.update(game_time)
