@@ -2,7 +2,9 @@ import random
 
 import pygame
 from bullet import BulletController
-from enemy_statemachine import StateMachine
+from config import SCREEN_HEIGHT, SCREEN_WIDTH
+
+# from enemy_statemachine import StateMachine, HackingState
 from pygame.surface import Surface
 from spritesheet import SpriteSheet
 
@@ -22,8 +24,13 @@ class MaisyModel:
         self.dy = 0
         self.width = 48
         self.height = 48
-        self.colour = (0, 128, 255)
+        self.at_terminal = False
         self.brain = StateMachine()
+        self.brain.add_state(HackingState(self))
+        self.brain.add_state(WanderingState(self))
+        self.speed = 3
+        # self.brain.add_state(delivering_state)
+        # self.brain.add_state(hunting_state)
 
 
 class MaisyController:
@@ -38,35 +45,12 @@ class MaisyController:
             )
             for _ in range(3)
         ]
-        self.speed = 3
+        for hacker in self.hacker_models:
+            hacker.brain.set_state("hacking_state")
 
     def update(self, _game_time, *args, **kwargs):
         for hacker in self.hacker_models:
-            # Change direction sometimes
-            if random.random() < 0.02:
-                hacker.dx = random.choice([-1, 0, 1])
-                hacker.dy = random.choice([-1, 0, 1])
-                if hacker.dx == 0 and hacker.dy == 0:
-                    hacker.dx = -1
-            hacker.x += hacker.dx * self.speed
-            hacker.y += hacker.dy * self.speed
-
-            # Keep maisy in bounds and bounce
-            half_size = (int(0.5 * hacker.width), int(0.5 * hacker.height))
-            x_min = 0 - half_size[0]
-            x_max = self.window_width - hacker.width
-
-            y_min = 0 - half_size[1]
-            y_max = self.window_height - half_size[1]
-            if hacker.x < x_min or hacker.x > x_max:
-                hacker.dx *= -1
-                if hacker.x < 0:
-                    hacker.x = max(0, min(self.window_width - hacker.width, hacker.x))
-                else:
-                    hacker.x = max(0, min(self.window_width + hacker.width, hacker.x))
-            if hacker.y < y_min or hacker.y > y_max:
-                hacker.dy *= -1
-                hacker.y = max(0, min(self.window_height - hacker.height, hacker.y))
+            hacker.brain.think(game_time=_game_time)
 
 
 class MaisyView:
@@ -258,3 +242,114 @@ class SwarmController:
         height: int = (top_most - bottom_most) + 32
 
         return left_most, bottom_most, width, height
+
+
+class State:
+    def __init__(self, name: str):
+        self.name: str = name
+
+    def do_actions(self, game_time):
+        pass
+
+    def check_conditions(self) -> str | None:
+        pass
+
+    def entry_actions(self):
+        pass
+
+    def exit_actions(self):
+        pass
+
+
+class StateMachine:
+    def __init__(self) -> None:
+        self.states: dict[str, State] = {}
+        self.active_state: State | None = None
+
+    def add_state(self, state: "State"):
+        self.states[state.name] = state
+
+    def think(self, game_time) -> None:
+        if self.active_state is None:
+            return
+
+        self.active_state.do_actions(game_time)
+
+        new_state_name: str | None = self.active_state.check_conditions()
+        if new_state_name is not None:
+            self.set_state(new_state_name)
+
+    def set_state(self, new_state_name: str):
+        if self.active_state is not None:
+            self.active_state.exit_actions()
+
+        self.active_state = self.states[new_state_name]
+        self.active_state.entry_actions()
+
+
+class HackingState(State):
+    def __init__(self, hacker_model: "MaisyModel"):
+        super().__init__("hacking_state")
+        self.hacker_model = hacker_model
+        self.game_time = 0
+
+    def do_actions(self, game_time):
+        print(f"Doing actions {game_time}")
+        self.game_time += game_time
+        print(self.game_time)
+
+    def check_conditions(self) -> str | None:
+        print(f"Checking conditions {self.game_time}")
+        if self.game_time > 2000:
+            return "wandering_state"
+
+    def entry_actions(self):
+        print("Check conditions")
+
+    def exit_actions(self):
+        print("Exit")
+
+
+class WanderingState(State):
+    def __init__(self, hacker_model: "MaisyModel"):
+        super().__init__("wandering_state")
+        self.hacker_model = hacker_model
+
+    def do_actions(self, game_time):
+        print("wandering actions")
+        hacker = self.hacker_model
+        # Change direction sometimes
+        if random.random() < 0.02:
+            hacker.dx = random.choice([-1, 0, 1])
+            hacker.dy = random.choice([-1, 0, 1])
+        if hacker.dx == 0 and hacker.dy == 0:
+            hacker.dx = -1
+        # Actually move
+        hacker.x += hacker.dx * hacker.speed
+        hacker.y += hacker.dy * hacker.speed
+
+        # Keep maisy in bounds and bounce
+        half_size = (int(0.5 * hacker.width), int(0.5 * hacker.height))
+        x_min = 0 - half_size[0]
+        x_max = SCREEN_WIDTH - hacker.width
+
+        y_min = 0 - half_size[1]
+        y_max = SCREEN_HEIGHT - half_size[1]
+        if hacker.x < x_min or hacker.x > x_max:
+            hacker.dx *= -1
+            if hacker.x < 0:
+                hacker.x = max(0, min(SCREEN_WIDTH - hacker.width, hacker.x))
+            else:
+                hacker.x = max(0, min(SCREEN_WIDTH + hacker.width, hacker.x))
+        if hacker.y < y_min or hacker.y > y_max:
+            hacker.dy *= -1
+            hacker.y = max(0, min(SCREEN_HEIGHT - hacker.height, hacker.y))
+
+    def check_conditions(self) -> str | None:
+        print("Checking wandering conditions")
+
+    def entry_actions(self):
+        print("Check wander conditions")
+
+    def exit_actions(self):
+        print("Exit")
