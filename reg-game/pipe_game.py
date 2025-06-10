@@ -179,43 +179,47 @@ class Pipe:
             # depending on the type, use the appropriate row and column to get the pipe image
             # depdening on the rotation, use the approriate transform to rotate the image
             if self.colour == GRAY:
-                x = 640
+                pipe_image_x = 640
             elif self.colour == RED:
-                x = 1600
+                pipe_image_x = 1600
             elif self.colour == BLUE:
-                x = 2560
+                pipe_image_x = 2560
             elif self.colour == YELLOW:
-                x = 2240
+                pipe_image_x = 2240
             elif self.colour == GREEN:
-                x = 1280
+                pipe_image_x = 1280
+            else:
+                pipe_image_x = 3200
 
             if self.type == "straight":
-                y = 64
-                x = x + 128
+                pipe_image_y = 64
+                pipe_image_x = pipe_image_x + 128
             elif self.type == "corner":
-                y = 128
-                x = x + 32
+                pipe_image_y = 128
+                pipe_image_x = pipe_image_x + 32
             elif self.type == "cross":
-                y = 192
-                x = x + 192
+                pipe_image_y = 192
+                pipe_image_x = pipe_image_x + 192
             elif self.type == "t_joint":
-                y = 192
-                x = x + 128
+                pipe_image_y = 192
+                pipe_image_x = pipe_image_x + 128
             elif self.type == "start_end":
-                y = 288
-                x = x + 160
+                pipe_image_y = 288
+                pipe_image_x = pipe_image_x + 160
             elif self.type == "empty":
-                y = 448
-                x = x + 128
+                pipe_image_y = 448
+                pipe_image_x = pipe_image_x + 128
             else:
-                y = 32
-                x = x + 64
+                pipe_image_y = 32
+                pipe_image_x = pipe_image_x + 64
 
             # Get the image from the sprite sheet
             if self.pipe_image_sheet is None:
                 raise TypeError("Pipe image sheet is not set. Cannot draw pipe.")
 
-            pipe_image = self.pipe_image_sheet.get_image(x, y, 32, 32)
+            pipe_image = self.pipe_image_sheet.get_image(
+                pipe_image_x, pipe_image_y, 32, 32
+            )
 
             # Scale the image to fit the pipe size
             pipe_image = pygame.transform.scale(pipe_image, (PIPE_SIZE, PIPE_SIZE))
