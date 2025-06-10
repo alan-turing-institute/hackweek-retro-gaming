@@ -42,6 +42,7 @@ class PlayGameState(GameState):
             self.maisy_controller,
             self.player_controller,
             self.mini_game_state,
+            self.terminals,
         )
 
         player_renderer = PlayerView(self.player_controller, PLAYER_SPRITE_SHEET_PATH)
