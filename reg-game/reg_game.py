@@ -1,15 +1,15 @@
+from backgroundmusic import MusicPlayer
 from bullet import BulletView
+from collision import CollisionController
 from config import (
+    LIVES_SPRITE_SHEET_PATH,
     PLAYER_SPRITE_SHEET_PATH,
     SCREEN_WIDTH,
-    SCREEN_HEIGHT,
-    LIVES_SPRITE_SHEET_PATH,
 )
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
-from collision import CollisionController
-from backgroundmusic import MusicPlayer
+from terminals import TerminalView, create_random_terminals
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -36,10 +36,9 @@ class PlayGameState(GameState):
     def initialise(self):
         self.music_player = MusicPlayer()
         self.music_player.start()
-        self.maisy_controller = MaisyController(
-            SCREEN_WIDTH, SCREEN_HEIGHT
-        )  # TODO read this from the game
-
+        self.maisy_controller = MaisyController()
+        # Initialize the terminals
+        self.terminals = create_random_terminals(3)
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
         self.collision_controller = CollisionController(
             self.game,
@@ -56,12 +55,16 @@ class PlayGameState(GameState):
             self.player_controller, LIVES_SPRITE_SHEET_PATH
         )
         bullet_renderer = BulletView(self.player_controller.bullets, "img/bullet.png")
+        terminal_renderer = TerminalView(
+            self.terminals, "img/CommTerminal.png"
+        )  # terminal image is 32 x 32 pixels
 
         self.renderers = [
             bullet_renderer,
             player_renderer,
             lives_renderer,
             maisy_renderer,
+            terminal_renderer,
         ]
 
         self.controllers = [
