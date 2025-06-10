@@ -20,8 +20,8 @@ class MaisyModel:
     def __init__(self, x, y) -> None:
         self.x = x
         self.y = y
-        self.dx = random.randint(-3, 3)
-        self.dy = random.randint(-3, 3)
+        self.dx = random.randint(-2, 2)
+        self.dy = random.randint(-2, 2)
         self.width = 48
         self.height = 48
         self.at_terminal = False
@@ -41,7 +41,7 @@ class MaisyController:
             for _ in range(3)
         ]
         for hacker in self.hacker_models:
-            hacker.brain.set_state("hacking_state")
+            hacker.brain.set_state("wandering_state")
 
     def update(self, _game_time, *args, **kwargs):
         for hacker in self.hacker_models:
@@ -108,10 +108,6 @@ class MaisyView:
                     PLAYER_SPRITE_HEIGHT,
                 ),
             )
-
-    # def render(self, surface: Surface):
-    #     for hackerview in self.hackers.hacker_models:
-    #         pygame.draw.rect(surface, hackerview.colour, (hackerview.x, hackerview.y, hackerview.width, hackerview.height))
 
 
 class InvaderModel:
@@ -311,7 +307,6 @@ class WanderingState(State):
         self.hacker_model = hacker_model
 
     def do_actions(self, game_time):
-        print("wandering actions")
         hacker = self.hacker_model
         # Change direction sometimes
         if random.random() < 0.02:
