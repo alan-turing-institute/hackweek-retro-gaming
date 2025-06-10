@@ -23,7 +23,6 @@ class SpriteSheet:
         number_of_sprites: int,
         target_size: tuple[int, int],
     ) -> list[Surface]:
-
         sprite_surfaces: list[Surface] = [
             self.get_image(
                 x=column_offset * sprite_width,

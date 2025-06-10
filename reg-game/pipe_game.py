@@ -1,9 +1,12 @@
 import random
+import time
 
 import pygame
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import Game, GameState
+from interstitial import InterstitialState
 from pygame.surface import Surface
+from spritesheet import SpriteSheet
 
 BOARD_SIZE = 6
 if BOARD_SIZE < 3:
@@ -19,13 +22,19 @@ GRAY = (200, 200, 200)
 BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
-PATH_HIGHLIGHT_colour = (0, 150, 0)
+GREEN = (0, 150, 0)
 
 
 class Pipe:
     """Represents a single pipe segment on the board."""
 
-    def __init__(self, type: str, rotation: int = 0):
+    def __init__(
+        self,
+        type: str,
+        rotation: int = 0,
+        draw_manual: bool = True,
+        pipe_image_sheet: str = "img/sci-fi-platformer-tiles-32x32-extension.png",
+    ):
         # type can be:
         # 'straight': | or -
         # 'corner': L-shaped
@@ -38,6 +47,15 @@ class Pipe:
         # rotation: 0, 90, 180, 270 degrees (clockwise)
         # Represents the current visual orientation
         self.rotation = rotation
+
+        # draw: whether to draw the pipe segment manually (True) or load it from a spritesheet
+        self.draw_manual = draw_manual
+        if self.draw_manual:
+            # If drawing manually, we don't need the sprite sheet
+            self.pipe_image_sheet = None
+        else:
+            # Load the sprite sheet for pipe images
+            self.pipe_image_sheet = SpriteSheet(pipe_image_sheet)
 
         # Define connections for each pipe type in its default (0 degree) rotation.
         # Connections are represented by a set of directions: 'N', 'E', 'S', 'W'
@@ -101,58 +119,122 @@ class Pipe:
         if self.type != "empty":
             self.rotation = (self.rotation + 90) % 360
 
-    def draw(self, surface, x, y):
+    def draw(self, surface: Surface, x: int, y: int):
         """Draws the pipe segment on the given surface."""
         # Add a small border effect
         rect = pygame.Rect(x + 2, y + 2, PIPE_SIZE - 4, PIPE_SIZE - 4)
 
-        # Draw background square
-        pygame.draw.rect(surface, self.colour, rect, border_radius=5)
+        if self.draw_manual:
+            # Draw background square
+            pygame.draw.rect(surface, self.colour, rect, border_radius=5)
 
-        # Only draw lines if the pipe is not empty
-        if self.type != "empty":
-            # Draw the pipe lines based on current connections
-            center_x = x + PIPE_SIZE // 2
-            center_y = y + PIPE_SIZE // 2
-            line_thickness = 5
+            # Only draw lines if the pipe is not empty
+            if self.type != "empty":
+                # Draw the pipe lines based on current connections
+                center_x = x + PIPE_SIZE // 2
+                center_y = y + PIPE_SIZE // 2
+                line_thickness = 5
 
-            # Draw lines based on type and rotation
-            connections = self.get_current_connections()
-            if "N" in connections:
-                pygame.draw.line(
-                    surface, BLACK, (center_x, center_y), (center_x, y), line_thickness
-                )
-            if "E" in connections:
-                pygame.draw.line(
-                    surface,
-                    BLACK,
-                    (center_x, center_y),
-                    (x + PIPE_SIZE, center_y),
-                    line_thickness,
-                )
-            if "S" in connections:
-                pygame.draw.line(
-                    surface,
-                    BLACK,
-                    (center_x, center_y),
-                    (center_x, y + PIPE_SIZE),
-                    line_thickness,
-                )
-            if "W" in connections:
-                pygame.draw.line(
-                    surface, BLACK, (center_x, center_y), (x, center_y), line_thickness
-                )
+                # Draw lines based on type and rotation
+                connections = self.get_current_connections()
+                if "N" in connections:
+                    pygame.draw.line(
+                        surface,
+                        BLACK,
+                        (center_x, center_y),
+                        (center_x, y),
+                        line_thickness,
+                    )
+                if "E" in connections:
+                    pygame.draw.line(
+                        surface,
+                        BLACK,
+                        (center_x, center_y),
+                        (x + PIPE_SIZE, center_y),
+                        line_thickness,
+                    )
+                if "S" in connections:
+                    pygame.draw.line(
+                        surface,
+                        BLACK,
+                        (center_x, center_y),
+                        (center_x, y + PIPE_SIZE),
+                        line_thickness,
+                    )
+                if "W" in connections:
+                    pygame.draw.line(
+                        surface,
+                        BLACK,
+                        (center_x, center_y),
+                        (x, center_y),
+                        line_thickness,
+                    )
 
-            # Draw a small circle in the center
-            pygame.draw.circle(
-                surface, BLACK, (center_x, center_y), line_thickness // 2 + 1
+                # Draw a small circle in the center
+                pygame.draw.circle(
+                    surface, BLACK, (center_x, center_y), line_thickness // 2 + 1
+                )
+        else:
+            # depending on the colour, use the appropriate row to get the pipe image
+            # depending on the type, use the appropriate row and column to get the pipe image
+            # depdening on the rotation, use the approriate transform to rotate the image
+            if self.colour == GRAY:
+                pipe_image_x = 640
+            elif self.colour == RED:
+                pipe_image_x = 1600
+            elif self.colour == BLUE:
+                pipe_image_x = 2560
+            elif self.colour == YELLOW:
+                pipe_image_x = 2240
+            elif self.colour == GREEN:
+                pipe_image_x = 1280
+            else:
+                pipe_image_x = 3200
+
+            if self.type == "straight":
+                pipe_image_y = 64
+                pipe_image_x = pipe_image_x + 128
+            elif self.type == "corner":
+                pipe_image_y = 128
+                pipe_image_x = pipe_image_x + 32
+            elif self.type == "cross":
+                pipe_image_y = 192
+                pipe_image_x = pipe_image_x + 192
+            elif self.type == "t_joint":
+                pipe_image_y = 192
+                pipe_image_x = pipe_image_x + 128
+            elif self.type == "start_end":
+                pipe_image_y = 288
+                pipe_image_x = pipe_image_x + 160
+            elif self.type == "empty":
+                pipe_image_y = 448
+                pipe_image_x = pipe_image_x + 128
+            else:
+                pipe_image_y = 32
+                pipe_image_x = pipe_image_x + 64
+
+            # Get the image from the sprite sheet
+            if self.pipe_image_sheet is None:
+                raise TypeError("Pipe image sheet is not set. Cannot draw pipe.")
+
+            pipe_image = self.pipe_image_sheet.get_image(
+                pipe_image_x, pipe_image_y, 32, 32
             )
+
+            # Scale the image to fit the pipe size
+            pipe_image = pygame.transform.scale(pipe_image, (PIPE_SIZE, PIPE_SIZE))
+
+            # Rotate the image based on the current rotation
+            pipe_image = pygame.transform.rotate(pipe_image, self.rotation)
+
+            # Draw the pipe image on the surface
+            surface.blit(pipe_image, (x, y))
 
 
 class Board:
     """Manages the grid of pipes and game logic."""
 
-    def __init__(self, size: int):
+    def __init__(self, size: int, draw_manual: bool = True):
         self.size = size
         self.grid = [[None for _ in range(size)] for _ in range(size)]
         # Start in top-left corner or adjacent
@@ -162,6 +244,8 @@ class Board:
             [(size - 1, col) for col in range((size // 2) + 1, size)]
             + [(row, size - 1) for row in range((size // 2) + 1, size)]
         )
+        # Whether to draw the pipe segment manually (True) or load it from a spritesheet
+        self.draw_manual = draw_manual
         self._initialize_board()
 
     def is_valid_move(self, rows: int, cols: int, r: int, c: int, visited: set) -> bool:
@@ -244,13 +328,21 @@ class Board:
                     self.solution_path[i + 1][1] - c,
                 )
                 if direction == (0, 1):  # Move East from start
-                    self.grid[r][c] = Pipe("start_end", rotation=90)
+                    self.grid[r][c] = Pipe(
+                        "start_end", rotation=90, draw_manual=self.draw_manual
+                    )
                 elif direction == (1, 0):  # Move South
-                    self.grid[r][c] = Pipe("start_end", rotation=180)
+                    self.grid[r][c] = Pipe(
+                        "start_end", rotation=180, draw_manual=self.draw_manual
+                    )
                 elif direction == (0, -1):  # Move West
-                    self.grid[r][c] = Pipe("start_end", rotation=270)
+                    self.grid[r][c] = Pipe(
+                        "start_end", rotation=270, draw_manual=self.draw_manual
+                    )
                 elif direction == (-1, 0):  # Move North
-                    self.grid[r][c] = Pipe("start_end", rotation=0)
+                    self.grid[r][c] = Pipe(
+                        "start_end", rotation=0, draw_manual=self.draw_manual
+                    )
             elif (r, c) == self.end_pos:
                 # end pipe: determine its rotation based on the last move direction
                 direction = (
@@ -258,13 +350,21 @@ class Board:
                     self.solution_path[i - 1][1] - c,
                 )
                 if direction == (0, 1):  # Move East to end
-                    self.grid[r][c] = Pipe("start_end", rotation=90)
+                    self.grid[r][c] = Pipe(
+                        "start_end", rotation=90, draw_manual=self.draw_manual
+                    )
                 elif direction == (1, 0):  # Move South to end
-                    self.grid[r][c] = Pipe("start_end", rotation=180)
+                    self.grid[r][c] = Pipe(
+                        "start_end", rotation=180, draw_manual=self.draw_manual
+                    )
                 elif direction == (0, -1):  # Move West to end
-                    self.grid[r][c] = Pipe("start_end", rotation=270)
+                    self.grid[r][c] = Pipe(
+                        "start_end", rotation=270, draw_manual=self.draw_manual
+                    )
                 elif direction == (-1, 0):  # Move North to end
-                    self.grid[r][c] = Pipe("start_end", rotation=0)
+                    self.grid[r][c] = Pipe(
+                        "start_end", rotation=0, draw_manual=self.draw_manual
+                    )
             else:
                 # Determine pipe type and rotation for intermediate path segments
                 prev_r, prev_c = self.solution_path[i - 1]
@@ -298,6 +398,7 @@ class Board:
                 self.grid[r][c] = Pipe(
                     pipe_type_and_rot[0],
                     rotation=pipe_type_and_rot[1],
+                    draw_manual=self.draw_manual,
                 )
 
         # 3. Fill the rest of the board with random pipes or empty cells
@@ -306,11 +407,16 @@ class Board:
             for c in range(self.size):
                 if (r, c) not in path_visited:
                     if random.random() < empty_cell_probability:
-                        self.grid[r][c] = Pipe("empty", rotation=0)
+                        self.grid[r][c] = Pipe(
+                            "empty",
+                            rotation=0,
+                            draw_manual=self.draw_manual,
+                        )
                     else:
                         self.grid[r][c] = Pipe(
                             random.choice(pipe_types),
                             rotation=random.choice([0, 90, 180, 270]),
+                            draw_manual=self.draw_manual,
                         )
                 else:
                     # For path cells, apply a random rotation to make it a puzzle,
@@ -446,19 +552,17 @@ class Board:
                                     connected_pipes.add((nr, nc))
 
         # Update colours based on the full set of connected pipes
-        # Intermediate pipes in the path turn PATH_HIGHLIGHT_colour
+        # Intermediate pipes in the path turn GREEN
         for r, c in connected_pipes:
             if (r, c) != self.start_pos and (r, c) != self.end_pos:
-                self.grid[r][c].colour = PATH_HIGHLIGHT_colour
+                self.grid[r][c].colour = GREEN
 
         # Determine if the end pipe is reached, indicating a win
         is_game_won = self.end_pos in connected_pipes
         if is_game_won:
             # If game is won, colour the start and end points as part of the winning path
-            self.grid[self.start_pos[0]][
-                self.start_pos[1]
-            ].colour = PATH_HIGHLIGHT_colour
-            self.grid[self.end_pos[0]][self.end_pos[1]].colour = PATH_HIGHLIGHT_colour
+            self.grid[self.start_pos[0]][self.start_pos[1]].colour = GREEN
+            self.grid[self.end_pos[0]][self.end_pos[1]].colour = GREEN
 
         return is_game_won
 
@@ -483,8 +587,8 @@ class Board:
         # Only highlight if it's not a start/end point and not an empty pipe
         if (
             pipe
-            and row
-            and col
+            and row is not None
+            and col is not None
             and (row, col) not in [self.start_pos, self.end_pos]
             and pipe.type != "empty"
         ):
@@ -497,16 +601,23 @@ class Board:
 
 class PipeGameState(GameState):
     def __init__(
-        self, game: Game, game_over_state: GameState | None = None, board_size: int = 6
+        self,
+        game: Game,
+        game_over_state: GameState | None = None,
+        play_game_state: GameState | None = None,
+        board_size: int = 6,
+        draw_manual: bool = True,
     ):
         if board_size < 3:
             raise ValueError("Board size must be at least 3x3 for a playable game.")
         super().__init__(game)
-        self.board_size = board_size
         self.game_over_state = game_over_state
+        self.play_game_state = play_game_state
+        self.board_size = board_size
+        self.draw_manual = draw_manual
 
     def on_enter(self, previous_state: GameState | None):
-        self.board = Board(self.board_size)
+        self.board = Board(self.board_size, self.draw_manual)
         self.game_won = False
 
     def on_exit(self):
@@ -524,7 +635,7 @@ class PipeGameState(GameState):
         # Only allow pipe rotation if a pipe was clicked and the game hasn't been won
         # and the clicked pipe is not an empty cell
         # Rotate_pipe updates colours and returns win status
-        if pipe and row and col and not self.game_won:
+        if pipe and row is not None and col is not None and not self.game_won:
             self.game_won = self.board.rotate_pipe(row, col)
 
     def draw(self, surface: Surface):
@@ -536,14 +647,41 @@ class PipeGameState(GameState):
             mouse_x, mouse_y = pygame.mouse.get_pos()
             self.board.draw_hover_highlight(surface, mouse_x, mouse_y)
 
-        # Display text if the game is won
-        winning_text = "Hacker stopped!"
-        if self.game_won:
-            font = pygame.font.Font(None, 74)
-            win_text = font.render(winning_text, True, BLUE)
-            win_text_rect = win_text.get_rect(
-                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-            )
-            surface.blit(win_text, win_text_rect)
-
         pygame.display.flip()
+
+        # Display text if the game is won
+        if self.game_won:
+            time.sleep(1)
+            self.end_game()
+
+    def end_game(self):
+        if self.play_game_state is not None:
+            # Move player in opposite direction in play_game_state
+            if self.play_game_state.player_controller.player_model.direction == "RIGHT":
+                self.play_game_state.player_controller.player_model.direction = "LEFT"
+                self.play_game_state.player_controller.player_model.x -= 50
+            elif (
+                self.play_game_state.player_controller.player_model.direction == "LEFT"
+            ):
+                self.play_game_state.player_controller.player_model.direction = "RIGHT"
+                self.play_game_state.player_controller.player_model.x += 50
+            elif self.play_game_state.player_controller.player_model.direction == "UP":
+                self.play_game_state.player_controller.player_model.direction = "DOWN"
+                self.play_game_state.player_controller.player_model.y -= 50
+            elif (
+                self.play_game_state.player_controller.player_model.direction == "DOWN"
+            ):
+                self.play_game_state.player_controller.player_model.direction = "UP"
+                self.play_game_state.player_controller.player_model.y += 50
+
+            get_ready_state: InterstitialState = InterstitialState(
+                self.game, "Hacker stopped!", 2000, self.play_game_state
+            )
+            self.game.change_state(get_ready_state)
+            return
+
+        game_over_state: InterstitialState = InterstitialState(
+            self.game, "You won!", 2000, self.game_over_state
+        )
+        self.game.change_state(game_over_state)
+        return
