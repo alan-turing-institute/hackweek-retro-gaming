@@ -17,6 +17,7 @@ pipe_game_state: PipeGameState = PipeGameState(reg_game, game_over_state)
 play_game_state: PlayGameState = PlayGameState(
     reg_game, game_over_state, pipe_game_state
 )
+pipe_game_state.play_game_state = play_game_state
 
 get_ready_state: InterstitialState = InterstitialState(
     reg_game, "Get ready!!", 2000, play_game_state
