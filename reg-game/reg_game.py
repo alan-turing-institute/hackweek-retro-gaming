@@ -4,7 +4,7 @@ from config import SCREEN_WIDTH
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
-from terminals import Terminal
+from terminals import create_random_terminals, Terminal, TerminalView
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -28,12 +28,7 @@ class PlayGameState(GameState):
     def initialise(self):
 
         # Initialize the terminals
-        self.terminals = [
-            Terminal("Terminal 1", (100, 100)),
-            Terminal("Terminal 2", (200, 200)),
-            Terminal("Terminal 3", (300, 300)),
-        ]
-
+        self.terminals = create_random_terminals(3)
         self.maisy_controller = MaisyController(
             800, 600
         )  # TODO read this from the game
@@ -50,6 +45,7 @@ class PlayGameState(GameState):
         explosion_view = ExplosionView(
             explosion_controller.list.explosions, "img/explosion.png", 32, 32
         )
+        terminal_renderer = TerminalView(self.terminals, "img/CommTerminal.png")  # terminal image is 32 x 32 pixels
 
         self.renderers = [
             bullet_renderer,
@@ -57,6 +53,7 @@ class PlayGameState(GameState):
             lives_renderer,
             explosion_view,
             maisy_renderer,
+            terminal_renderer,
         ]
 
         self.controllers = [
