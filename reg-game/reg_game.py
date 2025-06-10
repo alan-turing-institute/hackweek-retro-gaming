@@ -4,6 +4,7 @@ from config import SCREEN_WIDTH
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
+from terminals import Terminal
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -25,6 +26,14 @@ class PlayGameState(GameState):
             self.player_controller.pause(False)
 
     def initialise(self):
+
+        # Initialize the terminals
+        self.terminals = [
+            Terminal("Terminal 1", (100, 100)),
+            Terminal("Terminal 2", (200, 200)),
+            Terminal("Terminal 3", (300, 300)),
+        ]
+
         self.maisy_controller = MaisyController(
             800, 600
         )  # TODO read this from the game
