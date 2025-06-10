@@ -19,7 +19,7 @@ class MainMenuState(GameState):
     def set_play_state(self, state):
         self.play_game_state = state
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         keys: ScancodeWrapper = pygame.key.get_pressed()
 
         if keys[K_UP] or keys[K_DOWN] and self.input_tick == 0:

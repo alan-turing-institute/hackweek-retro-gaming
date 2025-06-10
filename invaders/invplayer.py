@@ -30,7 +30,7 @@ class PlayerController:
     def pause(self, is_paused: bool):
         self.is_paused = is_paused
 
-    def update(self, game_time: int) -> None:
+    def update(self, game_time: int, *args, **kwargs) -> None:
         self.bullets.update(game_time)
         if self.is_paused:
             return

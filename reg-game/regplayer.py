@@ -1,19 +1,18 @@
 import pygame
 from bitmapfont import BitmapFont
 from bullet import BulletController
-from pygame.key import ScancodeWrapper
-from pygame.locals import K_LEFT, K_RIGHT, K_SPACE, K_UP, K_DOWN
-from pygame.surface import Surface
-from spritesheet import SpriteSheet
 from config import (
-    PLAYER_SPRITE_WIDTH,
-    PLAYER_SPRITE_HEIGHT,
     NUMBER_OF_SPRITES,
+    PLAYER_SIZE,
+    PLAYER_SPRITE_HEIGHT,
+    PLAYER_SPRITE_WIDTH,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    PLAYER_SIZE,
 )
-
+from pygame.key import ScancodeWrapper
+from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_SPACE, K_UP
+from pygame.surface import Surface
+from spritesheet import SpriteSheet
 
 PLAYER_SPRITESHEET_X: int = 0
 PLAYER_SPRITESHEET_Y: int = 0
@@ -41,7 +40,7 @@ class PlayerController:
     def pause(self, is_paused: bool):
         self.is_paused = is_paused
 
-    def update(self, game_time: int) -> None:
+    def update(self, game_time: int, *args, **kwargs) -> None:
         self.bullets.update(game_time)
         if self.is_paused:
             return
@@ -98,6 +97,22 @@ class PlayerView:
             target_size=PLAYER_SIZE,
         )
 
+        self.moving_frames_up: list[Surface] = self.sprite_sheet.get_frames_in_row(
+            row_offset=0,
+            sprite_width=PLAYER_SPRITE_WIDTH,
+            sprite_height=PLAYER_SPRITE_HEIGHT,
+            number_of_sprites=NUMBER_OF_SPRITES,
+            target_size=PLAYER_SIZE,
+        )
+
+        self.moving_frames_down: list[Surface] = self.sprite_sheet.get_frames_in_row(
+            row_offset=1,
+            sprite_width=PLAYER_SPRITE_WIDTH,
+            sprite_height=PLAYER_SPRITE_HEIGHT,
+            number_of_sprites=NUMBER_OF_SPRITES,
+            target_size=PLAYER_SIZE,
+        )
+
         self.image: Surface = self.moving_frames_right[0]
 
     def render(self, surface: Surface):
@@ -112,6 +127,16 @@ class PlayerView:
                 self.moving_frames_left
             )
             self.image = self.moving_frames_left[list_index]
+        elif self.player_controller.model.direction == "UP":
+            list_index = int(self.player_controller.model.y) % len(
+                self.moving_frames_up
+            )
+            self.image = self.moving_frames_up[list_index]
+        elif self.player_controller.model.direction == "DOWN":
+            list_index = int(self.player_controller.model.y) % len(
+                self.moving_frames_down
+            )
+            self.image = self.moving_frames_down[list_index]
 
         surface.blit(
             self.image,

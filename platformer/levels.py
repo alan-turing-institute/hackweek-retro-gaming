@@ -19,7 +19,7 @@ class Level:
         self.enemy_list: Group = Group()
         self.player: Player | None = player
 
-    def update(self):
+    def update(self, *args, **kwargs):
         self.platform_list.update()
         self.enemy_list.update()
 
