@@ -2,18 +2,21 @@ import pygame
 from bitmapfont import BitmapFont
 from bullet import BulletController
 from pygame.key import ScancodeWrapper
-from pygame.locals import K_LEFT, K_RIGHT, K_SPACE
+from pygame.locals import K_LEFT, K_RIGHT, K_SPACE, K_UP, K_DOWN
 from pygame.surface import Surface
 from spritesheet import SpriteSheet
+from config import (
+    PLAYER_SPRITE_WIDTH,
+    PLAYER_SPRITE_HEIGHT,
+    NUMBER_OF_SPRITES,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    PLAYER_SIZE,
+)
 
-PLAYER_SIZE: tuple[int, int] = (96, 96)
 
 PLAYER_SPRITESHEET_X: int = 0
 PLAYER_SPRITESHEET_Y: int = 0
-PLAYER_SPRITE_WIDTH: int = 48
-PLAYER_SPRITE_HEIGHT: int = 48
-
-NUMBER_OF_SPRITES: int = 8
 
 
 class PlayerModel:
@@ -45,12 +48,19 @@ class PlayerController:
 
         keys: ScancodeWrapper = pygame.key.get_pressed()
 
-        if keys[K_RIGHT] and self.model.x < (800 - 32):
-            self.model.x += (game_time / 1000.0) * self.model.speed
+        distance: float = (game_time / 1000.0) * self.model.speed
+        if keys[K_RIGHT] and self.model.x < (SCREEN_WIDTH - PLAYER_SIZE[0]):
+            self.model.x += distance
             self.model.direction = "RIGHT"
         elif keys[K_LEFT] and self.model.x > 0:
-            self.model.x -= (game_time / 1000.0) * self.model.speed
+            self.model.x -= distance
             self.model.direction = "LEFT"
+        elif keys[K_UP] and self.model.y > 0:
+            self.model.y -= distance
+            self.model.direction = "UP"
+        elif keys[K_DOWN] and self.model.y < (SCREEN_HEIGHT - PLAYER_SIZE[1]):
+            self.model.y += distance
+            self.model.direction = "DOWN"
 
         if keys[K_SPACE] and self.bullets.can_fire():
             x = self.model.x + 9
@@ -73,7 +83,7 @@ class PlayerView:
 
         self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
         self.moving_frames_right: list[Surface] = self.sprite_sheet.get_frames_in_row(
-            row_offset=3,
+            row_offset=2,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
             number_of_sprites=NUMBER_OF_SPRITES,
@@ -81,7 +91,7 @@ class PlayerView:
         )
 
         self.moving_frames_left: list[Surface] = self.sprite_sheet.get_frames_in_row(
-            row_offset=2,
+            row_offset=3,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
             number_of_sprites=NUMBER_OF_SPRITES,
