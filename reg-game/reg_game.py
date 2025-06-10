@@ -8,6 +8,7 @@ from config import (
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
+from terminals import TerminalView, create_random_terminals
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -33,7 +34,8 @@ class PlayGameState(GameState):
 
     def initialise(self):
         self.maisy_controller = MaisyController()
-
+        # Initialize the terminals
+        self.terminals = create_random_terminals(3)
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
         self.collision_controller = CollisionController(
             self.game,
@@ -50,12 +52,16 @@ class PlayGameState(GameState):
             self.player_controller, LIVES_SPRITE_SHEET_PATH
         )
         bullet_renderer = BulletView(self.player_controller.bullets, "img/bullet.png")
+        terminal_renderer = TerminalView(
+            self.terminals, "img/CommTerminal.png"
+        )  # terminal image is 32 x 32 pixels
 
         self.renderers = [
             bullet_renderer,
             player_renderer,
             lives_renderer,
             maisy_renderer,
+            terminal_renderer,
         ]
 
         self.controllers = [
