@@ -16,4 +16,4 @@ jobs:
         run: |
           pip install .
       - name: Run mypy
-        run: mypy .
+        run: mypy reg-game

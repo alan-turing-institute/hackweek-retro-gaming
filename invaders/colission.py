@@ -76,7 +76,7 @@ class ExplosionController:
     def __init__(self, game: Game) -> None:
         self.list: ExplosionModelList = ExplosionModelList(game)
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         for explosion in self.list.explosions:
             explosion.speed -= game_time
             if explosion.speed < 0:
@@ -105,7 +105,7 @@ class CollisionController:
         self.alien_dead_sound: Sound = pygame.mixer.Sound("sound/aliendie.wav")
         self.player_die: Sound = pygame.mixer.Sound("sound/playerdie.wav")
 
-    def update(self, game_time) -> None:
+    def update(self, game_time, *args, **kwargs) -> None:
         aliens: list = []
         bullets: list = []
 

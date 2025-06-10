@@ -34,7 +34,7 @@ class GameState:
         """
         pass
 
-    def update(self, game_time: int):
+    def update(self, game_time: int, *args, **kwargs):
         """
         Called by the game instance to update the state.
 
