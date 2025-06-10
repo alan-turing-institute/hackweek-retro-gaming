@@ -20,8 +20,8 @@ class MaisyModel:
     def __init__(self, x, y) -> None:
         self.x = x
         self.y = y
-        self.dx = 0
-        self.dy = 0
+        self.dx = random.randint(-3, 3)
+        self.dy = random.randint(-3, 3)
         self.width = 48
         self.height = 48
         self.at_terminal = False
