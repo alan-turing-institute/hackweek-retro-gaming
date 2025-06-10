@@ -6,6 +6,7 @@ from enemy import MaisyModel
 from pygame import Rect
 from config import PLAYER_SIZE
 import enemy
+from interstitial import InterstitialState
 
 
 class CollisionController:
@@ -27,7 +28,11 @@ class CollisionController:
         for maisy_model in self.maisy_controller.hacker_models:
             if self.mini_game_state is not None:
                 if self.player_collide(maisy_model):
-                    self.game.change_state(self.mini_game_state)
+
+                    get_ready_state: InterstitialState = InterstitialState(
+                        self.game, "Stop the hacker!", 2000, self.mini_game_state
+                    )
+                    self.game.change_state(get_ready_state)
                     return
 
     def player_collide(self, maisy_model: MaisyModel) -> bool:
