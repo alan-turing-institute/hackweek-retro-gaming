@@ -2,7 +2,7 @@
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from random import randint
 
-terminal_img = "img/CommTerminal.png"
+terminal_img = "img/CommTerminal.png" # terminal image is 32 x 32 pixels
 
 class Terminal:
     def __init__(self, name: str, location: tuple[int, int]):
@@ -20,25 +20,11 @@ class Terminal:
     def __repr__(self):
         return f"Terminal(name={self.name}, location={self.location})"
 
-def generate_room(n_terminals, room_size=(SCREEN_WIDTH, SCREEN_HEIGHT)):
-
-    terminal_width = 32
-    terminal_height = 32
-
-    max_y = SCREEN_HEIGHT - terminal_height
-    min_y = 0 + terminal_height
-    max_x = SCREEN_WIDTH - terminal_width
-    min_x = 0 + terminal_width
-
-    terminals = {}
-    for i in range(n_terminals):
-        terminal_name = f"Terminal {i + 1 }"
-        terminal_location = (
-            randint(min_x, max_x),
-            randint(min_y, max_y)
-        )
-        terminals[terminal_name] = terminal_location
-
+def create_random_terminals(num_terminals: int) -> list[Terminal]:
+    terminals = []
+    for _ in range(num_terminals):
+        x = randint(0, SCREEN_WIDTH - 32)
+        y = randint(0, SCREEN_HEIGHT - 32)
+        terminal = Terminal(name=f"Terminal {_ + 1}", location=(x, y))
+        terminals.append(terminal)
     return terminals
-
-print(generate_room(2))
