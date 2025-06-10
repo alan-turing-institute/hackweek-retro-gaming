@@ -1,3 +1,4 @@
+from background import BackgroundView
 from bullet import BulletView
 from collision import CollisionController
 from config import (
@@ -44,6 +45,8 @@ class PlayGameState(GameState):
             self.mini_game_state,
         )
 
+        background_renderer = BackgroundView("img/industrial_floor.png")
+
         player_renderer = PlayerView(self.player_controller, PLAYER_SPRITE_SHEET_PATH)
         maisy_renderer = MaisyView(
             self.maisy_controller, "img/pixel_character_pale_yellow.png"
@@ -57,6 +60,7 @@ class PlayGameState(GameState):
         )  # terminal image is 32 x 32 pixels
 
         self.renderers = [
+            background_renderer,
             bullet_renderer,
             player_renderer,
             lives_renderer,
