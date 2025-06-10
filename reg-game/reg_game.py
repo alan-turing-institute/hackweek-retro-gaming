@@ -1,3 +1,5 @@
+import sys
+import pygame
 from bullet import BulletView
 from collision import CollisionController
 from config import (
@@ -7,6 +9,8 @@ from config import (
 )
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
+from pygame.key import ScancodeWrapper
+from pygame.locals import K_ESCAPE
 from regplayer import PlayerController, PlayerLivesView, PlayerView
 from terminals import TerminalView, create_random_terminals
 
@@ -71,6 +75,12 @@ class PlayGameState(GameState):
         ]
 
     def update(self, game_time: int, *args, **kwargs):
+        keys: ScancodeWrapper = pygame.key.get_pressed()
+
+        if keys[K_ESCAPE]:
+            pygame.quit()
+            sys.exit()
+
         if self.controllers is not None:
             for controller in self.controllers:
                 controller.update(game_time)
