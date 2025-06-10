@@ -29,19 +29,14 @@ class MaisyModel:
         self.brain.add_state(HackingState(self))
         self.brain.add_state(WanderingState(self))
         self.speed = 3
-        # self.brain.add_state(delivering_state)
-        # self.brain.add_state(hunting_state)
 
 
 class MaisyController:
-    def __init__(self, window_width, window_height):
-        self.window_width = window_width
-        self.window_height = window_height
-
+    def __init__(self):
         self.hacker_models = [
             MaisyModel(
-                x=random.randint(0, self.window_width),
-                y=random.randint(0, self.window_height),
+                x=random.randint(0, SCREEN_WIDTH),
+                y=random.randint(0, int(0.25 * SCREEN_HEIGHT)),
             )
             for _ in range(3)
         ]
