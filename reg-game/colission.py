@@ -1,11 +1,10 @@
-from framework import Game
 from enemy import MaisyController
-from regplayer import PlayerController
+from framework import Game
 from reg_game import GameState
+from regplayer import PlayerController
 
 
 class CollisionController:
-
     def __init__(
         self,
         game: Game,
