@@ -344,10 +344,10 @@ class WanderingState(State):
             )
 
     def check_conditions(self) -> str | None:
-        print("Checking wandering conditions")
+        pass
 
     def entry_actions(self):
-        print("Check wander conditions")
+        pass
 
     def exit_actions(self):
         print("Exit")
