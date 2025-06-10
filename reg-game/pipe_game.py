@@ -172,7 +172,7 @@ class Board:
 
     def find_random_path(
         self, rows: int, cols: int, start: tuple, end: tuple
-    ) -> list[tuple[int, int]]:
+    ) -> list[tuple[int, int]] | None:
         """
         Randomly generates a path between start and end points on a grid.
         """
@@ -368,6 +368,9 @@ class Board:
         """Rotates the pipe at the given grid coordinates."""
         # Only allow rotation if it's not a start/end point AND not an empty pipe
         current_pipe = self.grid[row][col]
+        if current_pipe is None:
+            return False
+
         if (row, col) not in {
             self.start_pos,
             self.end_pos,
@@ -463,9 +466,13 @@ class Board:
         """Draws all pipes on the board."""
         for r in range(self.size):
             for c in range(self.size):
+                pipe = self.grid[r][c]
+                if pipe is None:
+                    continue
+
                 x = MARGIN_X + c * PIPE_SIZE
                 y = MARGIN_Y + r * PIPE_SIZE
-                self.grid[r][c].draw(surface, x, y)
+                pipe.draw(surface, x, y)
 
                 # Draw thin black grid lines for better visualization
                 pygame.draw.rect(surface, BLACK, (x, y, PIPE_SIZE, PIPE_SIZE), 1)
@@ -476,6 +483,8 @@ class Board:
         # Only highlight if it's not a start/end point and not an empty pipe
         if (
             pipe
+            and row
+            and col
             and (row, col) not in [self.start_pos, self.end_pos]
             and pipe.type != "empty"
         ):
@@ -515,7 +524,7 @@ class PipeGameState(GameState):
         # Only allow pipe rotation if a pipe was clicked and the game hasn't been won
         # and the clicked pipe is not an empty cell
         # Rotate_pipe updates colours and returns win status
-        if pipe and not self.game_won:
+        if pipe and row and col and not self.game_won:
             self.game_won = self.board.rotate_pipe(row, col)
 
     def draw(self, surface: Surface):
