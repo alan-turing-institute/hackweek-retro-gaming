@@ -1,14 +1,16 @@
-from bullet import BulletView
 from collision import CollisionController
 from config import (
     LIVES_SPRITE_SHEET_PATH,
     PLAYER_SPRITE_SHEET_PATH,
     SCREEN_WIDTH,
+    LIVES_SPRITE_SHEET_PATH,
+    SANDBOX_IMAGE_PATH,
 )
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
 from terminals import TerminalView, create_random_terminals
+from sandbox import SandboxView
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -52,13 +54,15 @@ class PlayGameState(GameState):
         lives_renderer = PlayerLivesView(
             self.player_controller, LIVES_SPRITE_SHEET_PATH
         )
-        bullet_renderer = BulletView(self.player_controller.bullets, "img/bullet.png")
+        sandbox_renderer = SandboxView(
+            self.player_controller.sandbox_controller, SANDBOX_IMAGE_PATH
+        )
         terminal_renderer = TerminalView(
             self.terminals, "img/CommTerminal.png"
         )  # terminal image is 32 x 32 pixels
 
         self.renderers = [
-            bullet_renderer,
+            sandbox_renderer,
             player_renderer,
             lives_renderer,
             maisy_renderer,

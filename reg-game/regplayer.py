@@ -1,8 +1,7 @@
 import pygame
 from bitmapfont import BitmapFont
-from bullet import BulletController
 from config import (
-    NUMBER_OF_SPRITES,
+    PLAYER_NUMBER_OF_SPRITES,
     PLAYER_SIZE,
     PLAYER_SPRITE_HEIGHT,
     PLAYER_SPRITE_WIDTH,
@@ -13,6 +12,7 @@ from config import (
     LIVES_MESSAGE_X,
     LIVES_MESSAGE_Y,
 )
+from sandbox import SandboxController
 from pygame.key import ScancodeWrapper
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_SPACE, K_UP
 from pygame.surface import Surface
@@ -38,14 +38,14 @@ class PlayerController:
     def __init__(self, x, y) -> None:
         self.player_model: PlayerModel = PlayerModel(x, y)
         self.is_paused: bool = False
-        self.bullets: BulletController = BulletController(speed=-200)
+        self.sandbox_controller = SandboxController()
         self.shoot_sound = pygame.mixer.Sound("sound/playershoot.wav")
 
     def pause(self, is_paused: bool):
         self.is_paused = is_paused
 
     def update(self, game_time: int, *args, **kwargs) -> None:
-        self.bullets.update(game_time)
+        self.sandbox_controller.update(game_time)
         if self.is_paused:
             return
 
@@ -65,19 +65,11 @@ class PlayerController:
             self.player_model.y += distance
             self.player_model.direction = "DOWN"
 
-        if keys[K_SPACE] and self.bullets.can_fire():
+        if keys[K_SPACE] and self.sandbox_controller.is_sandbox_available():
             x = self.player_model.x + 9
             y = self.player_model.y - 16
-            self.bullets.add_bullet(x, y)
+            self.sandbox_controller.add_sandbox(x, y)
             self.shoot_sound.play()
-
-    def hit(self, x, y, width, height):
-        return (
-            x >= self.player_model.x
-            and y >= self.player_model.y
-            and x + width <= self.player_model.x + 32
-            and y + height <= self.player_model.y + 32
-        )
 
 
 class PlayerView:
@@ -89,7 +81,7 @@ class PlayerView:
             row_offset=2,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
-            number_of_sprites=NUMBER_OF_SPRITES,
+            number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
             target_size=PLAYER_SIZE,
         )
 
@@ -97,7 +89,7 @@ class PlayerView:
             row_offset=3,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
-            number_of_sprites=NUMBER_OF_SPRITES,
+            number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
             target_size=PLAYER_SIZE,
         )
 
@@ -105,7 +97,7 @@ class PlayerView:
             row_offset=0,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
-            number_of_sprites=NUMBER_OF_SPRITES,
+            number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
             target_size=PLAYER_SIZE,
         )
 
@@ -113,7 +105,7 @@ class PlayerView:
             row_offset=1,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
-            number_of_sprites=NUMBER_OF_SPRITES,
+            number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
             target_size=PLAYER_SIZE,
         )
 
