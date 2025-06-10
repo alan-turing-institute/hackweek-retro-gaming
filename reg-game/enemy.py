@@ -2,6 +2,7 @@ import random
 
 import pygame
 from bullet import BulletController
+from enemy_statemachine import StateMachine
 from pygame.surface import Surface
 from spritesheet import SpriteSheet
 
@@ -22,6 +23,7 @@ class MaisyModel:
         self.width = 48
         self.height = 48
         self.colour = (0, 128, 255)
+        self.brain = StateMachine()
 
 
 class MaisyController:
