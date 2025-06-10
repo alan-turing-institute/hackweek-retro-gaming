@@ -1,8 +1,10 @@
 import random
+import time
 
 import pygame
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import Game, GameState
+from interstitial import InterstitialState
 from pygame.surface import Surface
 from spritesheet import SpriteSheet
 
@@ -598,14 +600,16 @@ class PipeGameState(GameState):
         self,
         game: Game,
         game_over_state: GameState | None = None,
+        play_game_state: GameState | None = None,
         board_size: int = 6,
         draw_manual: bool = True,
     ):
         if board_size < 3:
             raise ValueError("Board size must be at least 3x3 for a playable game.")
         super().__init__(game)
-        self.board_size = board_size
         self.game_over_state = game_over_state
+        self.play_game_state = play_game_state
+        self.board_size = board_size
         self.draw_manual = draw_manual
 
     def on_enter(self, previous_state: GameState | None):
@@ -639,14 +643,41 @@ class PipeGameState(GameState):
             mouse_x, mouse_y = pygame.mouse.get_pos()
             self.board.draw_hover_highlight(surface, mouse_x, mouse_y)
 
-        # Display text if the game is won
-        winning_text = "Hacker stopped!"
-        if self.game_won:
-            font = pygame.font.Font(None, 74)
-            win_text = font.render(winning_text, True, BLUE)
-            win_text_rect = win_text.get_rect(
-                center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-            )
-            surface.blit(win_text, win_text_rect)
-
         pygame.display.flip()
+
+        # Display text if the game is won
+        if self.game_won:
+            time.sleep(1)
+            self.end_game()
+
+    def end_game(self):
+        if self.play_game_state is not None:
+            # Move player in opposite direction in play_game_state
+            if self.play_game_state.player_controller.player_model.direction == "RIGHT":
+                self.play_game_state.player_controller.player_model.direction = "LEFT"
+                self.play_game_state.player_controller.player_model.x -= 50
+            elif (
+                self.play_game_state.player_controller.player_model.direction == "LEFT"
+            ):
+                self.play_game_state.player_controller.player_model.direction = "RIGHT"
+                self.play_game_state.player_controller.player_model.x += 50
+            elif self.play_game_state.player_controller.player_model.direction == "UP":
+                self.play_game_state.player_controller.player_model.direction = "DOWN"
+                self.play_game_state.player_controller.player_model.y -= 50
+            elif (
+                self.play_game_state.player_controller.player_model.direction == "DOWN"
+            ):
+                self.play_game_state.player_controller.player_model.direction = "UP"
+                self.play_game_state.player_controller.player_model.y += 50
+
+            get_ready_state: InterstitialState = InterstitialState(
+                self.game, "Hacker stopped!", 2000, self.play_game_state
+            )
+            self.game.change_state(get_ready_state)
+            return
+
+        game_over_state: InterstitialState = InterstitialState(
+            self.game, "You won!", 2000, self.game_over_state
+        )
+        self.game.change_state(game_over_state)
+        return
