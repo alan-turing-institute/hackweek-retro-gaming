@@ -1,16 +1,13 @@
-from framework import Game
-from enemy import MaisyController
-from regplayer import PlayerController, PlayerModel
-from reg_game import GameState
-from enemy import MaisyModel
-from pygame import Rect
-from config import PLAYER_SIZE
 import enemy
+from config import PLAYER_SIZE
+from enemy import MaisyController, MaisyModel
+from framework import Game, GameState
 from interstitial import InterstitialState
+from pygame import Rect
+from regplayer import PlayerController, PlayerModel
 
 
 class CollisionController:
-
     def __init__(
         self,
         game: Game,
@@ -24,11 +21,9 @@ class CollisionController:
         self.mini_game_state: GameState | None = mini_game_state
 
     def update(self, game_time: int, *args, **kwargs) -> None:
-
         for maisy_model in self.maisy_controller.hacker_models:
             if self.mini_game_state is not None:
                 if self.player_collide(maisy_model):
-
                     get_ready_state: InterstitialState = InterstitialState(
                         self.game, "Stop the hacker!", 2000, self.mini_game_state
                     )

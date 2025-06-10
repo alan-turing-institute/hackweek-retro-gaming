@@ -161,4 +161,6 @@ class PlayerLivesView:
             surface.blit(self.image, (x, 8, 32, 32))
             x += 40
 
-        self.font.draw(surface, "1UP SCORE: " + str(self.player.player_model.score), 160, 12)
+        self.font.draw(
+            surface, "1UP SCORE: " + str(self.player.player_model.score), 160, 12
+        )
