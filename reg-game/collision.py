@@ -62,7 +62,7 @@ class HackerCollisionController:
             collision: bool = maisy_rect.colliderect(terminal_rect)
             if collision:
                 maisy_model.at_terminal = True
-                terminal.state_machine.set_state("hacking")
+                terminal.hacker_at_terminal = maisy_model
 
             collisions.append(collision)
 

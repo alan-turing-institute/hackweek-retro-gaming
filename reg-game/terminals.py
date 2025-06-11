@@ -3,19 +3,18 @@ from random import randint
 from config import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    TERMINAL_SPRITE_SHEET,
-    TERMINAL_IMAGE_WIDTH,
     TERMINAL_IMAGE_HEIGHT,
+    TERMINAL_IMAGE_WIDTH,
+    TERMINAL_SPRITE_SHEET,
 )
+from enemy import MaisyModel
 from framework import State, StateMachine
 from pygame import Surface, image
 from regplayer import PlayerModel
-from enemy import MaisyModel
 from spritesheet import SpriteSheet
 
 
 class ActiveState(State):
-
     def __init__(self, terminal: "TerminalModel"):
         super().__init__("active")
         self.terminal_model = terminal
@@ -127,20 +126,23 @@ class TerminalView:
         self.image: Surface = image.load(img_path)
 
     def render(self, surface: Surface):
-
         sprite_sheet: SpriteSheet = SpriteSheet(TERMINAL_SPRITE_SHEET)
         new_terminal_image: Surface = self.image
 
         for terminal in self.terminal_controller.terminals:
-
             if terminal.state_machine.active_state is not None:
                 terminal_state: str = terminal.state_machine.active_state.name
 
                 if terminal_state == "active":
                     new_terminal_image = self.image
                 elif terminal_state == "hacking":
-                    # TODO: Replace later
-                    print("Hacking!")
+                    # TODO fix later
+                    new_terminal_image = sprite_sheet.get_image(
+                        TERMINAL_IMAGE_WIDTH * 2,
+                        0,
+                        TERMINAL_IMAGE_WIDTH,
+                        TERMINAL_IMAGE_HEIGHT,
+                    )
                 elif terminal_state == "fixing":
                     new_terminal_image = sprite_sheet.get_image(
                         TERMINAL_IMAGE_WIDTH * 2,
