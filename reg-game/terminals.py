@@ -11,11 +11,11 @@ class Terminal:
         self.status = "active"
 
     def set_status(self, status: str):
-        if status in ["active", "inactive", "broken"]:
+        if status in ["active", "inactive", "broken", "hacking"]:
             self.status = status
         else:
             raise ValueError(
-                "Invalid status. Must be 'active', 'inactive', or 'broken'."
+                "Invalid status. Must be 'active', 'inactive', 'broken', or 'hacking'."
             )
 
     def __repr__(self):
@@ -46,4 +46,7 @@ class TerminalView:
                 pass
             elif terminal.status == "broken":
                 # Optionally render broken terminals differently
+                pass
+            elif terminal.status == "hacking":
+                # Optionally render terminals being hacked differently
                 pass

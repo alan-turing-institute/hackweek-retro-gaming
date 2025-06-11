@@ -1,3 +1,4 @@
+from background import BackgroundView
 from backgroundmusic import MusicPlayer
 from collision import CollisionController
 from config import (
@@ -49,6 +50,8 @@ class PlayGameState(GameState):
             self.terminals,
         )
 
+        background_renderer = BackgroundView("img/industrial_floor.png")
+
         player_renderer = PlayerView(self.player_controller, PLAYER_SPRITE_SHEET_PATH)
         maisy_renderer = MaisyView(
             self.maisy_controller, "img/pixel_character_pale_yellow.png"
@@ -64,6 +67,7 @@ class PlayGameState(GameState):
         )  # terminal image is 32 x 32 pixels
 
         self.renderers = [
+            background_renderer,
             sandbox_renderer,
             player_renderer,
             lives_renderer,
