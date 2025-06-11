@@ -263,6 +263,7 @@ class Board:
         # Whether to draw the pipe segment manually (True) or load it from a spritesheet
         self.draw_manual = draw_manual
         self._initialize_board()
+        self.sound_effect_player = SoundEffectPlayer()
 
     def is_valid_move(self, rows: int, cols: int, r: int, c: int, visited: set) -> bool:
         """
@@ -520,6 +521,7 @@ class Board:
             self.start_pos,
             self.end_pos,
         } and current_pipe.type != "empty":
+            self.sound_effect_player.play_rotate_pipe_sound()
             current_pipe.rotate()
             # After rotation, re-check connections and update colours
             return self.check_connections()
