@@ -1,11 +1,17 @@
 from random import randint
 
-from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from config import (
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    TERMINAL_SPRITE_SHEET,
+    TERMINAL_IMAGE_WIDTH,
+    TERMINAL_IMAGE_HEIGHT,
+)
 from framework import State, StateMachine
 from pygame import Surface, image
-from framework import StateMachine, State
 from regplayer import PlayerModel
 from enemy import MaisyModel
+from spritesheet import SpriteSheet
 
 
 class ActiveState(State):
@@ -14,17 +20,51 @@ class ActiveState(State):
         super().__init__("active")
         self.terminal_model = terminal
 
+    def check_conditions(self) -> str | None:
+        if (
+            self.terminal_model.hacker_at_terminal is not None
+            and self.terminal_model.player_at_terminal is None
+        ):
+            return "hacking"
+        return None
+
 
 class HackingState(State):
     def __init__(self, terminal: "TerminalModel"):
         super().__init__("hacking")
         self.terminal_model = terminal
 
+    def check_conditions(self) -> str | None:
+        if (
+            self.terminal_model.hacker_at_terminal is not None
+            and self.terminal_model.player_at_terminal is not None
+        ):
+            return "fixing"
+
+        return None
+
 
 class FixingState(State):
     def __init__(self, terminal: "TerminalModel"):
         super().__init__("fixing")
         self.terminal_model = terminal
+
+    def check_conditions(self) -> str | None:
+        if (
+            self.terminal_model.hacker_at_terminal is not None
+            and self.terminal_model.player_at_terminal is not None
+            and self.terminal_model.hacking_failed
+        ):
+            return "unhackable"
+
+        if (
+            self.terminal_model.hacker_at_terminal is not None
+            and self.terminal_model.player_at_terminal is not None
+            and self.terminal_model.fixing_failed
+        ):
+            return "broken"
+
+        return None
 
 
 class BrokenState(State):
@@ -45,6 +85,9 @@ class TerminalModel:
         self.location: tuple[int, int] = location
         self.player_at_terminal: PlayerModel | None = None
         self.hacker_at_terminal: MaisyModel | None = None
+
+        self.hacking_failed: bool = False
+        self.fixing_failed: bool = True
 
         self.state_machine = StateMachine()
         self.state_machine.add_state(ActiveState(self))
@@ -84,18 +127,40 @@ class TerminalView:
         self.image: Surface = image.load(img_path)
 
     def render(self, surface: Surface):
+
+        sprite_sheet: SpriteSheet = SpriteSheet(TERMINAL_SPRITE_SHEET)
+        new_terminal_image: Surface = self.image
+
         for terminal in self.terminal_controller.terminals:
 
             if terminal.state_machine.active_state is not None:
                 terminal_state: str = terminal.state_machine.active_state.name
 
                 if terminal_state == "active":
-                    surface.blit(self.image, terminal.location)
+                    new_terminal_image = self.image
                 elif terminal_state == "hacking":
-                    pass
+                    # TODO: Replace later
+                    print("Hacking!")
                 elif terminal_state == "fixing":
-                    pass
+                    new_terminal_image = sprite_sheet.get_image(
+                        TERMINAL_IMAGE_WIDTH * 2,
+                        0,
+                        TERMINAL_IMAGE_WIDTH,
+                        TERMINAL_IMAGE_HEIGHT,
+                    )
                 elif terminal_state == "broken":
-                    pass
+                    new_terminal_image = sprite_sheet.get_image(
+                        TERMINAL_IMAGE_WIDTH * 2,
+                        TERMINAL_IMAGE_HEIGHT * 2,
+                        TERMINAL_IMAGE_WIDTH,
+                        TERMINAL_IMAGE_HEIGHT,
+                    )
                 elif terminal_state == "unhackable":
-                    pass
+                    new_terminal_image = sprite_sheet.get_image(
+                        0,
+                        TERMINAL_IMAGE_HEIGHT * 2,
+                        TERMINAL_IMAGE_WIDTH,
+                        TERMINAL_IMAGE_HEIGHT,
+                    )
+
+        surface.blit(new_terminal_image, terminal.location)
