@@ -1,7 +1,11 @@
 import random
 
 import pygame
-from config import N_ENEMIES, SCREEN_HEIGHT, SCREEN_WIDTH
+from config import (
+    N_ENEMIES,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+)
 from framework import State, StateMachine
 
 # from enemy_statemachine import StateMachine, HackingState
@@ -54,9 +58,74 @@ class MaisyView:
     ) -> None:
         self.hackers = hacker_controller
         self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
+        # agents_count: int = N_ENEMIES + 1 # assuming enemies + hero
 
         self.walking_frames_left: list[Surface] = self.get_walking_frames_left()
         self.walking_frames_right: list[Surface] = self.get_walking_frames_right()
+        # self.moving_frames_right: list[Surface] = self.sprite_sheet.get_frames_in_row(
+        #     row_offset=2,
+        #     sprite_width=ENEMY_SPRITE_WIDTH,
+        #     sprite_height=ENEMY_SPRITE_HEIGHT,
+        #     number_of_sprites=agents_count,            target_size=ENEMY_SIZE,
+        # )
+        #
+        # self.moving_frames_left: list[Surface] = self.sprite_sheet.get_frames_in_row(
+        #     row_offset=3,
+        #     sprite_width=ENEMY_SPRITE_WIDTH,
+        #     sprite_height=ENEMY_SPRITE_HEIGHT,
+        #     number_of_sprites=agents_count,
+        #     target_size=ENEMY_SIZE,
+        # )
+        #
+        # self.moving_frames_up: list[Surface] = self.sprite_sheet.get_frames_in_row(
+        #     row_offset=0,
+        #     sprite_width=ENEMY_SPRITE_WIDTH,
+        #     sprite_height=ENEMY_SPRITE_HEIGHT,
+        #     number_of_sprites=agents_count,
+        #     target_size=ENEMY_SIZE,
+        # )
+        #
+        # self.moving_frames_down: list[Surface] = self.sprite_sheet.get_frames_in_row(
+        #     row_offset=1,
+        #     sprite_width=ENEMY_SPRITE_WIDTH,
+        #     sprite_height=ENEMY_SPRITE_HEIGHT,
+        #     number_of_sprites=agents_count,
+        #     target_size=ENEMY_SIZE,
+        # )
+        # self.image: Surface = self.moving_frames_right[0]
+
+    # def render(self, surface: Surface):
+    #     list_index: int = 0
+    #     if self.player_controller.player_model.direction == "RIGHT":
+    #         list_index = int(self.player_controller.player_model.x) % len(
+    #             self.moving_frames_right
+    #         )
+    #         self.image = self.moving_frames_right[list_index]
+    #     elif self.player_controller.player_model.direction == "LEFT":
+    #         list_index = int(self.player_controller.player_model.x) % len(
+    #             self.moving_frames_left
+    #         )
+    #         self.image = self.moving_frames_left[list_index]
+    #     elif self.player_controller.player_model.direction == "UP":
+    #         list_index = int(self.player_controller.player_model.y) % len(
+    #             self.moving_frames_up
+    #         )
+    #         self.image = self.moving_frames_up[list_index]
+    #     elif self.player_controller.player_model.direction == "DOWN":
+    #         list_index = int(self.player_controller.player_model.y) % len(
+    #             self.moving_frames_down
+    #         )
+    #         self.image = self.moving_frames_down[list_index]
+    #
+    #     surface.blit(
+    #         self.image,
+    #         (
+    #             self.player_controller.player_model.x,
+    #             self.player_controller.player_model.y,
+    #             PLAYER_SPRITE_WIDTH,
+    #             PLAYER_SPRITE_HEIGHT,
+    #         ),
+    #     )
 
     def get_walking_frames_left(self) -> list[Surface]:
         row_offset: int = 2

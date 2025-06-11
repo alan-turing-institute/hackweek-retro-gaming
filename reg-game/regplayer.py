@@ -1,21 +1,25 @@
 import pygame
 from bitmapfont import BitmapFont
 from config import (
+    LIVES_MESSAGE_X,
+    LIVES_MESSAGE_Y,
+    LIVES_SPRITE_HEIGHT,
+    LIVES_SPRITE_WIDTH,
+    PLAYER_FACING_DOWN_OFFSET,
+    PLAYER_FACING_LEFT_OFFSET,
+    PLAYER_FACING_RIGHT_OFFSET,
+    PLAYER_FACING_UP_OFFSET,
     PLAYER_NUMBER_OF_SPRITES,
     PLAYER_SIZE,
     PLAYER_SPRITE_HEIGHT,
     PLAYER_SPRITE_WIDTH,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    LIVES_SPRITE_WIDTH,
-    LIVES_SPRITE_HEIGHT,
-    LIVES_MESSAGE_X,
-    LIVES_MESSAGE_Y,
 )
-from sandbox import SandboxController
 from pygame.key import ScancodeWrapper
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_SPACE, K_UP
 from pygame.surface import Surface
+from sandbox import SandboxController
 from spritesheet import SpriteSheet
 
 PLAYER_SPRITESHEET_X: int = 0
@@ -78,7 +82,7 @@ class PlayerView:
 
         self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
         self.moving_frames_right: list[Surface] = self.sprite_sheet.get_frames_in_row(
-            row_offset=2,
+            row_offset=PLAYER_FACING_RIGHT_OFFSET,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
             number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
@@ -86,7 +90,7 @@ class PlayerView:
         )
 
         self.moving_frames_left: list[Surface] = self.sprite_sheet.get_frames_in_row(
-            row_offset=3,
+            row_offset=PLAYER_FACING_LEFT_OFFSET,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
             number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
@@ -94,7 +98,7 @@ class PlayerView:
         )
 
         self.moving_frames_up: list[Surface] = self.sprite_sheet.get_frames_in_row(
-            row_offset=0,
+            row_offset=PLAYER_FACING_UP_OFFSET,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
             number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
@@ -102,7 +106,7 @@ class PlayerView:
         )
 
         self.moving_frames_down: list[Surface] = self.sprite_sheet.get_frames_in_row(
-            row_offset=1,
+            row_offset=PLAYER_FACING_DOWN_OFFSET,
             sprite_width=PLAYER_SPRITE_WIDTH,
             sprite_height=PLAYER_SPRITE_HEIGHT,
             number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
