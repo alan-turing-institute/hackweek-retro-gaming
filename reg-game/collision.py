@@ -4,6 +4,7 @@ from enemy import MaisyController, MaisyModel
 from framework import Game, GameState
 from pygame import Rect
 from regplayer import PlayerController, PlayerModel
+from sounds import SoundEffectPlayer
 from terminals import TerminalController, TerminalModel
 
 
@@ -21,6 +22,7 @@ class HackerCollisionController:
         self.player_controller: PlayerController = player_controller
         self.mini_game_state: GameState | None = mini_game_state
         self.terminal_controller: TerminalController = terminal_controller
+        self.sound_effect_player: SoundEffectPlayer = SoundEffectPlayer()
 
     def update(self, game_time: int, *args, **kwargs) -> None:
         for terminal in self.terminal_controller.terminals:
@@ -32,6 +34,10 @@ class HackerCollisionController:
                     enemy.PLAYER_SIZE[1],
                     terminal,
                 ):
+                    if hacker.at_terminal:
+                        continue
+                    else:
+                        self.sound_effect_player.play_hacker_alert()
                     hacker.at_terminal = True
                     terminal.hacker_at_terminal = hacker
 
