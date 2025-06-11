@@ -24,7 +24,6 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 GREEN = (0, 150, 0)
-random.seed(42)  # For reproducibility in random path generation
 
 
 class Pipe:
