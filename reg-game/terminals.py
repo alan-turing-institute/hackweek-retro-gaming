@@ -163,4 +163,4 @@ class TerminalView:
                         TERMINAL_IMAGE_HEIGHT,
                     )
 
-        surface.blit(new_terminal_image, terminal.location)
+            surface.blit(new_terminal_image, terminal.location)
