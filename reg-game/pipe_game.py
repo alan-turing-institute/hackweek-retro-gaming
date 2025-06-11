@@ -36,6 +36,7 @@ class Pipe:
         colour: tuple[int, int, int] = GRAY,
         draw_manual: bool = True,
         pipe_image_sheet: str = "img/icon1.png",
+        pipe_image_green_sheet: str = "img/icon1_success.png",
     ):
         # type can be:
         # 'straight': | or -
@@ -56,6 +57,7 @@ class Pipe:
         if self.draw_manual:
             # If drawing manually, we don't need the sprite sheet
             self.pipe_image = None
+            self.pipe_image_green = None
         else:
             # depending on the colour, use the appropriate row to get the pipe image
             # depending on the type, use the appropriate row and column to get the pipe image
@@ -82,25 +84,29 @@ class Pipe:
                 pipe_image_y = 0
                 image_size = 6
 
-            # print(f"Loading pipe image at ({pipe_image_x}, {pipe_image_y}) for type '{self.type}' and colour '{self.colour}' and rotation {self.rotation}.")
-
             # Get the image from the sprite sheet
             self.pipe_image = SpriteSheet(pipe_image_sheet).get_image(
                 pipe_image_x, pipe_image_y, image_size, image_size
             )
+            self.pipe_image_green = SpriteSheet(pipe_image_green_sheet).get_image(
+                pipe_image_x, pipe_image_y, image_size, image_size
+            )
 
             # Rotate the image based on the initial rotation
-            print(
-                f"Pipe type {self.type} with initial rotation {self.rotation} degrees."
-            )
             if total_rotation != 0:
                 self.pipe_image = pygame.transform.rotate(
                     self.pipe_image, -total_rotation
+                )
+                self.pipe_image_green = pygame.transform.rotate(
+                    self.pipe_image_green, -total_rotation
                 )
 
             # Scale the image to fit the pipe size
             self.pipe_image = pygame.transform.scale(
                 self.pipe_image, (PIPE_SIZE, PIPE_SIZE)
+            )
+            self.pipe_image_green = pygame.transform.scale(
+                self.pipe_image_green, (PIPE_SIZE, PIPE_SIZE)
             )
 
         # Define connections for each pipe type in its default (0 degree) rotation.
@@ -164,6 +170,9 @@ class Pipe:
         if self.pipe_image:
             self.pipe_image = pygame.transform.rotate(self.pipe_image, -90)
 
+        if self.pipe_image_green:
+            self.pipe_image_green = pygame.transform.rotate(self.pipe_image_green, -90)
+
         print(f"Rotated pipe of type '{self.type}' to {self.rotation} degrees.")
 
     def draw(self, surface: Surface, x: int, y: int):
@@ -221,12 +230,13 @@ class Pipe:
                 pygame.draw.circle(
                     surface, BLACK, (center_x, center_y), line_thickness // 2 + 1
                 )
-
-                # print(f"Drawing manual pipe of type '{self.type}' at ({x}, {y}) with rotation {self.rotation} degrees.")
         else:
-            # print(f"Drawing pipe of type '{self.type}' at ({x}, {y}) with rotation {self.rotation} degrees.")
             # Draw the pipe image on the surface
-            surface.blit(self.pipe_image, (x, y))
+            if self.colour == GREEN:
+                # Use the green pipe image if the pipe is part of the solution path
+                surface.blit(self.pipe_image_green, (x, y))
+            else:
+                surface.blit(self.pipe_image, (x, y))
 
 
 class Board:
@@ -661,7 +671,7 @@ class PipeGameState(GameState):
 
         # Display text if the game is won
         if self.game_won:
-            time.sleep(1)
+            time.sleep(2)
             self.end_game()
 
     def end_game(self):
@@ -677,13 +687,13 @@ class PipeGameState(GameState):
                     hacker.brain.set_state("wandering")
 
             get_ready_state: InterstitialState = InterstitialState(
-                self.game, "Hacker stopped!", 2000, self.play_game_state
+                self.game, "Hacker stopped!", 4500, self.play_game_state
             )
             self.game.change_state(get_ready_state)
             return
 
         game_over_state: InterstitialState = InterstitialState(
-            self.game, "You won!", 2000, self.game_over_state
+            self.game, "You won!", 4500, self.game_over_state
         )
         self.game.change_state(game_over_state)
         return
