@@ -262,6 +262,24 @@ class HackingState(State):
         pass
 
 
+class FightingState(State):
+    def __init__(self, hacker_model: "MaisyModel"):
+        super().__init__("fighting_state")
+        self.hacker_model = hacker_model
+
+    def do_actions(self, game_time):
+        pass
+
+    def check_conditions(self) -> str | None:
+        return None
+
+    def entry_actions(self):
+        pass
+
+    def exit_actions(self):
+        pass
+
+
 class WanderingState(State):
     def __init__(self, hacker_model: "MaisyModel"):
         super().__init__("wandering_state")

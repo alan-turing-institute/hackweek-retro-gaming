@@ -5,7 +5,7 @@ from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame import Rect
 from regplayer import PlayerController, PlayerModel
-from terminals import TerminalModel, TerminalController
+from terminals import TerminalController, TerminalModel
 
 
 class HackerCollisionController:
@@ -50,16 +50,19 @@ class HackerCollisionController:
     def hacker_collide_terminal(self, maisy_model):
         enemy_width, enemy_height = enemy.PLAYER_SIZE
         maisy_rect: Rect = Rect(maisy_model.x, maisy_model.y, enemy_width, enemy_height)
-        collisiions = []
+        collisions = []
         for terminal in self.terminals:
-            collisiion = False
+            collision = False
             terminal_x, terminal_y = terminal.location
             terminal_width, terminal_height = TERMINAL_SIZE
             terminal_rect: Rect = Rect(
                 terminal_x, terminal_y, terminal_width, terminal_height
             )
 
-            collisiion: bool = maisy_rect.colliderect(terminal_rect)
-            collisiions.append(collisiion)
+            collision: bool = maisy_rect.colliderect(terminal_rect)
+            if collision:
+                maisy_model.brain.set_status("hacking_state")
+                terminal.set_status("hacking")
+            collisions.append(collision)
 
-        return collisiions
+        return collisions

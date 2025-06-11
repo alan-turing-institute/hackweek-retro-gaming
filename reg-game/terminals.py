@@ -1,12 +1,11 @@
 from random import randint
 
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from framework import State, StateMachine
 from pygame import Surface, image
-from framework import StateMachine, State
 
 
 class ActiveState(State):
-
     def __init__(self):
         super().__init__("active")
 
@@ -39,11 +38,11 @@ class TerminalModel:
         self.state_machine.set_state("active")
 
     def set_status(self, status: str):
-        if status in ["active", "inactive", "broken", "hacking"]:
+        if status in ["active", "inactive", "broken", "hacking", "fixing"]:
             self.status = status
         else:
             raise ValueError(
-                "Invalid status. Must be 'active', 'inactive', 'broken', or 'hacking'."
+                "Invalid status. Must be 'active', 'inactive', 'broken', 'hacking', or 'fixing'."
             )
 
     def __repr__(self):
@@ -51,7 +50,6 @@ class TerminalModel:
 
 
 class TerminalController:
-
     def __init__(self, number_of_terminals: int) -> None:
         self.terminals: list[TerminalModel] = []
         self.create_random_terminals(number_of_terminals)
