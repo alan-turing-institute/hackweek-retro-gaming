@@ -135,6 +135,7 @@ class PlayerView:
             )
             self.image = self.moving_frames_down[list_index]
 
+        self.image = pygame.transform.scale(self.image, PLAYER_SIZE)
         surface.blit(
             self.image,
             (

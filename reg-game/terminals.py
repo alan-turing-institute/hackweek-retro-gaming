@@ -1,4 +1,5 @@
 from random import randint
+import pygame
 
 from config import (
     SCREEN_HEIGHT,
@@ -7,6 +8,10 @@ from config import (
     TERMINAL_IMAGE_WIDTH,
     TERMINAL_SPRITE_SHEET,
     UNHACKABLE_COUNTDOWN,
+    TERMINAL_IMAGE_SERVER,
+    TERMINAL_IMAGE_COMPUTER_ON,
+    TERMINAL_IMAGE_COMPUTER_OFF,
+    TERMINAL_SIZE,
 )
 from framework import State, StateMachine
 from pygame import Surface, image
@@ -124,7 +129,7 @@ class TerminalController:
         self, number_of_terminals: int, game: Game, mini_game_state: GameState | None
     ) -> None:
 
-        offset: int = 50
+        offset: int = 80
         self.terminals: list[TerminalModel] = [
             TerminalModel("top-left", (offset, offset)),
             TerminalModel("top-right", (SCREEN_WIDTH - offset, offset)),
@@ -164,33 +169,23 @@ class TerminalController:
 class TerminalView:
     def __init__(self, terminal_controller: TerminalController, img_path: str):
         self.terminal_controller: TerminalController = terminal_controller
-        self.image: Surface = image.load(img_path)
+        self.current_terminal: Surface = image.load(img_path)
 
     def render(self, surface: Surface):
         sprite_sheet: SpriteSheet = SpriteSheet(TERMINAL_SPRITE_SHEET)
-        new_terminal_image: Surface = self.image
+        new_terminal_image: Surface = self.current_terminal
 
         for terminal in self.terminal_controller.terminals:
             if terminal.state_machine.active_state is not None:
                 terminal_state: str = terminal.state_machine.active_state.name
 
                 if terminal_state == "active":
-                    new_terminal_image = self.image
+                    new_terminal_image = image.load(TERMINAL_IMAGE_SERVER)
                 elif terminal_state == "hacking":
                     # TODO fix later
-                    new_terminal_image = sprite_sheet.get_image(
-                        TERMINAL_IMAGE_WIDTH * 2,
-                        0,
-                        TERMINAL_IMAGE_WIDTH,
-                        TERMINAL_IMAGE_HEIGHT,
-                    )
+                    new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_ON)
                 elif terminal_state == "fixing":
-                    new_terminal_image = sprite_sheet.get_image(
-                        TERMINAL_IMAGE_WIDTH * 2,
-                        0,
-                        TERMINAL_IMAGE_WIDTH,
-                        TERMINAL_IMAGE_HEIGHT,
-                    )
+                    new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_ON)
                 elif terminal_state == "broken":
                     new_terminal_image = sprite_sheet.get_image(
                         TERMINAL_IMAGE_WIDTH * 2,
@@ -199,11 +194,9 @@ class TerminalView:
                         TERMINAL_IMAGE_HEIGHT,
                     )
                 elif terminal_state == "unhackable":
-                    new_terminal_image = sprite_sheet.get_image(
-                        0,
-                        TERMINAL_IMAGE_HEIGHT * 2,
-                        TERMINAL_IMAGE_WIDTH,
-                        TERMINAL_IMAGE_HEIGHT,
-                    )
+                    new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_OFF)
 
+            new_terminal_image = pygame.transform.scale(
+                new_terminal_image, size=TERMINAL_SIZE
+            )
             surface.blit(new_terminal_image, terminal.location)
