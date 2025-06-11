@@ -1,5 +1,6 @@
 import random
 
+import numpy as np
 import pygame
 from config import N_ENEMIES, SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import State, StateMachine
@@ -7,6 +8,7 @@ from framework import State, StateMachine
 # from enemy_statemachine import StateMachine, HackingState
 from pygame.surface import Surface
 from spritesheet import SpriteSheet
+from terminals import TerminalController, TerminalModel
 
 PLAYER_SIZE: tuple[int, int] = (96, 96)
 
@@ -17,7 +19,7 @@ PLAYER_SPRITE_HEIGHT: int = 48
 
 
 class MaisyModel:
-    def __init__(self, x, y) -> None:
+    def __init__(self, x, y, terminals) -> None:
         self.x = x
         self.y = y
         self.dx = random.randint(-2, 2)
@@ -27,19 +29,22 @@ class MaisyModel:
         self.at_terminal = False
         self.brain = StateMachine()
         self.brain.add_state(HackingState(self))
-        self.brain.add_state(WanderingState(self))
+        self.brain.add_state(WanderingState(self, terminals))
+        self.brain.add_state(SearchingState(self))
         self.speed = 3
 
 
 class MaisyController:
-    def __init__(self):
+    def __init__(self, terminal_controller: "TerminalController"):
         self.hacker_models = [
             MaisyModel(
                 x=random.randint(0, SCREEN_WIDTH),
                 y=random.randint(0, int(0.25 * SCREEN_HEIGHT)),
+                terminals=terminal_controller.terminals,
             )
             for _ in range(N_ENEMIES)
         ]
+        self.terminal_controller = terminal_controller
         for hacker in self.hacker_models:
             hacker.brain.set_state("wandering")
 
@@ -140,10 +145,10 @@ class HackingState(State):
 
 
 class WanderingState(State):
-    def __init__(self, hacker_model: "MaisyModel"):
+    def __init__(self, hacker_model: "MaisyModel", terminals: list["TerminalModel"]):
         super().__init__("wandering")
         self.hacker_model = hacker_model
-        # self.terminals = terminals
+        self.terminals = terminals
 
     def do_actions(self, game_time):
         # Change direction sometimes
@@ -182,7 +187,22 @@ class WanderingState(State):
                 0, min(SCREEN_HEIGHT - self.hacker_model.height, self.hacker_model.y)
             )
 
+    def get_distance(self, h_loc, t_loc):
+        dist = abs(h_loc[0] - t_loc[0]) ** 2 + abs(h_loc[1] - t_loc[1]) ** 2
+        return np.sqrt(dist)
+
     def check_conditions(self) -> str | None:
+        # Check if terminal available and within range
+        # If so go to searching
+        range = -10
+        for terminal in self.terminals:
+            dist = self.get_distance(
+                (self.hacker_model.x, self.hacker_model.y), terminal.location
+            )
+            if dist < range:
+                return "searching"
+
+        # Check if at terminal TODO check if terminal is active
         print(f"At wandering {self.hacker_model.at_terminal=}")
         if self.hacker_model.at_terminal:
             return "hacking"
@@ -199,14 +219,19 @@ class SearchingState(State):
     def __init__(self, hacker_model: "MaisyModel"):
         super().__init__("searching")
         self.hacker_model = hacker_model
+        self.game_time = 0
 
     def do_actions(self, game_time):
-        pass
+        self.game_time += game_time
+        print(f"Searching: {self.game_time}")
 
     def check_conditions(self) -> str | None:
-        pass
+        if self.game_time > 10000:
+            print("TIME UP")
+            return "wandering"
 
     def entry_actions(self):
+        print("IN SEARCHING")
         pass
 
     def exit_actions(self):
