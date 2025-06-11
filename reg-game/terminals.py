@@ -7,11 +7,12 @@ from config import (
     TERMINAL_IMAGE_WIDTH,
     TERMINAL_SPRITE_SHEET,
 )
-from enemy import MaisyModel
 from framework import State, StateMachine
 from pygame import Surface, image
 from regplayer import PlayerModel
 from spritesheet import SpriteSheet
+from interstitial import InterstitialState
+from framework import Game, GameState
 
 
 class ActiveState(State):
@@ -44,9 +45,13 @@ class HackingState(State):
 
 
 class FixingState(State):
-    def __init__(self, terminal: "TerminalModel"):
+    def __init__(
+        self, terminal: "TerminalModel", get_ready_state: InterstitialState, game: Game
+    ):
         super().__init__("fixing")
-        self.terminal_model = terminal
+        self.terminal_model: TerminalModel = terminal
+        self.get_ready_state: InterstitialState = get_ready_state
+        self.game: Game = game
 
     def check_conditions(self) -> str | None:
         if (
@@ -64,6 +69,9 @@ class FixingState(State):
             return "broken"
 
         return None
+
+    def entry_actions(self) -> None:
+        self.game.change_state(self.get_ready_state)
 
 
 class BrokenState(State):
@@ -83,18 +91,12 @@ class TerminalModel:
         self.name = name
         self.location: tuple[int, int] = location
         self.player_at_terminal: PlayerModel | None = None
-        self.hacker_at_terminal: MaisyModel | None = None
+        self.hacker_at_terminal = None
 
         self.hacking_failed: bool = False
         self.fixing_failed: bool = True
 
         self.state_machine = StateMachine()
-        self.state_machine.add_state(ActiveState(self))
-        self.state_machine.add_state(HackingState(self))
-        self.state_machine.add_state(FixingState(self))
-        self.state_machine.add_state(BrokenState(self))
-
-        self.state_machine.set_state("active")
 
     def set_status(self, new_state: str):
         self.state_machine.set_state(new_state)
@@ -104,7 +106,9 @@ class TerminalModel:
 
 
 class TerminalController:
-    def __init__(self, number_of_terminals: int) -> None:
+    def __init__(
+        self, number_of_terminals: int, game: Game, mini_game_state: GameState | None
+    ) -> None:
 
         offset: int = 50
         self.terminals: list[TerminalModel] = [
@@ -115,6 +119,21 @@ class TerminalController:
                 "bottom-right", (SCREEN_WIDTH - offset, SCREEN_HEIGHT - offset)
             ),
         ]
+
+        get_ready_state: InterstitialState = InterstitialState(
+            game, "Stop the hacker!", 2000, mini_game_state
+        )
+
+        for terminal in self.terminals:
+            terminal.state_machine.add_state(ActiveState(terminal))
+            terminal.state_machine.add_state(HackingState(terminal))
+            terminal.state_machine.add_state(
+                FixingState(terminal, get_ready_state, game)
+            )
+            terminal.state_machine.add_state(BrokenState(terminal))
+            terminal.state_machine.add_state(UnHackableState(terminal))
+
+            terminal.state_machine.set_state("active")
 
     def create_random_terminals(self, num_terminals: int):
         for _ in range(num_terminals):
