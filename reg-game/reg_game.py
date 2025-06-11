@@ -36,7 +36,6 @@ class PlayGameState(GameState):
             self.player_controller.pause(False)
 
     def initialise(self) -> None:
-        self.maisy_controller = MaisyController()
         # Initialize the terminals
         self.terminal_controller: TerminalController = TerminalController(
             NUMBER_OF_TERMINALS, self.game, self.mini_game_state
