@@ -5,7 +5,7 @@ from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame import Rect
 from regplayer import PlayerController, PlayerModel
-from terminals import Terminal
+from terminals import TerminalController, TerminalModel
 
 
 class HackerCollisionController:
@@ -15,13 +15,13 @@ class HackerCollisionController:
         maisy_controller: MaisyController,
         player_controller: PlayerController,
         mini_game_state: GameState | None,
-        terminals: list[Terminal],
+        terminal_controller: TerminalController,
     ) -> None:
         self.game: Game = game
         self.maisy_controller: MaisyController = maisy_controller
         self.player_controller: PlayerController = player_controller
         self.mini_game_state: GameState | None = mini_game_state
-        self.terminals: list = terminals
+        self.terminals: list[TerminalModel] = terminal_controller.terminals
 
     def update(self, game_time: int, *args, **kwargs) -> None:
         for maisy_model in self.maisy_controller.hacker_models:
@@ -50,16 +50,20 @@ class HackerCollisionController:
     def hacker_collide_terminal(self, maisy_model):
         enemy_width, enemy_height = enemy.PLAYER_SIZE
         maisy_rect: Rect = Rect(maisy_model.x, maisy_model.y, enemy_width, enemy_height)
-        collisiions = []
+        collisions = []
         for terminal in self.terminals:
-            collisiion = False
+            collision = False
             terminal_x, terminal_y = terminal.location
             terminal_width, terminal_height = TERMINAL_SIZE
             terminal_rect: Rect = Rect(
                 terminal_x, terminal_y, terminal_width, terminal_height
             )
 
-            collisiion: bool = maisy_rect.colliderect(terminal_rect)
-            collisiions.append(collisiion)
+            collision: bool = maisy_rect.colliderect(terminal_rect)
+            if collision:
+                maisy_model.at_terminal = True
+                terminal.state_machine.set_state("hacking")
 
-        return collisiions
+            collisions.append(collision)
+
+        return collisions
