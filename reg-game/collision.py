@@ -21,17 +21,29 @@ class HackerCollisionController:
         self.maisy_controller: MaisyController = maisy_controller
         self.player_controller: PlayerController = player_controller
         self.mini_game_state: GameState | None = mini_game_state
-        self.terminals: list[TerminalModel] = terminal_controller.terminals
+        self.terminal_controller: TerminalController = terminal_controller
 
     def update(self, game_time: int, *args, **kwargs) -> None:
-        for maisy_model in self.maisy_controller.hacker_models:
-            if self.mini_game_state is not None:
-                if True in self.hacker_collide_terminal(maisy_model):
-                    get_ready_state: InterstitialState = InterstitialState(
-                        self.game, "Stop the hacker!", 2000, self.mini_game_state
-                    )
-                    self.game.change_state(get_ready_state)
-                    return
+
+        for terminal in self.terminal_controller.terminals:
+            for hacker in self.maisy_controller.hacker_models:
+                if self.collides_with_terminal(
+                    hacker.x,
+                    hacker.y,
+                    enemy.PLAYER_SIZE[0],
+                    enemy.PLAYER_SIZE[1],
+                    terminal,
+                ):
+                    terminal.hacker_at_terminal = hacker
+
+                if self.collides_with_terminal(
+                    self.player_controller.player_model.x,
+                    self.player_controller.player_model.y,
+                    PLAYER_SIZE[0],
+                    PLAYER_SIZE[1],
+                    terminal,
+                ):
+                    terminal.player_at_terminal = self.player_controller.player_model
 
     def player_collide(self, maisy_model: MaisyModel) -> bool:
         player_model: PlayerModel = self.player_controller.player_model
@@ -47,23 +59,24 @@ class HackerCollisionController:
 
         return result
 
-    def hacker_collide_terminal(self, maisy_model):
-        enemy_width, enemy_height = enemy.PLAYER_SIZE
-        maisy_rect: Rect = Rect(maisy_model.x, maisy_model.y, enemy_width, enemy_height)
-        collisions = []
-        for terminal in self.terminals:
-            collision = False
-            terminal_x, terminal_y = terminal.location
-            terminal_width, terminal_height = TERMINAL_SIZE
-            terminal_rect: Rect = Rect(
-                terminal_x, terminal_y, terminal_width, terminal_height
-            )
+    def collides_with_terminal(
+        self,
+        position_x: int,
+        position_y: int,
+        width: int,
+        height: int,
+        terminal_model: TerminalModel,
+    ) -> bool:
+        entity_rect: Rect = Rect(position_x, position_y, width, height)
 
-            collision: bool = maisy_rect.colliderect(terminal_rect)
-            if collision:
-                maisy_model.at_terminal = True
-                terminal.hacker_at_terminal = maisy_model
+        terminal_width, terminal_height = TERMINAL_SIZE
+        terminal_rect: Rect = Rect(
+            terminal_model.location[0],
+            terminal_model.location[1],
+            terminal_width,
+            terminal_height,
+        )
 
-            collisions.append(collision)
+        collision: bool = entity_rect.colliderect(terminal_rect)
 
-        return collisions
+        return collision
