@@ -6,15 +6,17 @@ class MusicPlayer:
         """
         Initializes the MusicPlayer instance.
         """
+        self.game_theme = mixer.music.load("sound/reggame.mp3")
         self.is_playing = False
+        self.volume = 0.3
 
     def start(self):
         """
         Starts playing the background music.
         """
         if not self.is_playing:
-            load_background_music()
-            play_background_music()
+            mixer.music.set_volume(self.volume)
+            mixer.music.play(-1)
             self.is_playing = True
 
     def stop(self):
@@ -34,16 +36,6 @@ class MusicPlayer:
         else:
             self.start()
 
-def load_background_music():
-    mixer.music.load("sound/reggame.mp3")
-
-def play_background_music():
-    """
-    Plays the background music in a loop.
-    """
-    mixer.music.play(-1)  # -1 means loop indefinitely
-    mixer.music.set_volume(0.25)  # Set volume to 25%
-
 
 class SoundEffectPlayer:
     def __init__(self):
@@ -58,4 +50,3 @@ class SoundEffectPlayer:
         Plays the sandbox sound effect.
         """
         self.sandbox_sound.play()
-
