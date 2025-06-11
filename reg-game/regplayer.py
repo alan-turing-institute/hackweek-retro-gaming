@@ -1,22 +1,22 @@
 import pygame
 from bitmapfont import BitmapFont
 from config import (
+    LIVES_MESSAGE_X,
+    LIVES_MESSAGE_Y,
+    LIVES_SPRITE_HEIGHT,
+    LIVES_SPRITE_WIDTH,
     PLAYER_NUMBER_OF_SPRITES,
     PLAYER_SIZE,
     PLAYER_SPRITE_HEIGHT,
     PLAYER_SPRITE_WIDTH,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    LIVES_SPRITE_WIDTH,
-    LIVES_SPRITE_HEIGHT,
-    LIVES_MESSAGE_X,
-    LIVES_MESSAGE_Y,
 )
-from sandbox import SandboxController
-from sounds import SoundEffectPlayer
 from pygame.key import ScancodeWrapper
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_SPACE, K_UP
 from pygame.surface import Surface
+from sandbox import SandboxController
+from sounds import SoundEffectPlayer
 from spritesheet import SpriteSheet
 
 PLAYER_SPRITESHEET_X: int = 0
