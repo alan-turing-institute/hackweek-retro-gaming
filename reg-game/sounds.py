@@ -1,4 +1,4 @@
-import pygame
+from pygame import mixer
 
 
 class MusicPlayer:
@@ -22,7 +22,7 @@ class MusicPlayer:
         Stops the background music.
         """
         if self.is_playing:
-            pygame.mixer.music.stop()
+            mixer.music.stop()
             self.is_playing = False
 
     def toggle(self):
@@ -35,11 +35,27 @@ class MusicPlayer:
             self.start()
 
 def load_background_music():
-    pygame.mixer.music.load("sound/reggame.mp3")
+    mixer.music.load("sound/reggame.mp3")
 
 def play_background_music():
     """
     Plays the background music in a loop.
     """
-    pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-    pygame.mixer.music.set_volume(0.25)  # Set volume to 25%
+    mixer.music.play(-1)  # -1 means loop indefinitely
+    mixer.music.set_volume(0.25)  # Set volume to 25%
+
+
+class SoundEffectPlayer:
+    def __init__(self):
+        """
+        Initializes the SoundEffectPlayer instance.
+        """
+        self.sandbox_sound = mixer.Sound("sound/playershoot.wav")
+        self.sandbox_sound.set_volume(0.5)
+
+    def play_sandbox_sound(self):
+        """
+        Plays the sandbox sound effect.
+        """
+        self.sandbox_sound.play()
+
