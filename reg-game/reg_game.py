@@ -39,7 +39,7 @@ class PlayGameState(GameState):
         self.maisy_controller = MaisyController()
         # Initialize the terminals
         self.terminal_controller: TerminalController = TerminalController(
-            NUMBER_OF_TERMINALS
+            NUMBER_OF_TERMINALS, self.game, self.mini_game_state
         )
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
         self.collision_controller = HackerCollisionController(
