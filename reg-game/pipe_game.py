@@ -697,7 +697,7 @@ class PipeGameState(GameState):
             # change state of the machine (to inactive)
             for terminal in self.play_game_state.terminal_controller.terminals:
                 if terminal.state_machine.active_state.name == "fixing":
-                    terminal.state_machine.set_state("unhackable")
+                    terminal.hacking_failed = True
 
             # change the state of the hackers to wandering (random)
             for hacker in self.play_game_state.maisy_controller.hacker_models:

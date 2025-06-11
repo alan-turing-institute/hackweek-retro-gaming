@@ -6,6 +6,7 @@ from config import (
     TERMINAL_IMAGE_HEIGHT,
     TERMINAL_IMAGE_WIDTH,
     TERMINAL_SPRITE_SHEET,
+    UNHACKABLE_COUNTDOWN,
 )
 from framework import State, StateMachine
 from pygame import Surface, image
@@ -84,6 +85,19 @@ class UnHackableState(State):
     def __init__(self, terminal: "TerminalModel"):
         super().__init__("unhackable")
         self.terminal_model = terminal
+        self.countdown: int = UNHACKABLE_COUNTDOWN
+
+    def do_actions(self, game_time):
+        self.countdown -= game_time
+
+    def entry_actions(self) -> None:
+        self.countdown = UNHACKABLE_COUNTDOWN
+
+    def check_conditions(self) -> str | None:
+        if self.countdown <= 0:
+            return "active"
+
+        return None
 
 
 class TerminalModel:
