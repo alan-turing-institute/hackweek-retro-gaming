@@ -1,5 +1,4 @@
 from background import BackgroundView
-from backgroundmusic import MusicPlayer
 from collision import CollisionController
 from config import (
     LIVES_SPRITE_SHEET_PATH,
@@ -11,6 +10,7 @@ from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
 from sandbox import SandboxView
+from sounds import MusicPlayer
 from terminals import TerminalView, create_random_terminals
 
 PLAYER_X: int = SCREEN_WIDTH // 2
