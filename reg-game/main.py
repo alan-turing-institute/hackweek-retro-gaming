@@ -19,10 +19,10 @@ play_game_state: PlayGameState = PlayGameState(
 )
 pipe_game_state.play_game_state = play_game_state
 
-get_ready_state: InterstitialState = InterstitialState(
-    reg_game, "Get ready!!", 2000, play_game_state
+prepare_for_challenge: InterstitialState = InterstitialState(
+    reg_game, "Defense and Security need you!", 2000, play_game_state
 )
 
-main_menu_state.set_play_state(get_ready_state)
+main_menu_state.set_play_state(prepare_for_challenge)
 
 reg_game.run(main_menu_state)

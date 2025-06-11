@@ -6,10 +6,12 @@ BACKGROUND_COLOR: tuple[int, int, int] = (215, 219, 171)
 
 class SpriteSheet:
     def __init__(self, file_name: str):
-        self.sprite_sheet: Surface = pygame.image.load(file_name).convert()
+        self.sprite_sheet: Surface = pygame.image.load(file_name).convert_alpha()
 
     def get_image(self, x, y, width, height) -> Surface:
-        image: Surface = pygame.Surface([width, height]).convert()
+        image: Surface = pygame.Surface(
+            [width, height], flags=pygame.SRCALPHA, depth=32
+        ).convert_alpha()
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
         # image.set_colorkey(BACKGROUND_COLOR)
 
