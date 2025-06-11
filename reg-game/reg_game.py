@@ -79,6 +79,7 @@ class PlayGameState(GameState):
             self.player_controller,
             self.maisy_controller,
             self.collision_controller,
+            self.terminal_controller,
         ]
 
     def update(self, game_time: int, *args, **kwargs):
