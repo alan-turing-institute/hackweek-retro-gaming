@@ -50,6 +50,8 @@ class SoundEffectPlayer:
         self.hacking_sound.set_volume(0.05)
         self.hacking_over: mixer.Sound = mixer.Sound("sound/hackingover.wav")
         self.hacking_over.set_volume(0.4)
+        self.rotate_pipe_sound: mixer.Sound = mixer.Sound("sound/pipe_rotation.wav")
+        self.rotate_pipe_sound.set_volume(.8)
 
     def play_sandbox_sound(self):
         """
@@ -80,3 +82,9 @@ class SoundEffectPlayer:
         Plays the hacking over sound effect.
         """
         self.hacking_over.play()
+
+    def play_rotate_pipe_sound(self):
+        """
+        Plays the rotate pipe sound effect.
+        """
+        self.rotate_pipe_sound.play()
