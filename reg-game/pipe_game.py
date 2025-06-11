@@ -6,6 +6,7 @@ from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame.surface import Surface
+from sounds import SoundEffectPlayer
 from spritesheet import SpriteSheet
 
 BOARD_SIZE = 6
@@ -34,12 +35,13 @@ class Pipe:
         rotation: int = 0,
         colour: tuple[int, int, int] = GRAY,
         draw_manual: bool = True,
-        pipe_image_sheet: str = "img/sci-fi-platformer-tiles-32x32-extension.png",
+        pipe_image_sheet: str = "img/icon1.png",
+        pipe_image_green_sheet: str = "img/icon1_success.png",
+        pipe_image_red_sheet: str = "img/icon1_fail.png",
     ):
         # type can be:
         # 'straight': | or -
         # 'corner': L-shaped
-        # 'cross': + shaped
         # 't_joint': T-shaped
         # 'start_end': special type for start and end points
         # 'empty': represents an impassable cell with no connections
@@ -55,70 +57,68 @@ class Pipe:
         self.draw_manual = draw_manual
         if self.draw_manual:
             # If drawing manually, we don't need the sprite sheet
-            self.pipe_image_sheet = None
             self.pipe_image = None
+            self.pipe_image_green = None
+            self.pipe_image_red = None
         else:
-            # Load the sprite sheet for pipe images
-            self.pipe_image_sheet = SpriteSheet(pipe_image_sheet)
-
             # depending on the colour, use the appropriate row to get the pipe image
             # depending on the type, use the appropriate row and column to get the pipe image
             # depdening on the rotation, use the approriate transform to rotate the image
-            if self.colour == GRAY:
-                pipe_image_y = 640
-            elif self.colour == RED:
-                pipe_image_y = 1600
-            elif self.colour == BLUE:
-                pipe_image_y = 2560
-            elif self.colour == YELLOW:
-                pipe_image_y = 2240
-            elif self.colour == GREEN:
-                pipe_image_y = 1280
-            else:
-                pipe_image_y = 3200
-
+            image_size = 30
+            total_rotation = self.rotation
             if self.type == "straight":
-                pipe_image_x = 64
-                pipe_image_y = pipe_image_y + 128
+                pipe_image_x = 10
+                pipe_image_y = 41
+                total_rotation += 90
             elif self.type == "corner":
-                pipe_image_x = 128
-                pipe_image_y = pipe_image_y + 32
-            elif self.type == "cross":
-                pipe_image_x = 192
-                pipe_image_y = pipe_image_y + 192
+                pipe_image_x = 74
+                pipe_image_y = 41
             elif self.type == "t_joint":
-                pipe_image_x = 192
-                pipe_image_y = pipe_image_y + 128
+                pipe_image_x = 42
+                pipe_image_y = 41
+                total_rotation += 90
             elif self.type == "start_end":
-                pipe_image_x = 288
-                pipe_image_y = pipe_image_y + 192
-            elif self.type == "empty":
-                pipe_image_x = 448
-                pipe_image_y = pipe_image_y + 128
+                pipe_image_x = 74
+                pipe_image_y = 73
             else:
-                pipe_image_x = 32
-                pipe_image_y = pipe_image_y + 64
+                # also for 'empty' type
+                pipe_image_x = 0
+                pipe_image_y = 0
+                image_size = 6
 
             # Get the image from the sprite sheet
-            if self.pipe_image_sheet is None:
-                raise TypeError("Pipe image sheet is not set. Cannot draw pipe.")
-            # print(f"Loading pipe image at ({pipe_image_x}, {pipe_image_y}) for type '{self.type}' and colour '{self.colour}' and rotation {self.rotation}.")
-
-            # Get the image from the sprite sheet
-            self.pipe_image = self.pipe_image_sheet.get_image(
-                pipe_image_x, pipe_image_y, 32, 32
+            self.pipe_image = SpriteSheet(pipe_image_sheet).get_image(
+                pipe_image_x, pipe_image_y, image_size, image_size
             )
+            self.pipe_image_green = SpriteSheet(pipe_image_green_sheet).get_image(
+                pipe_image_x, pipe_image_y, image_size, image_size
+            )
+            self.pipe_image_red = SpriteSheet(pipe_image_red_sheet).get_image(
+                pipe_image_x, pipe_image_y, image_size, image_size
+            )
+
+            # Rotate the image based on the initial rotation
+            if total_rotation != 0:
+                self.pipe_image = pygame.transform.rotate(
+                    self.pipe_image, -total_rotation
+                )
+                self.pipe_image_green = pygame.transform.rotate(
+                    self.pipe_image_green, -total_rotation
+                )
+                self.pipe_image_red = pygame.transform.rotate(
+                    self.pipe_image_red, -total_rotation
+                )
 
             # Scale the image to fit the pipe size
             self.pipe_image = pygame.transform.scale(
                 self.pipe_image, (PIPE_SIZE, PIPE_SIZE)
             )
-
-            # Rotate the image based on the initial rotation
-            if self.rotation != 0:
-                self.pipe_image = pygame.transform.rotate(
-                    self.pipe_image, -self.rotation
-                )
+            self.pipe_image_green = pygame.transform.scale(
+                self.pipe_image_green, (PIPE_SIZE, PIPE_SIZE)
+            )
+            self.pipe_image_red = pygame.transform.scale(
+                self.pipe_image_red, (PIPE_SIZE, PIPE_SIZE)
+            )
 
         # Define connections for each pipe type in its default (0 degree) rotation.
         # Connections are represented by a set of directions: 'N', 'E', 'S', 'W'
@@ -131,8 +131,6 @@ class Pipe:
             return {"N", "S"}
         elif self.type == "corner":
             return {"N", "E"}
-        elif self.type == "cross":
-            return {"N", "E", "S", "W"}
         elif self.type == "t_joint":
             return {"N", "E", "W"}
         elif self.type == "start_end":
@@ -182,6 +180,11 @@ class Pipe:
 
         if self.pipe_image:
             self.pipe_image = pygame.transform.rotate(self.pipe_image, -90)
+
+        if self.pipe_image_green:
+            self.pipe_image_green = pygame.transform.rotate(self.pipe_image_green, -90)
+
+        print(f"Rotated pipe of type '{self.type}' to {self.rotation} degrees.")
 
     def draw(self, surface: Surface, x: int, y: int):
         """Draws the pipe segment on the given surface."""
@@ -238,12 +241,16 @@ class Pipe:
                 pygame.draw.circle(
                     surface, BLACK, (center_x, center_y), line_thickness // 2 + 1
                 )
-
-                # print(f"Drawing manual pipe of type '{self.type}' at ({x}, {y}) with rotation {self.rotation} degrees.")
         else:
-            # print(f"Drawing pipe of type '{self.type}' at ({x}, {y}) with rotation {self.rotation} degrees.")
             # Draw the pipe image on the surface
-            surface.blit(self.pipe_image, (x, y))
+            if self.colour == GREEN:
+                # Use the green pipe image if the pipe is part of the solution path
+                surface.blit(self.pipe_image_green, (x, y))
+            elif self.colour == RED:
+                # Use the red pipe image if the game is failed
+                surface.blit(self.pipe_image_red, (x, y))
+            else:
+                surface.blit(self.pipe_image, (x, y))
 
 
 class Board:
@@ -262,6 +269,7 @@ class Board:
         # Whether to draw the pipe segment manually (True) or load it from a spritesheet
         self.draw_manual = draw_manual
         self._initialize_board()
+        self.sound_effect_player = SoundEffectPlayer()
 
     def is_valid_move(self, rows: int, cols: int, r: int, c: int, visited: set) -> bool:
         """
@@ -343,30 +351,30 @@ class Board:
                 )
                 if direction == (0, 1):  # Move East from start
                     self.grid[r][c] = Pipe(
-                        "start_end",
+                        type="start_end",
                         rotation=90,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (1, 0):  # Move South
                     self.grid[r][c] = Pipe(
-                        "start_end",
+                        type="start_end",
                         rotation=180,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (0, -1):  # Move West
                     self.grid[r][c] = Pipe(
-                        "start_end",
+                        type="start_end",
                         rotation=270,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (-1, 0):  # Move North
                     self.grid[r][c] = Pipe(
-                        "start_end",
+                        type="start_end",
                         rotation=0,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
             elif (r, c) == self.end_pos:
@@ -377,30 +385,30 @@ class Board:
                 )
                 if direction == (0, 1):  # Move East to end
                     self.grid[r][c] = Pipe(
-                        "start_end",
+                        type="start_end",
                         rotation=90,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (1, 0):  # Move South to end
                     self.grid[r][c] = Pipe(
-                        "start_end",
+                        type="start_end",
                         rotation=180,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (0, -1):  # Move West to end
                     self.grid[r][c] = Pipe(
-                        "start_end",
+                        type="start_end",
                         rotation=270,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (-1, 0):  # Move North to end
                     self.grid[r][c] = Pipe(
-                        "start_end",
+                        type="start_end",
                         rotation=0,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
             else:
@@ -430,12 +438,12 @@ class Board:
                     outgoing_dir = "E"  # Going East (next is right)
 
                 # Assign pipe based on incoming and outgoing directions
-                pipe_type_and_rot = self._get_pipe_type_and_rotation(
+                pipe_type, rotation = self._get_pipe_type_and_rotation(
                     incoming_dir, outgoing_dir
                 )
                 self.grid[r][c] = Pipe(
-                    pipe_type_and_rot[0],
-                    rotation=pipe_type_and_rot[1],
+                    type=pipe_type,
+                    rotation=rotation,
                     draw_manual=self.draw_manual,
                 )
 
@@ -452,16 +460,10 @@ class Board:
                         )
                     else:
                         self.grid[r][c] = Pipe(
-                            random.choice(pipe_types),
+                            type=random.choice(pipe_types),
                             rotation=random.choice([0, 90, 180, 270]),
                             draw_manual=self.draw_manual,
                         )
-                else:
-                    # For path cells, apply a random rotation to make it a puzzle,
-                    # but ensure the type is preserved from path generation.
-                    # Start/End pipes are handled explicitly.
-                    if (r, c) != self.start_pos and (r, c) != self.end_pos:
-                        self.grid[r][c].rotation = random.choice([0, 90, 180, 270])
 
         self.check_connections()  # Initial check to set up colours
 
@@ -519,6 +521,7 @@ class Board:
             self.start_pos,
             self.end_pos,
         } and current_pipe.type != "empty":
+            self.sound_effect_player.play_rotate_pipe_sound()
             current_pipe.rotate()
             # After rotation, re-check connections and update colours
             return self.check_connections()
@@ -535,7 +538,7 @@ class Board:
         for r in range(self.size):
             for c in range(self.size):
                 if (r, c) == self.start_pos or (r, c) == self.end_pos:
-                    self.grid[r][c].colour = RED  # Start/end points are initially red
+                    self.grid[r][c].colour = GRAY  # Start/end points are initially red
                 elif self.grid[r][c].type == "empty":
                     self.grid[r][c].colour = BLACK  # Empty cells are black
                 else:
@@ -560,20 +563,15 @@ class Board:
 
             # Define neighbors and the required connection direction from them
             neighbors = {
-                "N": (
-                    r - 1,
-                    c,
-                    "S",
-                ),  # Neighbor to the North requires a South connection
+                "N": (r - 1, c, "S"),
                 "E": (r, c + 1, "W"),
                 "S": (r + 1, c, "N"),
                 "W": (r, c - 1, "E"),
             }
 
             for direction, (nr, nc, required_neighbor_conn) in neighbors.items():
-                if (
-                    direction in current_connections
-                ):  # Check if current pipe connects in this direction
+                if direction in current_connections:
+                    # Check if current pipe connects in this direction
                     # Check if neighbor is within board bounds
                     if 0 <= nr < self.size and 0 <= nc < self.size:
                         neighbor_pipe = self.grid[nr][nc]
@@ -603,6 +601,13 @@ class Board:
             self.grid[self.end_pos[0]][self.end_pos[1]].colour = GREEN
 
         return is_game_won
+
+    def fail_game(self):
+        """Turns all pipes to red to indicate failure."""
+        for r in range(self.size):
+            for c in range(self.size):
+                if self.grid[r][c] is not None and self.grid[r][c].type != "empty":
+                    self.grid[r][c].colour = RED
 
     def draw(self, surface: Surface):
         """Draws all pipes on the board."""
@@ -643,8 +648,9 @@ class PipeGameState(GameState):
         game: Game,
         game_over_state: GameState | None = None,
         play_game_state: GameState | None = None,
-        board_size: int = 6,
-        draw_manual: bool = True,
+        board_size: int = BOARD_SIZE,
+        draw_manual: bool = False,
+        max_time: int = 15000,
     ):
         if board_size < 3:
             raise ValueError("Board size must be at least 3x3 for a playable game.")
@@ -653,16 +659,28 @@ class PipeGameState(GameState):
         self.play_game_state = play_game_state
         self.board_size = board_size
         self.draw_manual = draw_manual
+        self.sound_effect_player = SoundEffectPlayer()
+        self.game_time = 0
+        self.max_time = max_time
+        self.failed = False
 
     def on_enter(self, previous_state: GameState | None):
         self.board = Board(self.board_size, self.draw_manual)
         self.game_won = False
+        self.sound_effect_player.play_hacking_sound()
 
     def on_exit(self):
         self.board = None
         self.game_won = False
+        self.sound_effect_player.stop_hacking_sound()
 
     def update(self, game_time: int, pos: tuple[int, int] | None, *args, **kwargs):
+        self.game_time += game_time
+        if self.game_time >= self.max_time and not self.game_won:
+            self.board.fail_game()
+            self.failed = True
+            return
+
         if pos is None:
             return
 
@@ -687,31 +705,49 @@ class PipeGameState(GameState):
 
         pygame.display.flip()
 
-        # Display text if the game is won
-        if self.game_won:
-            time.sleep(1)
+        if self.failed or self.game_won:
+            time.sleep(2)
             self.end_game()
 
     def end_game(self):
+        if self.failed:
+            # set terminal fixing failed
+            if self.play_game_state is None:
+                # change state of the terminal
+                for terminal in self.game.terminal_controller.terminals:
+                    if terminal.state_machine.active_state.name == "fixing":
+                        terminal.fixing_failed = True
+
+            self.sound_effect_player.play_hacking_over()
+            get_ready_state: InterstitialState = InterstitialState(
+                self.game,
+                "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!",
+                4500,
+                self.play_game_state,
+            )
+            self.game.change_state(get_ready_state)
+            return
+
         if self.play_game_state is not None:
             # change state of the machine (to inactive)
             for terminal in self.play_game_state.terminal_controller.terminals:
                 if terminal.state_machine.active_state.name == "fixing":
-                    terminal.state_machine.set_state("unhackable")
+                    terminal.hacking_failed = True
 
             # change the state of the hackers to wandering (random)
             for hacker in self.play_game_state.maisy_controller.hacker_models:
                 if hacker.brain.active_state.name == "fighting":
                     hacker.brain.set_state("wandering")
 
+            self.sound_effect_player.play_hacking_over()
             get_ready_state: InterstitialState = InterstitialState(
-                self.game, "Hacker stopped!", 2000, self.play_game_state
+                self.game, "Hacker stopped!", 4500, self.play_game_state
             )
             self.game.change_state(get_ready_state)
             return
 
         game_over_state: InterstitialState = InterstitialState(
-            self.game, "You won!", 2000, self.game_over_state
+            self.game, "You won!", 4500, self.game_over_state
         )
         self.game.change_state(game_over_state)
         return
