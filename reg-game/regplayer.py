@@ -13,6 +13,7 @@ from config import (
     LIVES_MESSAGE_Y,
 )
 from sandbox import SandboxController
+from sounds import SoundEffectPlayer
 from pygame.key import ScancodeWrapper
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_SPACE, K_UP
 from pygame.surface import Surface
@@ -39,7 +40,7 @@ class PlayerController:
         self.player_model: PlayerModel = PlayerModel(x, y)
         self.is_paused: bool = False
         self.sandbox_controller = SandboxController()
-        self.shoot_sound = pygame.mixer.Sound("sound/playershoot.wav")
+        self.sound_effect_player = SoundEffectPlayer()
 
     def pause(self, is_paused: bool):
         self.is_paused = is_paused
@@ -69,7 +70,7 @@ class PlayerController:
             x = self.player_model.x + 9
             y = self.player_model.y - 16
             self.sandbox_controller.add_sandbox(x, y)
-            self.shoot_sound.play()
+            self.sound_effect_player.play_sandbox_sound()
 
 
 class PlayerView:
