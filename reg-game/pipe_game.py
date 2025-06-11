@@ -6,6 +6,7 @@ from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame.surface import Surface
+from sounds import SoundEffectPlayer
 from spritesheet import SpriteSheet
 
 BOARD_SIZE = 6
@@ -262,6 +263,7 @@ class Board:
         # Whether to draw the pipe segment manually (True) or load it from a spritesheet
         self.draw_manual = draw_manual
         self._initialize_board()
+        self.sound_effect_player = SoundEffectPlayer()
 
     def is_valid_move(self, rows: int, cols: int, r: int, c: int, visited: set) -> bool:
         """
@@ -519,6 +521,7 @@ class Board:
             self.start_pos,
             self.end_pos,
         } and current_pipe.type != "empty":
+            self.sound_effect_player.play_rotate_pipe_sound()
             current_pipe.rotate()
             # After rotation, re-check connections and update colours
             return self.check_connections()
@@ -653,14 +656,17 @@ class PipeGameState(GameState):
         self.play_game_state = play_game_state
         self.board_size = board_size
         self.draw_manual = draw_manual
+        self.sound_effect_player = SoundEffectPlayer()
 
     def on_enter(self, previous_state: GameState | None):
         self.board = Board(self.board_size, self.draw_manual)
         self.game_won = False
+        self.sound_effect_player.play_hacking_sound()
 
     def on_exit(self):
         self.board = None
         self.game_won = False
+        self.sound_effect_player.stop_hacking_sound()
 
     def update(self, game_time: int, pos: tuple[int, int] | None, *args, **kwargs):
         if pos is None:
@@ -704,6 +710,7 @@ class PipeGameState(GameState):
                 if hacker.brain.active_state.name == "fighting":
                     hacker.brain.set_state("wandering")
 
+            self.sound_effect_player.play_hacking_over()
             get_ready_state: InterstitialState = InterstitialState(
                 self.game, "Hacker stopped!", 2000, self.play_game_state
             )

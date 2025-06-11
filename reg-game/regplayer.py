@@ -1,21 +1,22 @@
 import pygame
 from bitmapfont import BitmapFont
 from config import (
+    LIVES_MESSAGE_X,
+    LIVES_MESSAGE_Y,
+    LIVES_SPRITE_HEIGHT,
+    LIVES_SPRITE_WIDTH,
     PLAYER_NUMBER_OF_SPRITES,
     PLAYER_SIZE,
     PLAYER_SPRITE_HEIGHT,
     PLAYER_SPRITE_WIDTH,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    LIVES_SPRITE_WIDTH,
-    LIVES_SPRITE_HEIGHT,
-    LIVES_MESSAGE_X,
-    LIVES_MESSAGE_Y,
 )
-from sandbox import SandboxController
 from pygame.key import ScancodeWrapper
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_SPACE, K_UP
 from pygame.surface import Surface
+from sandbox import SandboxController
+from sounds import SoundEffectPlayer
 from spritesheet import SpriteSheet
 
 PLAYER_SPRITESHEET_X: int = 0
@@ -39,7 +40,7 @@ class PlayerController:
         self.player_model: PlayerModel = PlayerModel(x, y)
         self.is_paused: bool = False
         self.sandbox_controller = SandboxController()
-        self.shoot_sound = pygame.mixer.Sound("sound/playershoot.wav")
+        self.sound_effect_player = SoundEffectPlayer()
 
     def pause(self, is_paused: bool):
         self.is_paused = is_paused
@@ -69,7 +70,7 @@ class PlayerController:
             x = self.player_model.x + 9
             y = self.player_model.y - 16
             self.sandbox_controller.add_sandbox(x, y)
-            self.shoot_sound.play()
+            self.sound_effect_player.play_sandbox_sound()
 
 
 class PlayerView:
