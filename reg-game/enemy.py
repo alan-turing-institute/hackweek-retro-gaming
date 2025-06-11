@@ -3,6 +3,7 @@ import random
 import pygame
 from bullet import BulletController
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from framework import State, StateMachine
 
 # from enemy_statemachine import StateMachine, HackingState
 from pygame.surface import Surface
@@ -233,49 +234,6 @@ class SwarmController:
         height: int = (top_most - bottom_most) + 32
 
         return left_most, bottom_most, width, height
-
-
-class State:
-    def __init__(self, name: str):
-        self.name: str = name
-
-    def do_actions(self, game_time):
-        pass
-
-    def check_conditions(self) -> str | None:
-        pass
-
-    def entry_actions(self):
-        pass
-
-    def exit_actions(self):
-        pass
-
-
-class StateMachine:
-    def __init__(self) -> None:
-        self.states: dict[str, State] = {}
-        self.active_state: State | None = None
-
-    def add_state(self, state: "State"):
-        self.states[state.name] = state
-
-    def think(self, game_time) -> None:
-        if self.active_state is None:
-            return
-
-        self.active_state.do_actions(game_time)
-
-        new_state_name: str | None = self.active_state.check_conditions()
-        if new_state_name is not None:
-            self.set_state(new_state_name)
-
-    def set_state(self, new_state_name: str):
-        if self.active_state is not None:
-            self.active_state.exit_actions()
-
-        self.active_state = self.states[new_state_name]
-        self.active_state.entry_actions()
 
 
 class HackingState(State):
