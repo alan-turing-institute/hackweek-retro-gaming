@@ -650,7 +650,7 @@ class PipeGameState(GameState):
         play_game_state: GameState | None = None,
         board_size: int = BOARD_SIZE,
         draw_manual: bool = False,
-        max_time: int = 15000,
+        max_time: int = 2000,
     ):
         if board_size < 3:
             raise ValueError("Board size must be at least 3x3 for a playable game.")
@@ -721,7 +721,7 @@ class PipeGameState(GameState):
             self.sound_effect_player.play_hacking_over()
             get_ready_state: InterstitialState = InterstitialState(
                 self.game,
-                "You did not stop the hacker in time!",
+                "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!",
                 4500,
                 self.play_game_state,
             )
