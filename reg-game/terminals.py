@@ -131,6 +131,7 @@ class TerminalController:
                 FixingState(terminal, get_ready_state, game)
             )
             terminal.state_machine.add_state(BrokenState(terminal))
+            terminal.state_machine.add_state(UnHackableState(terminal))
 
             terminal.state_machine.set_state("active")
 
