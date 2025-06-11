@@ -42,7 +42,7 @@ class MaisyController:
             for _ in range(3)
         ]
         for hacker in self.hacker_models:
-            hacker.brain.set_state("wandering_state")
+            hacker.brain.set_state("wandering")
 
     def update(self, _game_time, *args, **kwargs):
         for hacker in self.hacker_models:
@@ -238,7 +238,7 @@ class SwarmController:
 
 class HackingState(State):
     def __init__(self, hacker_model: "MaisyModel"):
-        super().__init__("hacking_state")
+        super().__init__("hacking")
         self.hacker_model = hacker_model
         self.game_time = 0
 
@@ -250,7 +250,7 @@ class HackingState(State):
     def check_conditions(self) -> str | None:
         # print(f"Checking conditions {self.game_time}")
         if self.game_time > 2000:
-            return "wandering_state"
+            return "wandering"
 
         return None
 
@@ -264,7 +264,7 @@ class HackingState(State):
 
 class FightingState(State):
     def __init__(self, hacker_model: "MaisyModel"):
-        super().__init__("fighting_state")
+        super().__init__("fighting")
         self.hacker_model = hacker_model
 
     def do_actions(self, game_time):
@@ -282,7 +282,7 @@ class FightingState(State):
 
 class WanderingState(State):
     def __init__(self, hacker_model: "MaisyModel"):
-        super().__init__("wandering_state")
+        super().__init__("wandering")
         self.hacker_model = hacker_model
 
     def do_actions(self, game_time):
@@ -334,5 +334,5 @@ class WanderingState(State):
 
 class SearchingState(State):
     def __init__(self, hacker_model: "MaisyModel"):
-        super().__init__("wandering_state")
+        super().__init__("wandering")
         self.hacker_model = hacker_model
