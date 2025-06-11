@@ -6,6 +6,7 @@ from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame.surface import Surface
+from sounds import SoundEffectPlayer
 from spritesheet import SpriteSheet
 
 BOARD_SIZE = 6
@@ -654,14 +655,17 @@ class PipeGameState(GameState):
         self.play_game_state = play_game_state
         self.board_size = board_size
         self.draw_manual = draw_manual
+        self.sound_effect_player = SoundEffectPlayer()
 
     def on_enter(self, previous_state: GameState | None):
         self.board = Board(self.board_size, self.draw_manual)
         self.game_won = False
+        self.sound_effect_player.play_hacking_sound()
 
     def on_exit(self):
         self.board = None
         self.game_won = False
+        self.sound_effect_player.stop_hacking_sound()
 
     def update(self, game_time: int, pos: tuple[int, int] | None, *args, **kwargs):
         if pos is None:
