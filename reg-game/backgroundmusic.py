@@ -33,13 +33,7 @@ class MusicPlayer:
             self.stop()
         else:
             self.start()
-# def init():
-#     """
-#     Initializes the pygame mixer for background music.
-#     """
-#     pygame.mixer.init()
-#     pygame.mixer.set_num_channels(8)
-    # pygame.mixer.music.set_endevent(pygame.USEREVENT + 1)
+
 def load_background_music():
     pygame.mixer.music.load("sound/reggame.mp3")
 
@@ -48,4 +42,4 @@ def play_background_music():
     Plays the background music in a loop.
     """
     pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-    pygame.mixer.music.set_volume(0.25)  # Set volume to 50%
+    pygame.mixer.music.set_volume(0.25)  # Set volume to 25%
