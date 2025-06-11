@@ -7,7 +7,8 @@ from config import (
     TERMINAL_IMAGE_WIDTH,
     TERMINAL_SPRITE_SHEET,
 )
-from enemy import MaisyModel
+
+# from enemy import MaisyModel
 from framework import State, StateMachine
 from pygame import Surface, image
 from regplayer import PlayerModel
@@ -83,7 +84,7 @@ class TerminalModel:
         self.name = name
         self.location: tuple[int, int] = location
         self.player_at_terminal: PlayerModel | None = None
-        self.hacker_at_terminal: MaisyModel | None = None
+        self.hacker_at_terminal = None
 
         self.hacking_failed: bool = False
         self.fixing_failed: bool = True
@@ -105,8 +106,16 @@ class TerminalModel:
 
 class TerminalController:
     def __init__(self, number_of_terminals: int) -> None:
-        self.terminals: list[TerminalModel] = []
-        self.create_random_terminals(number_of_terminals)
+
+        offset: int = 50
+        self.terminals: list[TerminalModel] = [
+            TerminalModel("top-left", (offset, offset)),
+            TerminalModel("top-right", (SCREEN_WIDTH - offset, offset)),
+            TerminalModel("bottom-left", (offset, SCREEN_HEIGHT - offset)),
+            TerminalModel(
+                "bottom-right", (SCREEN_WIDTH - offset, SCREEN_HEIGHT - offset)
+            ),
+        ]
 
     def create_random_terminals(self, num_terminals: int):
         for _ in range(num_terminals):
