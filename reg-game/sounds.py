@@ -7,8 +7,8 @@ class MusicPlayer:
         Initializes the MusicPlayer instance.
         """
         self.game_theme = mixer.music.load("sound/reggame-v2.mp3")
-        self.is_playing = False
-        self.volume = 0.3
+        self.is_playing: bool = False
+        self.volume: float = 0.3
 
     def start(self):
         """
@@ -42,12 +42,14 @@ class SoundEffectPlayer:
         """
         Initializes the SoundEffectPlayer instance.
         """
-        self.hacker_alert = mixer.Sound("sound/hackeralert.ogg")
+        self.hacker_alert: mixer.Sound = mixer.Sound("sound/hackeralert.ogg")
         self.hacker_alert.set_volume(0.5)
-        self.sandbox_sound = mixer.Sound("sound/playershoot.wav")
+        self.sandbox_sound: mixer.Sound = mixer.Sound("sound/playershoot.wav")
         self.sandbox_sound.set_volume(0.5)
-        self.hacking_sound = mixer.Sound("sound/hackingnoise-shorter.wav")
+        self.hacking_sound: mixer.Sound = mixer.Sound("sound/hackingnoise-shorter.wav")
         self.hacking_sound.set_volume(0.05)
+        self.hacking_over: mixer.Sound = mixer.Sound("sound/hackingover.wav")
+        self.hacking_over.set_volume(0.4)
 
     def play_sandbox_sound(self):
         """
@@ -65,10 +67,16 @@ class SoundEffectPlayer:
         """
         Plays the hacking sound effect.
         """
-        self.hacking_sound.play(loops = -1)
+        self.hacking_sound.play(loops=-1)
 
     def stop_hacking_sound(self):
         """
         Plays the hacking sound effect.
         """
         self.hacking_sound.stop()
+
+    def play_hacking_over(self):
+        """
+        Plays the hacking over sound effect.
+        """
+        self.hacking_over.play()

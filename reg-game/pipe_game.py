@@ -708,6 +708,7 @@ class PipeGameState(GameState):
                 if hacker.brain.active_state.name == "fighting":
                     hacker.brain.set_state("wandering")
 
+            self.sound_effect_player.play_hacking_over()
             get_ready_state: InterstitialState = InterstitialState(
                 self.game, "Hacker stopped!", 2000, self.play_game_state
             )
