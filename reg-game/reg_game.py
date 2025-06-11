@@ -14,9 +14,10 @@ from config import (
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
 from pygame.key import ScancodeWrapper
-from pygame.locals import K_ESCAPE
+from pygame.locals import K_ESCAPE, K_m
 from regplayer import PlayerController, PlayerLivesView, PlayerView
 from sandbox import SandboxView
+from sounds import MusicPlayer
 from terminals import TerminalView, TerminalController
 
 PLAYER_X: int = SCREEN_WIDTH // 2
@@ -34,6 +35,7 @@ class PlayGameState(GameState):
 
         self.game_over_state: GameState | None = game_over_state
         self.mini_game_state: GameState | None = mini_game_state
+        self.music_player: MusicPlayer = MusicPlayer()
 
         self.initialise()
 
@@ -94,6 +96,9 @@ class PlayGameState(GameState):
         if keys[K_ESCAPE]:
             pygame.quit()
             sys.exit()
+
+        if keys[K_m]:
+            self.music_player.toggle()
 
         if self.controllers is not None:
             for controller in self.controllers:
