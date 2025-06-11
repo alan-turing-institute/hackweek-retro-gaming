@@ -2,7 +2,6 @@ from background import BackgroundView
 from collision import HackerCollisionController
 from config import (
     LIVES_SPRITE_SHEET_PATH,
-    NUMBER_OF_TERMINALS,
     PLAYER_SPRITE_SHEET_PATH,
     SANDBOX_IMAGE_PATH,
     SCREEN_WIDTH,
@@ -41,10 +40,11 @@ class PlayGameState(GameState):
         self.music_player.start()
         self.maisy_controller = MaisyController()
         # Initialize the terminals
-        self.terminal_controller: TerminalController = TerminalController(
-            NUMBER_OF_TERMINALS, self.game, self.mini_game_state
-        )
+
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
+        self.terminal_controller: TerminalController = TerminalController(
+            self.player_controller, self.game, self.mini_game_state
+        )
         self.collision_controller = HackerCollisionController(
             self.game,
             self.maisy_controller,
