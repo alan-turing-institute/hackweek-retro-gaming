@@ -7,7 +7,8 @@ from config import (
     TERMINAL_IMAGE_WIDTH,
     TERMINAL_SPRITE_SHEET,
 )
-from enemy import MaisyModel
+
+# from enemy import MaisyModel
 from framework import State, StateMachine
 from pygame import Surface, image
 from regplayer import PlayerModel
@@ -83,7 +84,7 @@ class TerminalModel:
         self.name = name
         self.location: tuple[int, int] = location
         self.player_at_terminal: PlayerModel | None = None
-        self.hacker_at_terminal: MaisyModel | None = None
+        self.hacker_at_terminal = None
 
         self.hacking_failed: bool = False
         self.fixing_failed: bool = True

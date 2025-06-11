@@ -122,6 +122,7 @@ class HackingState(State):
     def check_conditions(self) -> str | None:
         print(f"At Hacking Checking conditions {self.game_time=}")
         if self.game_time > 10000:
+            print("TIME UP")
             return "wandering"
         return None
 
@@ -142,6 +143,7 @@ class WanderingState(State):
     def __init__(self, hacker_model: "MaisyModel"):
         super().__init__("wandering")
         self.hacker_model = hacker_model
+        # self.terminals = terminals
 
     def do_actions(self, game_time):
         # Change direction sometimes
@@ -181,7 +183,7 @@ class WanderingState(State):
             )
 
     def check_conditions(self) -> str | None:
-        print(f"At wondering {self.hacker_model.at_terminal=}")
+        print(f"At wandering {self.hacker_model.at_terminal=}")
         if self.hacker_model.at_terminal:
             return "hacking"
         return None
@@ -197,3 +199,15 @@ class SearchingState(State):
     def __init__(self, hacker_model: "MaisyModel"):
         super().__init__("searching")
         self.hacker_model = hacker_model
+
+    def do_actions(self, game_time):
+        pass
+
+    def check_conditions(self) -> str | None:
+        pass
+
+    def entry_actions(self):
+        pass
+
+    def exit_actions(self):
+        pass
