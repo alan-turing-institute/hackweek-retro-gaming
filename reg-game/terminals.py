@@ -1,18 +1,32 @@
 from random import randint
 
-from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from config import (
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    TERMINAL_IMAGE_HEIGHT,
+    TERMINAL_IMAGE_WIDTH,
+    TERMINAL_SPRITE_SHEET,
+)
 from framework import State, StateMachine
 from pygame import Surface, image
-from framework import StateMachine, State
 from regplayer import PlayerModel
-from enemy import MaisyModel
+from spritesheet import SpriteSheet
+from interstitial import InterstitialState
+from framework import Game, GameState
 
 
 class ActiveState(State):
-
     def __init__(self, terminal: "TerminalModel"):
         super().__init__("active")
         self.terminal_model = terminal
+
+    def check_conditions(self) -> str | None:
+        if (
+            self.terminal_model.hacker_at_terminal is not None
+            and self.terminal_model.player_at_terminal is None
+        ):
+            return "hacking"
+        return None
 
 
 class HackingState(State):
@@ -20,11 +34,44 @@ class HackingState(State):
         super().__init__("hacking")
         self.terminal_model = terminal
 
+    def check_conditions(self) -> str | None:
+        if (
+            self.terminal_model.hacker_at_terminal is not None
+            and self.terminal_model.player_at_terminal is not None
+        ):
+            return "fixing"
+
+        return None
+
 
 class FixingState(State):
-    def __init__(self, terminal: "TerminalModel"):
+    def __init__(
+        self, terminal: "TerminalModel", get_ready_state: InterstitialState, game: Game
+    ):
         super().__init__("fixing")
-        self.terminal_model = terminal
+        self.terminal_model: TerminalModel = terminal
+        self.get_ready_state: InterstitialState = get_ready_state
+        self.game: Game = game
+
+    def check_conditions(self) -> str | None:
+        if (
+            self.terminal_model.hacker_at_terminal is not None
+            and self.terminal_model.player_at_terminal is not None
+            and self.terminal_model.hacking_failed
+        ):
+            return "unhackable"
+
+        if (
+            self.terminal_model.hacker_at_terminal is not None
+            and self.terminal_model.player_at_terminal is not None
+            and self.terminal_model.fixing_failed
+        ):
+            return "broken"
+
+        return None
+
+    def entry_actions(self) -> None:
+        self.game.change_state(self.get_ready_state)
 
 
 class BrokenState(State):
@@ -44,15 +91,12 @@ class TerminalModel:
         self.name = name
         self.location: tuple[int, int] = location
         self.player_at_terminal: PlayerModel | None = None
-        self.hacker_at_terminal: MaisyModel | None = None
+        self.hacker_at_terminal = None
+
+        self.hacking_failed: bool = False
+        self.fixing_failed: bool = True
 
         self.state_machine = StateMachine()
-        self.state_machine.add_state(ActiveState(self))
-        self.state_machine.add_state(HackingState(self))
-        self.state_machine.add_state(FixingState(self))
-        self.state_machine.add_state(BrokenState(self))
-
-        self.state_machine.set_state("active")
 
     def set_status(self, new_state: str):
         self.state_machine.set_state(new_state)
@@ -62,9 +106,34 @@ class TerminalModel:
 
 
 class TerminalController:
-    def __init__(self, number_of_terminals: int) -> None:
-        self.terminals: list[TerminalModel] = []
-        self.create_random_terminals(number_of_terminals)
+    def __init__(
+        self, number_of_terminals: int, game: Game, mini_game_state: GameState | None
+    ) -> None:
+
+        offset: int = 50
+        self.terminals: list[TerminalModel] = [
+            TerminalModel("top-left", (offset, offset)),
+            TerminalModel("top-right", (SCREEN_WIDTH - offset, offset)),
+            TerminalModel("bottom-left", (offset, SCREEN_HEIGHT - offset)),
+            TerminalModel(
+                "bottom-right", (SCREEN_WIDTH - offset, SCREEN_HEIGHT - offset)
+            ),
+        ]
+
+        get_ready_state: InterstitialState = InterstitialState(
+            game, "Stop the hacker!", 2000, mini_game_state
+        )
+
+        for terminal in self.terminals:
+            terminal.state_machine.add_state(ActiveState(terminal))
+            terminal.state_machine.add_state(HackingState(terminal))
+            terminal.state_machine.add_state(
+                FixingState(terminal, get_ready_state, game)
+            )
+            terminal.state_machine.add_state(BrokenState(terminal))
+            terminal.state_machine.add_state(UnHackableState(terminal))
+
+            terminal.state_machine.set_state("active")
 
     def create_random_terminals(self, num_terminals: int):
         for _ in range(num_terminals):
@@ -84,18 +153,43 @@ class TerminalView:
         self.image: Surface = image.load(img_path)
 
     def render(self, surface: Surface):
-        for terminal in self.terminal_controller.terminals:
+        sprite_sheet: SpriteSheet = SpriteSheet(TERMINAL_SPRITE_SHEET)
+        new_terminal_image: Surface = self.image
 
+        for terminal in self.terminal_controller.terminals:
             if terminal.state_machine.active_state is not None:
                 terminal_state: str = terminal.state_machine.active_state.name
 
                 if terminal_state == "active":
-                    surface.blit(self.image, terminal.location)
+                    new_terminal_image = self.image
                 elif terminal_state == "hacking":
-                    pass
+                    # TODO fix later
+                    new_terminal_image = sprite_sheet.get_image(
+                        TERMINAL_IMAGE_WIDTH * 2,
+                        0,
+                        TERMINAL_IMAGE_WIDTH,
+                        TERMINAL_IMAGE_HEIGHT,
+                    )
                 elif terminal_state == "fixing":
-                    pass
+                    new_terminal_image = sprite_sheet.get_image(
+                        TERMINAL_IMAGE_WIDTH * 2,
+                        0,
+                        TERMINAL_IMAGE_WIDTH,
+                        TERMINAL_IMAGE_HEIGHT,
+                    )
                 elif terminal_state == "broken":
-                    pass
+                    new_terminal_image = sprite_sheet.get_image(
+                        TERMINAL_IMAGE_WIDTH * 2,
+                        TERMINAL_IMAGE_HEIGHT * 2,
+                        TERMINAL_IMAGE_WIDTH,
+                        TERMINAL_IMAGE_HEIGHT,
+                    )
                 elif terminal_state == "unhackable":
-                    pass
+                    new_terminal_image = sprite_sheet.get_image(
+                        0,
+                        TERMINAL_IMAGE_HEIGHT * 2,
+                        TERMINAL_IMAGE_WIDTH,
+                        TERMINAL_IMAGE_HEIGHT,
+                    )
+
+            surface.blit(new_terminal_image, terminal.location)
