@@ -20,8 +20,8 @@ class MaisyModel:
     def __init__(self, x, y) -> None:
         self.x = x
         self.y = y
-        self.dx = random.randint(-3, 3)
-        self.dy = random.randint(-3, 3)
+        self.dx = random.randint(-2, 2)
+        self.dy = random.randint(-2, 2)
         self.width = 48
         self.height = 48
         self.at_terminal = False
@@ -41,7 +41,7 @@ class MaisyController:
             for _ in range(3)
         ]
         for hacker in self.hacker_models:
-            hacker.brain.set_state("hacking_state")
+            hacker.brain.set_state("wandering_state")
 
     def update(self, _game_time, *args, **kwargs):
         for hacker in self.hacker_models:
@@ -108,10 +108,6 @@ class MaisyView:
                     PLAYER_SPRITE_HEIGHT,
                 ),
             )
-
-    # def render(self, surface: Surface):
-    #     for hackerview in self.hackers.hacker_models:
-    #         pygame.draw.rect(surface, hackerview.colour, (hackerview.x, hackerview.y, hackerview.width, hackerview.height))
 
 
 class InvaderModel:
@@ -289,20 +285,23 @@ class HackingState(State):
         self.game_time = 0
 
     def do_actions(self, game_time):
-        print(f"Doing actions {game_time}")
+        # print(f"Doing actions {game_time}")
         self.game_time += game_time
-        print(self.game_time)
+        # print(self.game_time)
 
     def check_conditions(self) -> str | None:
-        print(f"Checking conditions {self.game_time}")
+        # print(f"Checking conditions {self.game_time}")
         if self.game_time > 2000:
             return "wandering_state"
+
+        return None
 
     def entry_actions(self):
         print("Check conditions")
 
     def exit_actions(self):
-        print("Exit")
+        # print("Exit")
+        pass
 
 
 class WanderingState(State):
@@ -311,40 +310,53 @@ class WanderingState(State):
         self.hacker_model = hacker_model
 
     def do_actions(self, game_time):
-        print("wandering actions")
-        hacker = self.hacker_model
         # Change direction sometimes
         if random.random() < 0.02:
-            hacker.dx = random.choice([-1, 0, 1])
-            hacker.dy = random.choice([-1, 0, 1])
-        if hacker.dx == 0 and hacker.dy == 0:
-            hacker.dx = -1
+            self.hacker_model.dx = random.choice([-1, 0, 1])
+            self.hacker_model.dy = random.choice([-1, 0, 1])
+        if self.hacker_model.dx == 0 and self.hacker_model.dy == 0:
+            self.hacker_model.dx = -1
         # Actually move
-        hacker.x += hacker.dx * hacker.speed
-        hacker.y += hacker.dy * hacker.speed
+        self.hacker_model.x += self.hacker_model.dx * self.hacker_model.speed
+        self.hacker_model.y += self.hacker_model.dy * self.hacker_model.speed
 
         # Keep maisy in bounds and bounce
-        half_size = (int(0.5 * hacker.width), int(0.5 * hacker.height))
+        half_size = (
+            int(0.5 * self.hacker_model.width),
+            int(0.5 * self.hacker_model.height),
+        )
         x_min = 0 - half_size[0]
-        x_max = SCREEN_WIDTH - hacker.width
+        x_max = SCREEN_WIDTH - self.hacker_model.width
 
         y_min = 0 - half_size[1]
         y_max = SCREEN_HEIGHT - half_size[1]
-        if hacker.x < x_min or hacker.x > x_max:
-            hacker.dx *= -1
-            if hacker.x < 0:
-                hacker.x = max(0, min(SCREEN_WIDTH - hacker.width, hacker.x))
+        if self.hacker_model.x < x_min or self.hacker_model.x > x_max:
+            self.hacker_model.dx *= -1
+            if self.hacker_model.x < 0:
+                self.hacker_model.x = max(
+                    0, min(SCREEN_WIDTH - self.hacker_model.width, self.hacker_model.x)
+                )
             else:
-                hacker.x = max(0, min(SCREEN_WIDTH + hacker.width, hacker.x))
-        if hacker.y < y_min or hacker.y > y_max:
-            hacker.dy *= -1
-            hacker.y = max(0, min(SCREEN_HEIGHT - hacker.height, hacker.y))
+                self.hacker_model.x = max(
+                    0, min(SCREEN_WIDTH + self.hacker_model.width, self.hacker_model.x)
+                )
+        if self.hacker_model.y < y_min or self.hacker_model.y > y_max:
+            self.hacker_model.dy *= -1
+            self.hacker_model.y = max(
+                0, min(SCREEN_HEIGHT - self.hacker_model.height, self.hacker_model.y)
+            )
 
     def check_conditions(self) -> str | None:
-        print("Checking wandering conditions")
+        pass
 
     def entry_actions(self):
-        print("Check wander conditions")
+        pass
 
     def exit_actions(self):
         print("Exit")
+
+
+class SearchingState(State):
+    def __init__(self, hacker_model: "MaisyModel"):
+        super().__init__("wandering_state")
+        self.hacker_model = hacker_model

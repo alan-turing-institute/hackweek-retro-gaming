@@ -23,6 +23,7 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 GREEN = (0, 150, 0)
+random.seed(42)
 
 
 class Pipe:
@@ -32,6 +33,7 @@ class Pipe:
         self,
         type: str,
         rotation: int = 0,
+        colour: tuple[int, int, int] = GRAY,
         draw_manual: bool = True,
         pipe_image_sheet: str = "img/sci-fi-platformer-tiles-32x32-extension.png",
     ):
@@ -48,21 +50,81 @@ class Pipe:
         # Represents the current visual orientation
         self.rotation = rotation
 
+        self.colour = colour
+
         # draw: whether to draw the pipe segment manually (True) or load it from a spritesheet
         self.draw_manual = draw_manual
         if self.draw_manual:
             # If drawing manually, we don't need the sprite sheet
             self.pipe_image_sheet = None
+            self.pipe_image = None
         else:
             # Load the sprite sheet for pipe images
             self.pipe_image_sheet = SpriteSheet(pipe_image_sheet)
+
+            # depending on the colour, use the appropriate row to get the pipe image
+            # depending on the type, use the appropriate row and column to get the pipe image
+            # depdening on the rotation, use the approriate transform to rotate the image
+            if self.colour == GRAY:
+                pipe_image_y = 640
+            elif self.colour == RED:
+                pipe_image_y = 1600
+            elif self.colour == BLUE:
+                pipe_image_y = 2560
+            elif self.colour == YELLOW:
+                pipe_image_y = 2240
+            elif self.colour == GREEN:
+                pipe_image_y = 1280
+            else:
+                pipe_image_y = 3200
+
+            if self.type == "straight":
+                pipe_image_x = 64
+                pipe_image_y = pipe_image_y + 128
+            elif self.type == "corner":
+                pipe_image_x = 128
+                pipe_image_y = pipe_image_y + 32
+            elif self.type == "cross":
+                pipe_image_x = 192
+                pipe_image_y = pipe_image_y + 192
+            elif self.type == "t_joint":
+                pipe_image_x = 192
+                pipe_image_y = pipe_image_y + 128
+            elif self.type == "start_end":
+                pipe_image_x = 288
+                pipe_image_y = pipe_image_y + 192
+            elif self.type == "empty":
+                pipe_image_x = 448
+                pipe_image_y = pipe_image_y + 128
+            else:
+                pipe_image_x = 32
+                pipe_image_y = pipe_image_y + 64
+
+            # Get the image from the sprite sheet
+            if self.pipe_image_sheet is None:
+                raise TypeError("Pipe image sheet is not set. Cannot draw pipe.")
+            # print(f"Loading pipe image at ({pipe_image_x}, {pipe_image_y}) for type '{self.type}' and colour '{self.colour}' and rotation {self.rotation}.")
+
+            # Get the image from the sprite sheet
+            self.pipe_image = self.pipe_image_sheet.get_image(
+                pipe_image_x, pipe_image_y, 32, 32
+            )
+
+            # Scale the image to fit the pipe size
+            self.pipe_image = pygame.transform.scale(
+                self.pipe_image, (PIPE_SIZE, PIPE_SIZE)
+            )
+
+            # Rotate the image based on the initial rotation
+            if self.rotation != 0:
+                self.pipe_image = pygame.transform.rotate(
+                    self.pipe_image, -self.rotation
+                )
 
         # Define connections for each pipe type in its default (0 degree) rotation.
         # Connections are represented by a set of directions: 'N', 'E', 'S', 'W'
         # 'N': North (up), 'E': East (right), 'S': South (down), 'W': West (left)
         self.base_connections = self._define_base_connections()
-
-        self.colour = GRAY
 
     def _define_base_connections(self):
         """Defines the connections for each pipe type in its default rotation."""
@@ -119,12 +181,15 @@ class Pipe:
         if self.type != "empty":
             self.rotation = (self.rotation + 90) % 360
 
+        if self.pipe_image:
+            self.pipe_image = pygame.transform.rotate(self.pipe_image, -90)
+
     def draw(self, surface: Surface, x: int, y: int):
         """Draws the pipe segment on the given surface."""
-        # Add a small border effect
-        rect = pygame.Rect(x + 2, y + 2, PIPE_SIZE - 4, PIPE_SIZE - 4)
-
         if self.draw_manual:
+            # Add a small border effect
+            rect = pygame.Rect(x + 2, y + 2, PIPE_SIZE - 4, PIPE_SIZE - 4)
+
             # Draw background square
             pygame.draw.rect(surface, self.colour, rect, border_radius=5)
 
@@ -174,61 +239,12 @@ class Pipe:
                 pygame.draw.circle(
                     surface, BLACK, (center_x, center_y), line_thickness // 2 + 1
                 )
+
+                # print(f"Drawing manual pipe of type '{self.type}' at ({x}, {y}) with rotation {self.rotation} degrees.")
         else:
-            # depending on the colour, use the appropriate row to get the pipe image
-            # depending on the type, use the appropriate row and column to get the pipe image
-            # depdening on the rotation, use the approriate transform to rotate the image
-            if self.colour == GRAY:
-                pipe_image_x = 640
-            elif self.colour == RED:
-                pipe_image_x = 1600
-            elif self.colour == BLUE:
-                pipe_image_x = 2560
-            elif self.colour == YELLOW:
-                pipe_image_x = 2240
-            elif self.colour == GREEN:
-                pipe_image_x = 1280
-            else:
-                pipe_image_x = 3200
-
-            if self.type == "straight":
-                pipe_image_y = 64
-                pipe_image_x = pipe_image_x + 128
-            elif self.type == "corner":
-                pipe_image_y = 128
-                pipe_image_x = pipe_image_x + 32
-            elif self.type == "cross":
-                pipe_image_y = 192
-                pipe_image_x = pipe_image_x + 192
-            elif self.type == "t_joint":
-                pipe_image_y = 192
-                pipe_image_x = pipe_image_x + 128
-            elif self.type == "start_end":
-                pipe_image_y = 288
-                pipe_image_x = pipe_image_x + 160
-            elif self.type == "empty":
-                pipe_image_y = 448
-                pipe_image_x = pipe_image_x + 128
-            else:
-                pipe_image_y = 32
-                pipe_image_x = pipe_image_x + 64
-
-            # Get the image from the sprite sheet
-            if self.pipe_image_sheet is None:
-                raise TypeError("Pipe image sheet is not set. Cannot draw pipe.")
-
-            pipe_image = self.pipe_image_sheet.get_image(
-                pipe_image_x, pipe_image_y, 32, 32
-            )
-
-            # Scale the image to fit the pipe size
-            pipe_image = pygame.transform.scale(pipe_image, (PIPE_SIZE, PIPE_SIZE))
-
-            # Rotate the image based on the current rotation
-            pipe_image = pygame.transform.rotate(pipe_image, self.rotation)
-
+            # print(f"Drawing pipe of type '{self.type}' at ({x}, {y}) with rotation {self.rotation} degrees.")
             # Draw the pipe image on the surface
-            surface.blit(pipe_image, (x, y))
+            surface.blit(self.pipe_image, (x, y))
 
 
 class Board:
@@ -315,7 +331,6 @@ class Board:
         self.solution_path = self.find_random_path(
             self.size, self.size, self.start_pos, self.end_pos
         )
-        print(f"Generated path: {self.solution_path}")
 
         # 2. Populate self.grid with path pipes in their correct solution orientations
         for i in range(len(self.solution_path)):
@@ -329,19 +344,31 @@ class Board:
                 )
                 if direction == (0, 1):  # Move East from start
                     self.grid[r][c] = Pipe(
-                        "start_end", rotation=90, draw_manual=self.draw_manual
+                        "start_end",
+                        rotation=90,
+                        colour=RED,
+                        draw_manual=self.draw_manual,
                     )
                 elif direction == (1, 0):  # Move South
                     self.grid[r][c] = Pipe(
-                        "start_end", rotation=180, draw_manual=self.draw_manual
+                        "start_end",
+                        rotation=180,
+                        colour=RED,
+                        draw_manual=self.draw_manual,
                     )
                 elif direction == (0, -1):  # Move West
                     self.grid[r][c] = Pipe(
-                        "start_end", rotation=270, draw_manual=self.draw_manual
+                        "start_end",
+                        rotation=270,
+                        colour=RED,
+                        draw_manual=self.draw_manual,
                     )
                 elif direction == (-1, 0):  # Move North
                     self.grid[r][c] = Pipe(
-                        "start_end", rotation=0, draw_manual=self.draw_manual
+                        "start_end",
+                        rotation=0,
+                        colour=RED,
+                        draw_manual=self.draw_manual,
                     )
             elif (r, c) == self.end_pos:
                 # end pipe: determine its rotation based on the last move direction
@@ -351,19 +378,31 @@ class Board:
                 )
                 if direction == (0, 1):  # Move East to end
                     self.grid[r][c] = Pipe(
-                        "start_end", rotation=90, draw_manual=self.draw_manual
+                        "start_end",
+                        rotation=90,
+                        colour=RED,
+                        draw_manual=self.draw_manual,
                     )
                 elif direction == (1, 0):  # Move South to end
                     self.grid[r][c] = Pipe(
-                        "start_end", rotation=180, draw_manual=self.draw_manual
+                        "start_end",
+                        rotation=180,
+                        colour=RED,
+                        draw_manual=self.draw_manual,
                     )
                 elif direction == (0, -1):  # Move West to end
                     self.grid[r][c] = Pipe(
-                        "start_end", rotation=270, draw_manual=self.draw_manual
+                        "start_end",
+                        rotation=270,
+                        colour=RED,
+                        draw_manual=self.draw_manual,
                     )
                 elif direction == (-1, 0):  # Move North to end
                     self.grid[r][c] = Pipe(
-                        "start_end", rotation=0, draw_manual=self.draw_manual
+                        "start_end",
+                        rotation=0,
+                        colour=RED,
+                        draw_manual=self.draw_manual,
                     )
             else:
                 # Determine pipe type and rotation for intermediate path segments
@@ -656,6 +695,9 @@ class PipeGameState(GameState):
 
     def end_game(self):
         if self.play_game_state is not None:
+            # change state of the machine (to unhackable)
+            # change the state of the hackers to wandering (random)
+
             # Move player in opposite direction in play_game_state
             if self.play_game_state.player_controller.player_model.direction == "RIGHT":
                 self.play_game_state.player_controller.player_model.direction = "LEFT"
