@@ -247,9 +247,8 @@ class HackingState(State):
 
     def check_conditions(self) -> str | None:
         # print(f"Checking conditions {self.game_time}")
-        if self.game_time > 2000:
+        if self.game_time > 10000:
             return "wandering"
-
         return None
 
     def entry_actions(self):
@@ -307,15 +306,13 @@ class WanderingState(State):
 
     def check_conditions(self) -> str | None:
         if self.hacker_model.at_terminal:
-            return "hacking_state"
+            return "hacking"
         return None
 
     def entry_actions(self):
         pass
 
     def exit_actions(self):
-        print(self.hacker_model.at_terminal)
-        print(self.hacker_model)
         print("Exititing wandering")
 
 
