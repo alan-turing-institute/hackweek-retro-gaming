@@ -37,6 +37,7 @@ class Pipe:
         draw_manual: bool = True,
         pipe_image_sheet: str = "img/icon1.png",
         pipe_image_green_sheet: str = "img/icon1_success.png",
+        pipe_image_red_sheet: str = "img/icon1_fail.png",
     ):
         # type can be:
         # 'straight': | or -
@@ -58,6 +59,7 @@ class Pipe:
             # If drawing manually, we don't need the sprite sheet
             self.pipe_image = None
             self.pipe_image_green = None
+            self.pipe_image_red = None
         else:
             # depending on the colour, use the appropriate row to get the pipe image
             # depending on the type, use the appropriate row and column to get the pipe image
@@ -91,6 +93,9 @@ class Pipe:
             self.pipe_image_green = SpriteSheet(pipe_image_green_sheet).get_image(
                 pipe_image_x, pipe_image_y, image_size, image_size
             )
+            self.pipe_image_red = SpriteSheet(pipe_image_red_sheet).get_image(
+                pipe_image_x, pipe_image_y, image_size, image_size
+            )
 
             # Rotate the image based on the initial rotation
             if total_rotation != 0:
@@ -100,6 +105,9 @@ class Pipe:
                 self.pipe_image_green = pygame.transform.rotate(
                     self.pipe_image_green, -total_rotation
                 )
+                self.pipe_image_red = pygame.transform.rotate(
+                    self.pipe_image_red, -total_rotation
+                )
 
             # Scale the image to fit the pipe size
             self.pipe_image = pygame.transform.scale(
@@ -107,6 +115,9 @@ class Pipe:
             )
             self.pipe_image_green = pygame.transform.scale(
                 self.pipe_image_green, (PIPE_SIZE, PIPE_SIZE)
+            )
+            self.pipe_image_red = pygame.transform.scale(
+                self.pipe_image_red, (PIPE_SIZE, PIPE_SIZE)
             )
 
         # Define connections for each pipe type in its default (0 degree) rotation.
@@ -235,6 +246,9 @@ class Pipe:
             if self.colour == GREEN:
                 # Use the green pipe image if the pipe is part of the solution path
                 surface.blit(self.pipe_image_green, (x, y))
+            elif self.colour == RED:
+                # Use the red pipe image if the game is failed
+                surface.blit(self.pipe_image_red, (x, y))
             else:
                 surface.blit(self.pipe_image, (x, y))
 
@@ -339,28 +353,28 @@ class Board:
                     self.grid[r][c] = Pipe(
                         type="start_end",
                         rotation=90,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (1, 0):  # Move South
                     self.grid[r][c] = Pipe(
                         type="start_end",
                         rotation=180,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (0, -1):  # Move West
                     self.grid[r][c] = Pipe(
                         type="start_end",
                         rotation=270,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (-1, 0):  # Move North
                     self.grid[r][c] = Pipe(
                         type="start_end",
                         rotation=0,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
             elif (r, c) == self.end_pos:
@@ -373,28 +387,28 @@ class Board:
                     self.grid[r][c] = Pipe(
                         type="start_end",
                         rotation=90,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (1, 0):  # Move South to end
                     self.grid[r][c] = Pipe(
                         type="start_end",
                         rotation=180,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (0, -1):  # Move West to end
                     self.grid[r][c] = Pipe(
                         type="start_end",
                         rotation=270,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
                 elif direction == (-1, 0):  # Move North to end
                     self.grid[r][c] = Pipe(
                         type="start_end",
                         rotation=0,
-                        colour=RED,
+                        colour=GRAY,
                         draw_manual=self.draw_manual,
                     )
             else:
@@ -524,7 +538,7 @@ class Board:
         for r in range(self.size):
             for c in range(self.size):
                 if (r, c) == self.start_pos or (r, c) == self.end_pos:
-                    self.grid[r][c].colour = RED  # Start/end points are initially red
+                    self.grid[r][c].colour = GRAY  # Start/end points are initially red
                 elif self.grid[r][c].type == "empty":
                     self.grid[r][c].colour = BLACK  # Empty cells are black
                 else:
@@ -588,6 +602,13 @@ class Board:
 
         return is_game_won
 
+    def fail_game(self):
+        """Turns all pipes to red to indicate failure."""
+        for r in range(self.size):
+            for c in range(self.size):
+                if self.grid[r][c] is not None and self.grid[r][c].type != "empty":
+                    self.grid[r][c].colour = RED
+
     def draw(self, surface: Surface):
         """Draws all pipes on the board."""
         for r in range(self.size):
@@ -627,8 +648,9 @@ class PipeGameState(GameState):
         game: Game,
         game_over_state: GameState | None = None,
         play_game_state: GameState | None = None,
-        board_size: int = 6,
+        board_size: int = BOARD_SIZE,
         draw_manual: bool = False,
+        max_time: int = 15000,
     ):
         if board_size < 3:
             raise ValueError("Board size must be at least 3x3 for a playable game.")
@@ -638,6 +660,9 @@ class PipeGameState(GameState):
         self.board_size = board_size
         self.draw_manual = draw_manual
         self.sound_effect_player = SoundEffectPlayer()
+        self.game_time = 0
+        self.max_time = max_time
+        self.failed = False
 
     def on_enter(self, previous_state: GameState | None):
         self.board = Board(self.board_size, self.draw_manual)
@@ -650,6 +675,12 @@ class PipeGameState(GameState):
         self.sound_effect_player.stop_hacking_sound()
 
     def update(self, game_time: int, pos: tuple[int, int] | None, *args, **kwargs):
+        self.game_time += game_time
+        if self.game_time >= self.max_time and not self.game_won:
+            self.board.fail_game()
+            self.failed = True
+            return
+
         if pos is None:
             return
 
@@ -674,12 +705,29 @@ class PipeGameState(GameState):
 
         pygame.display.flip()
 
-        # Display text if the game is won
-        if self.game_won:
+        if self.failed or self.game_won:
             time.sleep(2)
             self.end_game()
 
     def end_game(self):
+        if self.failed:
+            # set terminal fixing failed
+            if self.play_game_state is None:
+                # change state of the terminal
+                for terminal in self.game.terminal_controller.terminals:
+                    if terminal.state_machine.active_state.name == "fixing":
+                        terminal.fixing_failed = True
+
+            self.sound_effect_player.play_hacking_over()
+            get_ready_state: InterstitialState = InterstitialState(
+                self.game,
+                "You did not stop the hacker in time!",
+                4500,
+                self.play_game_state,
+            )
+            self.game.change_state(get_ready_state)
+            return
+
         if self.play_game_state is not None:
             # change state of the machine (to inactive)
             for terminal in self.play_game_state.terminal_controller.terminals:
