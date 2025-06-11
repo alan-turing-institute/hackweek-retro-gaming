@@ -5,6 +5,7 @@ from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame import Rect
 from regplayer import PlayerController, PlayerModel
+from sounds import SoundEffectPlayer
 from terminals import Terminal
 
 
@@ -22,11 +23,13 @@ class CollisionController:
         self.player_controller: PlayerController = player_controller
         self.mini_game_state: GameState | None = mini_game_state
         self.terminals: list = terminals
+        self.sound_effect_player: SoundEffectPlayer = SoundEffectPlayer()
 
     def update(self, game_time: int, *args, **kwargs) -> None:
         for maisy_model in self.maisy_controller.hacker_models:
             if self.mini_game_state is not None:
                 if True in self.hacker_collide_terminal(maisy_model):
+                    self.sound_effect_player.play_hacker_alert()
                     get_ready_state: InterstitialState = InterstitialState(
                         self.game, "Stop the hacker!", 2000, self.mini_game_state
                     )
