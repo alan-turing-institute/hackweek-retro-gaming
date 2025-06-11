@@ -2,7 +2,6 @@ import enemy
 from config import PLAYER_SIZE, TERMINAL_SIZE
 from enemy import MaisyController, MaisyModel
 from framework import Game, GameState
-from interstitial import InterstitialState
 from pygame import Rect
 from regplayer import PlayerController, PlayerModel
 from terminals import TerminalController, TerminalModel
@@ -34,6 +33,7 @@ class HackerCollisionController:
                     enemy.PLAYER_SIZE[1],
                     terminal,
                 ):
+                    hacker.at_terminal = True
                     terminal.hacker_at_terminal = hacker
 
                 if self.collides_with_terminal(
