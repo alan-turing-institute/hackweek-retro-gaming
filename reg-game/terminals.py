@@ -106,8 +106,16 @@ class TerminalModel:
 
 class TerminalController:
     def __init__(self, number_of_terminals: int) -> None:
-        self.terminals: list[TerminalModel] = []
-        self.create_random_terminals(number_of_terminals)
+
+        offset: int = 50
+        self.terminals: list[TerminalModel] = [
+            TerminalModel("top-left", (offset, offset)),
+            TerminalModel("top-right", (SCREEN_WIDTH - offset, offset)),
+            TerminalModel("bottom-left", (offset, SCREEN_HEIGHT - offset)),
+            TerminalModel(
+                "bottom-right", (SCREEN_WIDTH - offset, SCREEN_HEIGHT - offset)
+            ),
+        ]
 
     def create_random_terminals(self, num_terminals: int):
         for _ in range(num_terminals):
