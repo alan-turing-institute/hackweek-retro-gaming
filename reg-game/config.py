@@ -28,6 +28,7 @@ SANDBOX_COUNTDOWN: int = 1000
 PLAYER_NUMBER_OF_SPRITES: int = 4
 
 TERMINAL_SIZE: tuple[int, int] = (32, 32)
+NUMBER_OF_TERMINALS: int = 3
 
 LIVES_SPRITE_SHEET_PATH: str = "img/male_ivory_lizard_head.png"
 LIVES_SPRITE_WIDTH: int = 64

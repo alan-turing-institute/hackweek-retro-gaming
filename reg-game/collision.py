@@ -5,7 +5,7 @@ from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame import Rect
 from regplayer import PlayerController, PlayerModel
-from terminals import Terminal
+from terminals import TerminalModel, TerminalController
 
 
 class HackerCollisionController:
@@ -15,13 +15,13 @@ class HackerCollisionController:
         maisy_controller: MaisyController,
         player_controller: PlayerController,
         mini_game_state: GameState | None,
-        terminals: list[Terminal],
+        terminal_controller: TerminalController,
     ) -> None:
         self.game: Game = game
         self.maisy_controller: MaisyController = maisy_controller
         self.player_controller: PlayerController = player_controller
         self.mini_game_state: GameState | None = mini_game_state
-        self.terminals: list = terminals
+        self.terminals: list[TerminalModel] = terminal_controller.terminals
 
     def update(self, game_time: int, *args, **kwargs) -> None:
         for maisy_model in self.maisy_controller.hacker_models:
