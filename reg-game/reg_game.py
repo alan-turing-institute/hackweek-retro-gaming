@@ -3,12 +3,13 @@ import sys
 import pygame
 
 from background import BackgroundView
-from collision import CollisionController
+from collision import HackerCollisionController
 from config import (
     LIVES_SPRITE_SHEET_PATH,
     PLAYER_SPRITE_SHEET_PATH,
-    SANDBOX_IMAGE_PATH,
     SCREEN_WIDTH,
+    SANDBOX_IMAGE_PATH,
+    NUMBER_OF_TERMINALS,
 )
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
@@ -16,7 +17,7 @@ from pygame.key import ScancodeWrapper
 from pygame.locals import K_ESCAPE
 from regplayer import PlayerController, PlayerLivesView, PlayerView
 from sandbox import SandboxView
-from terminals import TerminalView, create_random_terminals
+from terminals import TerminalView, TerminalController
 
 PLAYER_X: int = SCREEN_WIDTH // 2
 PLAYER_Y: int = 500
@@ -29,7 +30,7 @@ class PlayGameState(GameState):
         super().__init__(game)
         self.controllers: list | None = None
         self.renderers: list | None = None
-        self.player_controller = None
+        self.player_controller: PlayerController | None = None
 
         self.game_over_state: GameState | None = game_over_state
         self.mini_game_state: GameState | None = mini_game_state
@@ -40,17 +41,19 @@ class PlayGameState(GameState):
         if self.player_controller is not None:
             self.player_controller.pause(False)
 
-    def initialise(self):
+    def initialise(self) -> None:
         self.maisy_controller = MaisyController()
         # Initialize the terminals
-        self.terminals = create_random_terminals(3)
+        self.terminal_controller: TerminalController = TerminalController(
+            NUMBER_OF_TERMINALS, self.game, self.mini_game_state
+        )
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
-        self.collision_controller = CollisionController(
+        self.collision_controller = HackerCollisionController(
             self.game,
             self.maisy_controller,
             self.player_controller,
             self.mini_game_state,
-            self.terminals,
+            self.terminal_controller,
         )
 
         background_renderer = BackgroundView("img/industrial_floor.png")
@@ -66,7 +69,7 @@ class PlayGameState(GameState):
             self.player_controller.sandbox_controller, SANDBOX_IMAGE_PATH
         )
         terminal_renderer = TerminalView(
-            self.terminals, "img/CommTerminal.png"
+            self.terminal_controller, "img/CommTerminal.png"
         )  # terminal image is 32 x 32 pixels
 
         self.renderers = [
@@ -82,6 +85,7 @@ class PlayGameState(GameState):
             self.player_controller,
             self.maisy_controller,
             self.collision_controller,
+            self.terminal_controller,
         ]
 
     def update(self, game_time: int, *args, **kwargs):

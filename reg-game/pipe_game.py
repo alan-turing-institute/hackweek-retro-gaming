@@ -23,7 +23,6 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 GREEN = (0, 150, 0)
-random.seed(42)
 
 
 class Pipe:
@@ -695,26 +694,15 @@ class PipeGameState(GameState):
 
     def end_game(self):
         if self.play_game_state is not None:
-            # change state of the machine (to unhackable)
-            # change the state of the hackers to wandering (random)
+            # change state of the machine (to inactive)
+            for terminal in self.play_game_state.terminal_controller.terminals:
+                if terminal.state_machine.active_state.name == "fixing":
+                    terminal.state_machine.set_state("unhackable")
 
-            # Move player in opposite direction in play_game_state
-            if self.play_game_state.player_controller.player_model.direction == "RIGHT":
-                self.play_game_state.player_controller.player_model.direction = "LEFT"
-                self.play_game_state.player_controller.player_model.x -= 50
-            elif (
-                self.play_game_state.player_controller.player_model.direction == "LEFT"
-            ):
-                self.play_game_state.player_controller.player_model.direction = "RIGHT"
-                self.play_game_state.player_controller.player_model.x += 50
-            elif self.play_game_state.player_controller.player_model.direction == "UP":
-                self.play_game_state.player_controller.player_model.direction = "DOWN"
-                self.play_game_state.player_controller.player_model.y -= 50
-            elif (
-                self.play_game_state.player_controller.player_model.direction == "DOWN"
-            ):
-                self.play_game_state.player_controller.player_model.direction = "UP"
-                self.play_game_state.player_controller.player_model.y += 50
+            # change the state of the hackers to wandering (random)
+            for hacker in self.play_game_state.maisy_controller.hacker_models:
+                if hacker.brain.active_state.name == "fighting":
+                    hacker.brain.set_state("wandering")
 
             get_ready_state: InterstitialState = InterstitialState(
                 self.game, "Hacker stopped!", 2000, self.play_game_state
