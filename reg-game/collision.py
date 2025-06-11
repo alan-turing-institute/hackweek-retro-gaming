@@ -8,7 +8,7 @@ from regplayer import PlayerController, PlayerModel
 from terminals import Terminal
 
 
-class CollisionController:
+class HackerCollisionController:
     def __init__(
         self,
         game: Game,

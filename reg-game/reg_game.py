@@ -1,10 +1,10 @@
 from background import BackgroundView
-from collision import CollisionController
+from collision import HackerCollisionController
 from config import (
     LIVES_SPRITE_SHEET_PATH,
     PLAYER_SPRITE_SHEET_PATH,
-    SANDBOX_IMAGE_PATH,
     SCREEN_WIDTH,
+    SANDBOX_IMAGE_PATH,
 )
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
@@ -39,7 +39,7 @@ class PlayGameState(GameState):
         # Initialize the terminals
         self.terminals = create_random_terminals(3)
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
-        self.collision_controller = CollisionController(
+        self.collision_controller = HackerCollisionController(
             self.game,
             self.maisy_controller,
             self.player_controller,
