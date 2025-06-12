@@ -27,6 +27,8 @@ class MaisyModel:
         self.width = 48
         self.height = 48
         self.at_terminal = False
+        self.active_terminal: None | TerminalModel = None
+        self.terminals: None | TerminalModel = None
         self.brain = StateMachine()
         self.brain.add_state(HackingState(self))
         self.brain.add_state(WanderingState(self, terminals))
@@ -194,17 +196,33 @@ class WanderingState(State):
     def check_conditions(self) -> str | None:
         # Check if terminal available and within range
         # If so go to searching
-        range = -10
-        for terminal in self.terminals:
-            dist = self.get_distance(
-                (self.hacker_model.x, self.hacker_model.y), terminal.location
-            )
-            if dist < range:
-                return "searching"
+        # range = 200
+        # for terminal in self.terminals:
+        #     dist = self.get_distance(
+        #         (self.hacker_model.x, self.hacker_model.y), terminal.location
+        #     )
+        #     if dist < range:
+        #         return "searching"
+
+        # Lazy check - have a small chance of changing to search mode
+        if random.random() < 0.005:
+            return "searching"
+            print("I'd search now")
 
         # Check if at terminal TODO check if terminal is active
         # print(f"At wandering {self.hacker_model.at_terminal=}")
         if self.hacker_model.at_terminal:
+            print("ABOUT TO HACK")
+            print(self.hacker_model.active_terminal)
+            print(self.hacker_model.active_terminal.state_machine.active_state.name)
+            print(
+                self.get_distance(
+                    (self.hacker_model.x, self.hacker_model.y),
+                    self.hacker_model.active_terminal.location,
+                )
+            )
+            print(f"Hacker loc = {self.hacker_model.x, self.hacker_model.y}")
+            print("----")
             return "hacking"
         return None
 
@@ -233,6 +251,7 @@ class SearchingState(State):
 
     def entry_actions(self):
         print("IN SEARCHING")
+        # avail_terminals = self.hacker_model.terminals
         pass
 
     def exit_actions(self):
