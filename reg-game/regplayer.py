@@ -5,6 +5,7 @@ from config import (
     LIVES_MESSAGE_Y,
     LIVES_SPRITE_HEIGHT,
     LIVES_SPRITE_WIDTH,
+    NUMBER_OF_LIVES,
     PLAYER_FACING_DOWN_OFFSET,
     PLAYER_FACING_LEFT_OFFSET,
     PLAYER_FACING_RIGHT_OFFSET,
@@ -32,7 +33,7 @@ class PlayerModel:
         self.x = x
         self.y = y
 
-        self.lives: int = 3
+        self.lives: int = NUMBER_OF_LIVES
         self.score: int = 0
         self.speed: int = 100
 

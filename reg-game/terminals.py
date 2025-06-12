@@ -4,6 +4,7 @@ from typing import Any, Optional
 import pygame
 from config import (
     FIXING_SCORE,
+    HACKED_PENALTY,
     HACKING_COUNTDOWN,
     NUMBER_OF_TERMINALS,
     SCREEN_HEIGHT,
@@ -13,7 +14,7 @@ from config import (
     TERMINAL_SIZE,
     UNHACKABLE_COUNTDOWN,
 )
-from framework import Game, GameState, EntityState, EntityStateMachine
+from framework import EntityState, EntityStateMachine, Game, GameState
 from interstitial import InterstitialState
 from pipe_game import PipeGameState
 from pygame import Surface, image
@@ -30,7 +31,6 @@ class ActiveState(EntityState):
         pass
 
     def check_conditions(self) -> str | None:
-
         print(
             f"Active state {self.terminal_model.hacker_at_terminal=} {self.terminal_model.player_at_terminal=}"
         )
@@ -128,6 +128,7 @@ class BrokenState(EntityState):
     def entry_actions(self) -> None:
         self.player_model.lives -= 1
         self.terminal_model.fixing_failed = False
+        self.player_model.score -= HACKED_PENALTY
 
         time_out: InterstitialState = InterstitialState(
             self.game,
