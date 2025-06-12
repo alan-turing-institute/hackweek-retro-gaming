@@ -51,6 +51,7 @@ class MaisyController:
 
     def update(self, _game_time, *args, **kwargs):
         for hacker in self.hacker_models:
+            print(f"{hacker.brain.active_state.name=}")
             hacker.brain.think(game_time=_game_time)
 
 

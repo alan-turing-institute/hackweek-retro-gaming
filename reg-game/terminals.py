@@ -96,19 +96,11 @@ class FixingState(EntityState):
         self.game: Game = game
 
     def check_conditions(self) -> str | None:
-        if (
-            self.terminal_model.hacker_at_terminal is not None
-            and self.terminal_model.player_at_terminal is not None
-            and self.terminal_model.hacking_failed
-        ):
+        if self.terminal_model.hacking_failed:
             self.player_model.score += FIXING_SCORE
             return "unhackable"
 
-        if (
-            self.terminal_model.hacker_at_terminal is not None
-            and self.terminal_model.player_at_terminal is not None
-            and self.terminal_model.fixing_failed
-        ):
+        if self.terminal_model.fixing_failed:
             return "broken"
 
         return None
@@ -130,6 +122,7 @@ class BrokenState(EntityState):
 
     def entry_actions(self) -> None:
         self.player_model.lives -= 1
+        self.terminal_model.fixing_failed = False
         print(f"State changed to Broken. Player lives left: {self.player_model.lives}")
 
     def check_conditions(self) -> str | None:
@@ -150,6 +143,7 @@ class UnHackableState(EntityState):
 
     def entry_actions(self) -> None:
         self.countdown = UNHACKABLE_COUNTDOWN
+        self.terminal_model.hacking_failed = False
         print(f"State changed to UnHackable. Player score: {self.player_model.score}")
 
     def check_conditions(self) -> str | None:
