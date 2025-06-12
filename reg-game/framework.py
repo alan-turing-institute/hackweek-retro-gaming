@@ -1,8 +1,8 @@
-import array
 import sys
 
 import moderngl
 import pygame
+from glshaders import glContext
 from pygame import Color
 from pygame.locals import QUIT
 from pygame.surface import Surface
@@ -108,6 +108,8 @@ class Game:
         """
         pygame.init()
         pygame.display.set_caption(game_name)
+        # see https://stackoverflow.com/questions/76151435/creating-a-context-utilizing-moderngl-for-pygame
+        # need to do some set up work for OpenGL context creation on Mac
         pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
         pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
         pygame.display.gl_set_attribute(
@@ -120,60 +122,7 @@ class Game:
         self.gl_screen: Surface = pygame.display.set_mode(
             (width, height), pygame.OPENGL | pygame.DOUBLEBUF
         )
-        self.ctx: moderngl.Context = moderngl.create_context()
-        self.quad_buffer = self.ctx.buffer(
-            data=array.array(
-                "f",
-                [
-                    -1.0,
-                    1.0,
-                    0.0,
-                    0.0,
-                    1.0,
-                    1.0,
-                    1.0,
-                    0.0,
-                    -1.0,
-                    -1.0,
-                    0.0,
-                    1.0,
-                    1.0,
-                    -1.0,
-                    1.0,
-                    1.0,
-                ],
-            )
-        )
-        vert_shader = """
-        #version 330 core
-        in vec2 vert;
-        in vec2 texcoord;
-        out vec2 uvs;
-
-        void main() {
-            uvs = texcoord;
-            gl_Position = vec4(vert.x, vert.y, 0.0, 1.0);
-        }
-        """
-
-        frag_shader = """
-        #version 330 core
-        uniform sampler2D tex;
-        in vec2 uvs;
-        out vec4 f_colour;
-        void main() {
-            f_colour = vec4(texture(tex, uvs).rgb, 1.0);
-        }
-        """
-
-        self.program = self.ctx.program(
-            vertex_shader=vert_shader, fragment_shader=frag_shader
-        )
-        self.render_object = self.ctx.vertex_array(
-            self.program,
-            [(self.quad_buffer, "2f 2f", "vert", "texcoord")],
-        )
-        # self.screen_shader = pygame_shaders.DefaultScreenShader(display)
+        self.ctx: glContext = glContext()
         self.background: Color = Color(0, 0, 0)
         self.current_state: GameState | None = None
 
@@ -224,11 +173,9 @@ class Game:
 
             frame_tex = self.surf_to_texture(self.main_window)
             frame_tex.use(0)
-            self.program["tex"] = 0
-            self.render_object.render(mode=moderngl.TRIANGLE_STRIP)
+            self.ctx.render(type(self.current_state).__name__)
             pygame.display.flip()
             frame_tex.release()
-            # pygame.display.update()
             self.fps_clock.tick(30)
 
     def surf_to_texture(self, surface: Surface):
@@ -238,7 +185,7 @@ class Game:
         :param surface: The pygame surface to convert.
         :returns: A moderngl texture.
         """
-        texture = self.ctx.texture(surface.get_size(), 4)
+        texture = self.ctx.ctx.texture(surface.get_size(), 4)
         texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
         texture.swizzle = "BGRA"
         texture.write(surface.get_view("1"))
