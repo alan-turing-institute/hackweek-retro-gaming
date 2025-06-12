@@ -719,13 +719,6 @@ class PipeGameState(GameState):
                         terminal.fixing_failed = True
 
             self.sound_effect_player.play_hacking_over()
-            get_ready_state: InterstitialState = InterstitialState(
-                self.game,
-                "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!",
-                4500,
-                self.play_game_state,
-            )
-            self.game.change_state(get_ready_state)
             return
 
         if self.play_game_state is not None:

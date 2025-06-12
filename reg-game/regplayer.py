@@ -173,7 +173,7 @@ class PlayerLivesView:
 
         self.font.draw(
             surface,
-            "1UP SCORE: " + str(self.player.player_model.score),
+            "REGINA SCORE: " + str(self.player.player_model.score),
             LIVES_MESSAGE_X,
             LIVES_MESSAGE_Y,
         )

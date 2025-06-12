@@ -5,11 +5,11 @@ from config import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     UNHACKABLE_COUNTDOWN,
-    TERMINAL_IMAGE_SERVER,
     TERMINAL_IMAGE_COMPUTER_ON,
     TERMINAL_IMAGE_COMPUTER_OFF,
     TERMINAL_SIZE,
     HACKING_COUNTDOWN,
+    FIXING_SCORE,
 )
 from framework import State, StateMachine
 from pygame import Surface, image
@@ -89,26 +89,37 @@ class FixingState(State):
 
 
 class BrokenState(State):
-    def __init__(self, terminal: "TerminalModel", player_model: PlayerModel):
+    def __init__(
+        self,
+        terminal: "TerminalModel",
+        player_model: PlayerModel,
+        live_lost_state: InterstitialState,
+        game: Game,
+    ):
         super().__init__("broken")
         self.terminal_model: TerminalModel = terminal
         self.player_model: PlayerModel = player_model
+        self.game: Game = game
+        self.live_lost_state: InterstitialState = live_lost_state
 
     def entry_actions(self) -> None:
         self.player_model.lives -= 1
+        self.game.change_state(self.live_lost_state)
 
 
 class UnHackableState(State):
-    def __init__(self, terminal: "TerminalModel"):
+    def __init__(self, terminal: "TerminalModel", player: PlayerModel):
         super().__init__("unhackable")
         self.terminal_model = terminal
         self.countdown: int = UNHACKABLE_COUNTDOWN
+        self.player: PlayerModel = player
 
     def do_actions(self, game_time):
         self.countdown -= game_time
 
     def entry_actions(self) -> None:
         self.countdown = UNHACKABLE_COUNTDOWN
+        self.player.score += FIXING_SCORE
 
     def check_conditions(self) -> str | None:
         if self.countdown <= 0:
@@ -142,6 +153,7 @@ class TerminalController:
         player_controller: PlayerController,
         game: Game,
         mini_game_state: GameState | None,
+        play_game_state: GameState | None,
     ) -> None:
 
         offset: int = 80
@@ -158,6 +170,13 @@ class TerminalController:
             game, "Stop the hacker!", 2000, mini_game_state
         )
 
+        live_lost_state: InterstitialState = InterstitialState(
+            game,
+            "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!",
+            4500,
+            play_game_state,
+        )
+
         for terminal in self.terminals:
             terminal.state_machine.add_state(ActiveState(terminal))
             terminal.state_machine.add_state(HackingState(terminal))
@@ -165,9 +184,13 @@ class TerminalController:
                 FixingState(terminal, get_ready_state, game)
             )
             terminal.state_machine.add_state(
-                BrokenState(terminal, player_controller.player_model)
+                BrokenState(
+                    terminal, player_controller.player_model, live_lost_state, game
+                )
             )
-            terminal.state_machine.add_state(UnHackableState(terminal))
+            terminal.state_machine.add_state(
+                UnHackableState(terminal, player_controller.player_model)
+            )
 
             terminal.state_machine.set_state("active")
 
@@ -196,16 +219,16 @@ class TerminalView:
                 terminal_state: str = terminal.state_machine.active_state.name
 
                 if terminal_state == "active":
-                    new_terminal_image = image.load(TERMINAL_IMAGE_SERVER)
+                    new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_OFF)
                 elif terminal_state == "hacking":
                     # TODO fix later
                     new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_ON)
                 elif terminal_state == "fixing":
                     new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_ON)
                 elif terminal_state == "broken":
-                    new_terminal_image = self.current_terminal_image
-                elif terminal_state == "unhackable":
                     new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_OFF)
+                elif terminal_state == "unhackable":
+                    new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_ON)
 
             new_terminal_image = pygame.transform.scale(
                 new_terminal_image, size=TERMINAL_SIZE
