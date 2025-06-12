@@ -39,6 +39,7 @@ class HackerCollisionController:
                     else:
                         self.sound_effect_player.play_hacker_alert()
                     hacker.at_terminal = True
+                    hacker.active_terminal = terminal
                     terminal.hacker_at_terminal = hacker
 
                 if self.collides_with_terminal(
