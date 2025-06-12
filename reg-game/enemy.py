@@ -187,6 +187,8 @@ class HackingState(EntityState):
     def check_conditions(self) -> str | None:
         if self.game_time > 10000:
             return "wandering"
+        if self.hacker_model.active_terminal is None:
+            return "wandering"
         return None
 
     def entry_actions(self):
