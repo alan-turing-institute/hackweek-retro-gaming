@@ -88,7 +88,6 @@ class PlayGameState(GameState):
             or self.player_controller.player_model.lives == 0
         ):
             print("Ending the game")
-            # self.music_player.stop()
             self.music_player.start("sound/winmusic.mp3")
             self.game_time = 0
             if self.player_controller.player_model.lives == 0:
