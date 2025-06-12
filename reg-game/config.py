@@ -39,6 +39,8 @@ MENU_BACKGROUND_SCALE_FACTOR: float = 1.0
 
 MENU_ITEMS: tuple[str, ...] = ("Start", "Resume", "Quit")
 
+MINI_GAME_MAX_TIME: int = 15000
+
 SCREEN_WIDTH: int = 800
 SCREEN_HEIGHT: int = 600
 

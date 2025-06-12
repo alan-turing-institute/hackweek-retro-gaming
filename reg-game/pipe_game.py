@@ -2,7 +2,7 @@ import random
 import time
 
 import pygame
-from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from config import SCREEN_HEIGHT, SCREEN_WIDTH, MINI_GAME_MAX_TIME
 from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame.surface import Surface
@@ -651,7 +651,7 @@ class PipeGameState(GameState):
         play_game_state: GameState | None = None,
         board_size: int = BOARD_SIZE,
         draw_manual: bool = False,
-        max_time: int = 15000,
+        max_time: int = MINI_GAME_MAX_TIME,
     ):
         if board_size < 3:
             raise ValueError("Board size must be at least 3x3 for a playable game.")
@@ -667,6 +667,8 @@ class PipeGameState(GameState):
         self.current_terminal = current_terminal
 
     def on_enter(self, previous_state: GameState | None):
+        self.game_time = 0
+        self.failed = False
         self.board = Board(self.board_size, self.draw_manual)
         self.game_won = False
         self.sound_effect_player.play_hacking_sound()
