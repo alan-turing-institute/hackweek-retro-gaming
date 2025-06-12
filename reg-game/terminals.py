@@ -31,9 +31,9 @@ class ActiveState(EntityState):
         pass
 
     def check_conditions(self) -> str | None:
-        print(
-            f"Active state {self.terminal_model.hacker_at_terminal=} {self.terminal_model.player_at_terminal=}"
-        )
+        # print(
+        #     f"Active state {self.terminal_model.hacker_at_terminal=} {self.terminal_model.player_at_terminal=}"
+        # )
         if (
             self.terminal_model.hacker_at_terminal is not None
             and self.terminal_model.player_at_terminal is None
@@ -141,7 +141,7 @@ class BrokenState(EntityState):
         print(f"State changed to Broken. Player lives left: {self.player_model.lives}")
 
     def check_conditions(self) -> str | None:
-        print("Going to unhackable")
+        # print("Going to unhackable")
 
         return "unhackable"
 
@@ -246,8 +246,8 @@ class TerminalController:
     def update(self, game_time: int, *args, **kwargs):
         for terminal in self.terminals:
             # TODO: Remove later
-            if terminal.state_machine.active_state is not None:
-                print(f"{terminal.state_machine.active_state.name=}")
+            # if terminal.state_machine.active_state is not None:
+            #     print(f"{terminal.state_machine.active_state.name=}")
 
             terminal.state_machine.think(game_time)
 
