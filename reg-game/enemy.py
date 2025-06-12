@@ -266,7 +266,19 @@ class WanderingState(EntityState):
 
     def check_conditions(self) -> str | None:
         # print(f"At wandering {self.hacker_model.at_terminal=}")
+
+        # TODO: Remove later
         if self.hacker_model.active_terminal is not None:
+            print(f"Hacker ->{self.hacker_model.active_terminal=}")
+            print(
+                f"Hacker ->{self.hacker_model.active_terminal.state_machine.active_state.name=}"
+            )
+
+        if (
+            self.hacker_model.active_terminal is not None
+            and self.hacker_model.active_terminal.hacker_at_terminal
+            == self.hacker_model
+        ):
             return "hacking"
         if self.hacker_model.active_sandbox is not None:
             return "in_sandbox"

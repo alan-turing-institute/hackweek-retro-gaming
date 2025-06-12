@@ -54,7 +54,7 @@ class HackerCollisionController:
                     )
                     terminal.hacker_at_terminal = hacker
                     hacker.active_terminal = terminal
-                else:
+                elif hacker.active_terminal == terminal:
                     terminal.hacker_at_terminal = None
                     hacker.active_terminal = None
 
