@@ -199,8 +199,8 @@ class HackingState(EntityState):
         # self.hacker_model.active_terminal = None
         self.hacker_model.x = SCREEN_WIDTH / 2
         self.hacker_model.y = SCREEN_HEIGHT / 2
-        self.hacker_model.dx = random.choice([-1, 1])
-        self.hacker_model.dy = random.choice([-1, 1])
+        self.hacker_model.dx = random.choice([-3, 3])
+        self.hacker_model.dy = random.choice([-3, 3])
         return None
 
 
