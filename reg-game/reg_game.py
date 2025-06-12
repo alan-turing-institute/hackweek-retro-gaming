@@ -88,24 +88,29 @@ class PlayGameState(GameState):
             self.game_time >= MAIN_GAME_MAX_TIME
             or self.player_controller.player_model.lives == 0
         ):
+            print("Ending the game")
             self.game_time = 0
             if self.player_controller.player_model.lives == 0:
                 # all machines have been compromised
+                print("Game Over (loss): All machines compromised")
                 message = "You have failed us solider!!!\n\nAll our machines have been compromised!\nYou were USELESS out there!\n\nWe will never recover from this."
             elif self.player_controller.player_model.lives == NUMBER_OF_LIVES:
                 # all machines have been defended
+                print("Game Over (win): All machines defended")
                 message = "Well done soldier!!!\n\nYou have successfully defended all our machines!\n\nWe will never forget your bravery!"
             else:
                 # some machines have been compromised
                 if self.player_controller.player_model.score >= 0:
+                    print("Game Over (win): Some machines compromised, but not all")
                     message = "Well done soldier!\n\nSome machines have been compromised, but you helped save some.\n\nWe live to fight another day."
                 else:
+                    print("Game Over (loss): Some machines compromised, but not all")
                     message = "You have failed us soldier!!!\n\nSome machines have been compromised but at least not all.\n\nYou need to do better next time."
 
             game_over_state = InterstitialState(
                 game=self.game,
                 message=message,
-                wait_time_ms=10000,
+                wait_time_ms=12000,
                 next_state=self.game_over_state,
             )
             self.game.change_state(game_over_state)
