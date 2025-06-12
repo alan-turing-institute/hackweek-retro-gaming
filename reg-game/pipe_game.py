@@ -651,7 +651,7 @@ class PipeGameState(GameState):
         play_game_state: GameState | None = None,
         board_size: int = BOARD_SIZE,
         draw_manual: bool = False,
-        max_time: int = 2000,
+        max_time: int = 15000,
     ):
         if board_size < 3:
             raise ValueError("Board size must be at least 3x3 for a playable game.")
