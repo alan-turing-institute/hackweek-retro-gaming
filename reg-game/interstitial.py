@@ -29,4 +29,11 @@ class InterstitialState(GameState):
             self.game.change_state(self.next_state)
 
     def draw(self, surface: Surface):
-        self.font.centre(surface, self.message, surface.get_rect().height / 2)
+        messages = self.message.split("\n")
+        if len(messages) > 1:
+            for i, message in enumerate(messages):
+                self.font.centre(
+                    surface, message, surface.get_rect().height / 2 + i * 20
+                )
+        else:
+            self.font.centre(surface, self.message, surface.get_rect().height / 2)

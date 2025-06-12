@@ -1,24 +1,24 @@
 from random import randint
-import pygame
+from typing import Any, Optional
 
+import pygame
 from config import (
+    FIXING_SCORE,
+    HACKING_COUNTDOWN,
+    NUMBER_OF_TERMINALS,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    TERMINAL_IMAGE_HEIGHT,
-    TERMINAL_IMAGE_WIDTH,
-    TERMINAL_SPRITE_SHEET,
-    UNHACKABLE_COUNTDOWN,
-    TERMINAL_IMAGE_SERVER,
-    TERMINAL_IMAGE_COMPUTER_ON,
     TERMINAL_IMAGE_COMPUTER_OFF,
+    TERMINAL_IMAGE_COMPUTER_ON,
     TERMINAL_SIZE,
+    UNHACKABLE_COUNTDOWN,
 )
-from framework import State, StateMachine
-from pygame import Surface, image
-from regplayer import PlayerModel
-from spritesheet import SpriteSheet
+from framework import Game, GameState, State, StateMachine
 from interstitial import InterstitialState
-from framework import Game, GameState
+from pipe_game import PipeGameState
+from pygame import Surface, image
+from regplayer import PlayerController, PlayerModel
+from sounds import SoundEffectPlayer
 
 
 class ActiveState(State):
@@ -39,8 +39,21 @@ class HackingState(State):
     def __init__(self, terminal: "TerminalModel"):
         super().__init__("hacking")
         self.terminal_model = terminal
+        self.countdown: int = HACKING_COUNTDOWN
+
+        self.sound_effect_player: SoundEffectPlayer = SoundEffectPlayer()
+
+    def do_actions(self, game_time):
+        self.countdown -= game_time
+
+    def entry_actions(self) -> None:
+        self.countdown = HACKING_COUNTDOWN
+        self.sound_effect_player.play_hacker_alert()
 
     def check_conditions(self) -> str | None:
+        if self.countdown <= 0:
+            return "broken"
+
         if (
             self.terminal_model.hacker_at_terminal is not None
             and self.terminal_model.player_at_terminal is not None
@@ -52,11 +65,21 @@ class HackingState(State):
 
 class FixingState(State):
     def __init__(
-        self, terminal: "TerminalModel", get_ready_state: InterstitialState, game: Game
+        self,
+        terminal: "TerminalModel",
+        game: Game,
+        game_over_state: InterstitialState | None,
     ):
         super().__init__("fixing")
         self.terminal_model: TerminalModel = terminal
-        self.get_ready_state: InterstitialState = get_ready_state
+
+        mini_game_state: PipeGameState = PipeGameState(
+            game=game, current_terminal=terminal, game_over_state=game_over_state
+        )
+        self.get_ready_state: InterstitialState = InterstitialState(
+            game, "Stop the hacker!", 2000, mini_game_state
+        )
+
         self.game: Game = game
 
     def check_conditions(self) -> str | None:
@@ -81,22 +104,44 @@ class FixingState(State):
 
 
 class BrokenState(State):
-    def __init__(self, terminal: "TerminalModel"):
+    def __init__(
+        self,
+        terminal: "TerminalModel",
+        player_model: PlayerModel,
+        live_lost_state: InterstitialState,
+        game: Game,
+    ):
         super().__init__("broken")
-        self.terminal_model = terminal
+        self.terminal_model: TerminalModel = terminal
+        self.player_model: PlayerModel = player_model
+        self.game: Game = game
+        self.live_lost_state: InterstitialState = live_lost_state
+
+    def entry_actions(self) -> None:
+        self.player_model.lives -= 1
+        self.game.change_state(self.live_lost_state)
+
+        print("State changed")
+
+    def check_conditions(self) -> str | None:
+        print("Going to unhackable")
+
+        return "unhackable"
 
 
 class UnHackableState(State):
-    def __init__(self, terminal: "TerminalModel"):
+    def __init__(self, terminal: "TerminalModel", player: PlayerModel):
         super().__init__("unhackable")
         self.terminal_model = terminal
         self.countdown: int = UNHACKABLE_COUNTDOWN
+        self.player: PlayerModel = player
 
     def do_actions(self, game_time):
         self.countdown -= game_time
 
     def entry_actions(self) -> None:
         self.countdown = UNHACKABLE_COUNTDOWN
+        self.player.score += FIXING_SCORE
 
     def check_conditions(self) -> str | None:
         if self.countdown <= 0:
@@ -110,7 +155,7 @@ class TerminalModel:
         self.name = name
         self.location: tuple[int, int] = location
         self.player_at_terminal: PlayerModel | None = None
-        self.hacker_at_terminal = None
+        self.hacker_at_terminal: Optional[Any] = None
 
         self.hacking_failed: bool = False
         self.fixing_failed: bool = True
@@ -126,9 +171,12 @@ class TerminalModel:
 
 class TerminalController:
     def __init__(
-        self, number_of_terminals: int, game: Game, mini_game_state: GameState | None
+        self,
+        player_controller: PlayerController,
+        game: Game,
+        play_game_state: GameState | None,
+        game_over_state: GameState | None,
     ) -> None:
-
         offset: int = 80
         self.terminals: list[TerminalModel] = [
             TerminalModel("top-left", (offset, offset)),
@@ -139,18 +187,31 @@ class TerminalController:
             ),
         ]
 
-        get_ready_state: InterstitialState = InterstitialState(
-            game, "Stop the hacker!", 2000, mini_game_state
+        self.terminals = self.terminals[:NUMBER_OF_TERMINALS]
+
+        live_lost_state: InterstitialState = InterstitialState(
+            game,
+            "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!",
+            4500,
+            play_game_state,
         )
 
         for terminal in self.terminals:
             terminal.state_machine.add_state(ActiveState(terminal))
             terminal.state_machine.add_state(HackingState(terminal))
             terminal.state_machine.add_state(
-                FixingState(terminal, get_ready_state, game)
+                FixingState(
+                    terminal=terminal, game_over_state=game_over_state, game=game
+                )
             )
-            terminal.state_machine.add_state(BrokenState(terminal))
-            terminal.state_machine.add_state(UnHackableState(terminal))
+            terminal.state_machine.add_state(
+                BrokenState(
+                    terminal, player_controller.player_model, live_lost_state, game
+                )
+            )
+            terminal.state_machine.add_state(
+                UnHackableState(terminal, player_controller.player_model)
+            )
 
             terminal.state_machine.set_state("active")
 
@@ -169,32 +230,26 @@ class TerminalController:
 class TerminalView:
     def __init__(self, terminal_controller: TerminalController, img_path: str):
         self.terminal_controller: TerminalController = terminal_controller
-        self.current_terminal: Surface = image.load(img_path)
+        self.current_terminal_image: Surface = image.load(img_path)
 
     def render(self, surface: Surface):
-        sprite_sheet: SpriteSheet = SpriteSheet(TERMINAL_SPRITE_SHEET)
-        new_terminal_image: Surface = self.current_terminal
+        new_terminal_image: Surface = self.current_terminal_image
 
         for terminal in self.terminal_controller.terminals:
             if terminal.state_machine.active_state is not None:
                 terminal_state: str = terminal.state_machine.active_state.name
 
                 if terminal_state == "active":
-                    new_terminal_image = image.load(TERMINAL_IMAGE_SERVER)
+                    new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_OFF)
                 elif terminal_state == "hacking":
                     # TODO fix later
                     new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_ON)
                 elif terminal_state == "fixing":
                     new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_ON)
                 elif terminal_state == "broken":
-                    new_terminal_image = sprite_sheet.get_image(
-                        TERMINAL_IMAGE_WIDTH * 2,
-                        TERMINAL_IMAGE_HEIGHT * 2,
-                        TERMINAL_IMAGE_WIDTH,
-                        TERMINAL_IMAGE_HEIGHT,
-                    )
-                elif terminal_state == "unhackable":
                     new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_OFF)
+                elif terminal_state == "unhackable":
+                    new_terminal_image = image.load(TERMINAL_IMAGE_COMPUTER_ON)
 
             new_terminal_image = pygame.transform.scale(
                 new_terminal_image, size=TERMINAL_SIZE

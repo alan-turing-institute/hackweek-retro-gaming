@@ -1,10 +1,9 @@
 import enemy
 from config import PLAYER_SIZE, TERMINAL_SIZE
 from enemy import MaisyController, MaisyModel
-from framework import Game, GameState
+from framework import Game
 from pygame import Rect
 from regplayer import PlayerController, PlayerModel
-from sounds import SoundEffectPlayer
 from terminals import TerminalController, TerminalModel
 
 
@@ -14,15 +13,12 @@ class HackerCollisionController:
         game: Game,
         maisy_controller: MaisyController,
         player_controller: PlayerController,
-        mini_game_state: GameState | None,
         terminal_controller: TerminalController,
     ) -> None:
         self.game: Game = game
         self.maisy_controller: MaisyController = maisy_controller
         self.player_controller: PlayerController = player_controller
-        self.mini_game_state: GameState | None = mini_game_state
         self.terminal_controller: TerminalController = terminal_controller
-        self.sound_effect_player: SoundEffectPlayer = SoundEffectPlayer()
 
     def update(self, game_time: int, *args, **kwargs) -> None:
         for terminal in self.terminal_controller.terminals:
@@ -34,13 +30,12 @@ class HackerCollisionController:
                     enemy.PLAYER_SIZE[1],
                     terminal,
                 ):
-                    if hacker.at_terminal:
-                        continue
-                    else:
-                        self.sound_effect_player.play_hacker_alert()
-                    hacker.at_terminal = True
-                    hacker.active_terminal = terminal
-                    terminal.hacker_at_terminal = hacker
+                    # if hacker.at_terminal:
+                    #     continue
+                    # hacker.at_terminal = True
+                    if terminal.hacker_at_terminal is None:
+                        terminal.hacker_at_terminal = hacker
+                        hacker.active_terminal = terminal
 
                 if self.collides_with_terminal(
                     self.player_controller.player_model.x,

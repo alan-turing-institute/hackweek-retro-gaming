@@ -2,12 +2,11 @@ from background import BackgroundView
 from collision import HackerCollisionController
 from config import (
     LIVES_SPRITE_SHEET_PATH,
-    NUMBER_OF_TERMINALS,
     PLAYER_SPRITE_SHEET_PATH,
     SANDBOX_IMAGE_PATH,
     SCREEN_WIDTH,
 )
-from enemy import MaisyController, MaisyView
+from enemy import MaisyView
 from framework import Game, GameState
 from regplayer import PlayerController, PlayerLivesView, PlayerView
 from sandbox import SandboxView
@@ -18,16 +17,13 @@ PLAYER_Y: int = 500
 
 
 class PlayGameState(GameState):
-    def __init__(
-        self, game: Game, game_over_state: GameState, mini_game_state: GameState
-    ) -> None:
+    def __init__(self, game: Game, game_over_state: GameState) -> None:
         super().__init__(game)
         self.controllers: list | None = None
         self.renderers: list | None = None
         self.player_controller: PlayerController | None = None
 
         self.game_over_state: GameState | None = game_over_state
-        self.mini_game_state: GameState | None = mini_game_state
 
         self.initialise()
 
@@ -37,17 +33,18 @@ class PlayGameState(GameState):
 
     def initialise(self) -> None:
         # Initialize the terminals
-        self.terminal_controller: TerminalController = TerminalController(
-            NUMBER_OF_TERMINALS, self.game, self.mini_game_state
-        )
-        self.maisy_controller = MaisyController(self.terminal_controller)
 
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
+        self.terminal_controller: TerminalController = TerminalController(
+            self.player_controller,
+            self.game,
+            game_over_state=self.game_over_state,
+            play_game_state=self,
+        )
         self.collision_controller = HackerCollisionController(
             self.game,
             self.maisy_controller,
             self.player_controller,
-            self.mini_game_state,
             self.terminal_controller,
         )
 
