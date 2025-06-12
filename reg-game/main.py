@@ -19,4 +19,4 @@ prepare_for_challenge: InterstitialState = InterstitialState(
 
 main_menu_state.set_play_state(prepare_for_challenge)
 
-reg_game.run(play_game_state)
+reg_game.run(main_menu_state)

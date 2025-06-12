@@ -38,11 +38,10 @@ class HackerCollisionController:
                             self.player_controller.sandbox_controller
                         )
                         hacker.active_sandbox = sandbox
-                    break
 
             for terminal in self.terminal_controller.terminals:
                 # Check if the hacker collides with the terminal
-                if self.collides_with_terminal(
+                if self.colligdes_with_terminal(
                     hacker.x,
                     hacker.y,
                     enemy.PLAYER_SIZE[0],
