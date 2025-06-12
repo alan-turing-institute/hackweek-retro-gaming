@@ -115,73 +115,11 @@ class MovingFrames:
             row_offset=self.character_right_offset
         )
 
-        # self.moving_frames_right = self.sprite_sheet.get_frames_in_row(
-        #     row_offset=self.character_right_offset,
-        #     sprite_width=self.character_width,
-        #     sprite_height=self.character_height,
-        #     number_of_sprites=self.number_of_sprites,
-        #     target_size=self.character_size,
-        # )
-        # self.moving_frames_left = self.sprite_sheet.get_frames_in_row(
-        #     row_offset=PLAYER_FACING_LEFT_OFFSET,
-        #     sprite_width=PLAYER_SPRITE_WIDTH,
-        #     sprite_height=PLAYER_SPRITE_HEIGHT,
-        #     number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
-        #     target_size=PLAYER_SIZE,
-        # )
-        # self.moving_frames_up = self.sprite_sheet.get_frames_in_row(
-        #     row_offset=PLAYER_FACING_UP_OFFSET,
-        #     sprite_width=PLAYER_SPRITE_WIDTH,
-        #     sprite_height=PLAYER_SPRITE_HEIGHT,
-        #     number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
-        #     target_size=PLAYER_SIZE,
-        # )
-        # self.moving_frames_down = self.sprite_sheet.get_frames_in_row(
-        #     row_offset=PLAYER_FACING_DOWN_OFFSET,
-        #     sprite_width=PLAYER_SPRITE_WIDTH,
-        #     sprite_height=PLAYER_SPRITE_HEIGHT,
-        #     number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
-        #     target_size=PLAYER_SIZE,
-        # )
-
 
 class PlayerView:
     def __init__(self, player: PlayerController, sprite_sheet_path: str) -> None:
         self.player_controller: PlayerController = player
         self.moving_frames = MovingFrames(sprite_sheet=SpriteSheet(sprite_sheet_path))
-
-        # self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
-        # self.moving_frames_right: list[Surface] = self.sprite_sheet.get_frames_in_row(
-        #     row_offset=PLAYER_FACING_RIGHT_OFFSET,
-        #     sprite_width=PLAYER_SPRITE_WIDTH,
-        #     sprite_height=PLAYER_SPRITE_HEIGHT,
-        #     number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
-        #     target_size=PLAYER_SIZE,
-        # )
-        #
-        # self.moving_frames_left: list[Surface] = self.sprite_sheet.get_frames_in_row(
-        #     row_offset=PLAYER_FACING_LEFT_OFFSET,
-        #     sprite_width=PLAYER_SPRITE_WIDTH,
-        #     sprite_height=PLAYER_SPRITE_HEIGHT,
-        #     number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
-        #     target_size=PLAYER_SIZE,
-        # )
-        #
-        # self.moving_frames_up: list[Surface] = self.sprite_sheet.get_frames_in_row(
-        #     row_offset=PLAYER_FACING_UP_OFFSET,
-        #     sprite_width=PLAYER_SPRITE_WIDTH,
-        #     sprite_height=PLAYER_SPRITE_HEIGHT,
-        #     number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
-        #     target_size=PLAYER_SIZE,
-        # )
-        #
-        # self.moving_frames_down: list[Surface] = self.sprite_sheet.get_frames_in_row(
-        #     row_offset=PLAYER_FACING_DOWN_OFFSET,
-        #     sprite_width=PLAYER_SPRITE_WIDTH,
-        #     sprite_height=PLAYER_SPRITE_HEIGHT,
-        #     number_of_sprites=PLAYER_NUMBER_OF_SPRITES,
-        #     target_size=PLAYER_SIZE,
-        # )
 
         self.image: Surface = self.moving_frames.right[0]
 
