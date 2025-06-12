@@ -5,6 +5,7 @@ from pygame import Color
 from pygame.locals import QUIT
 from pygame.surface import Surface
 from pygame.time import Clock
+from sounds import MusicPlayer
 
 
 class EntityState:
@@ -111,6 +112,7 @@ class Game:
         self.main_window: Surface = pygame.display.set_mode((width, height))
         self.background: Color = Color(0, 0, 0)
         self.current_state: GameState | None = None
+        self.music_player: MusicPlayer = MusicPlayer()
 
     def change_state(self, new_state: GameState | None):
         """
@@ -135,6 +137,7 @@ class Game:
         Main game loop. Handles event management, state update and display.
         """
         self.change_state(initial_state)
+        self.music_player.start("sound/reggame-v2.mp3")
 
         while True:
             # position of a mouse click (needed for some games which rely on mouse click inputs)
