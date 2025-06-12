@@ -7,6 +7,8 @@ from config import (
     MENU_FONT_IMG,
     MENU_ITEMS,
     MENU_TITLE,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
 )
 from framework import Game, GameState
 from pygame.image import load
@@ -26,6 +28,9 @@ class MainMenuState(GameState):
         self.input_tick: int = 0
         self.menu_items: tuple[str, ...] = MENU_ITEMS
         self.background: Surface = load(MENU_BACKGROUND_PATH).convert()
+        self.background = pygame.transform.scale(
+            self.background, size=(SCREEN_WIDTH, SCREEN_HEIGHT)
+        )
 
     def set_play_state(self, state) -> None:
         self.play_game_state = state
@@ -58,11 +63,12 @@ class MainMenuState(GameState):
                 self.game.change_state(self.play_game_state)
 
     def draw(self, surface: Surface) -> None:
-        self.font.centre(surface, MENU_TITLE, 48)
         surface.blit(
             scale_by(self.background, MENU_BACKGROUND_SCALE_FACTOR),
             MENU_BACKGROUND_POSITION,
         )
+        self.font.centre(surface, MENU_TITLE, SCREEN_HEIGHT / 2 - 100)
+
         count: int = 0
         y = surface.get_rect().height - len(self.menu_items) * 160
 
@@ -72,7 +78,7 @@ class MainMenuState(GameState):
             if count == self.index:
                 item_text = "> "
             item_text += item
-            self.font.draw(surface, item_text, 25, y)
+            self.font.centre(surface, item_text, y)
 
             y += 24
             count += 1

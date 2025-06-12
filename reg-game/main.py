@@ -14,7 +14,10 @@ game_over_state: InterstitialState = InterstitialState(
 play_game_state: PlayGameState = PlayGameState(reg_game, game_over_state)
 
 prepare_for_challenge: InterstitialState = InterstitialState(
-    reg_game, "Defence and Security need you!", 2000, play_game_state
+    reg_game,
+    "Regina, we need you!\n\nWe are under attack and you are our last line of defence!\n\nProtect our terminals!",
+    5000,
+    play_game_state,
 )
 
 main_menu_state.set_play_state(prepare_for_challenge)

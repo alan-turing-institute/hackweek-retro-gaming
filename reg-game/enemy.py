@@ -38,8 +38,8 @@ class MaisyController:
     def __init__(self):
         self.hacker_models = [
             MaisyModel(
-                x=random.randint(0, SCREEN_WIDTH),
-                y=random.randint(0, int(0.25 * SCREEN_HEIGHT)),
+                x=SCREEN_WIDTH / 2 + random.randint(-100, 100),
+                y=SCREEN_HEIGHT / 2 + random.randint(-100, 100),
             )
             for _ in range(N_ENEMIES)
         ]
@@ -155,8 +155,8 @@ class MaisyView:
         ]
 
     def render(self, surface: Surface):
-        for hackerview in self.hackers.hacker_models:
-            if hackerview.dx >= 0:
+        for hacker in self.hackers.hacker_models:
+            if hacker.dx >= 0:
                 self.image = self.facing_right
                 # self.image = self.walking_frames_right[0]
             else:
@@ -166,8 +166,8 @@ class MaisyView:
             surface.blit(
                 self.image,
                 (
-                    hackerview.x,
-                    hackerview.y,
+                    hacker.x,
+                    hacker.y,
                     PLAYER_SPRITE_WIDTH,
                     PLAYER_SPRITE_HEIGHT,
                 ),
@@ -187,6 +187,8 @@ class HackingState(EntityState):
     def check_conditions(self) -> str | None:
         if self.game_time > 10000:
             return "wandering"
+        if self.hacker_model.active_terminal is None:
+            return "wandering"
         return None
 
     def entry_actions(self):
@@ -199,8 +201,8 @@ class HackingState(EntityState):
         # self.hacker_model.active_terminal = None
         self.hacker_model.x = SCREEN_WIDTH / 2
         self.hacker_model.y = SCREEN_HEIGHT / 2
-        self.hacker_model.dx = random.choice([-1, 1])
-        self.hacker_model.dy = random.choice([-1, 1])
+        self.hacker_model.dx = random.choice([-3, 3])
+        self.hacker_model.dy = random.choice([-3, 3])
         return None
 
 
