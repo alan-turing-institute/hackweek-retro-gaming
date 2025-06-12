@@ -52,7 +52,7 @@ class glContext:
                 uniform sampler2D tex;
                 uniform float time;
                 in vec2 uvs;
-                layout (location = 0) out vec4 out_color;
+                layout (location = 0) out vec4 out_colour;
 
                 float hash13(vec3 p3) {
                     p3 = fract(p3 * .1031);
@@ -63,8 +63,8 @@ class glContext:
                 void main() {
                 ivec2 at = ivec2(gl_FragCoord.x, (1. - gl_FragCoord.y / 600) * 600);
                 float grain = hash13(vec3(gl_FragCoord.x, (1. - (gl_FragCoord.y / 600)) * 600 , time)) * 0.5 + 0.5;
-                out_color = texelFetch(tex, at, 0) * grain;
-                out_color = vec4(out_color.r, out_color.g * 1.2, out_color.b, 1.0);
+                out_colour = texelFetch(tex, at, 0) * grain;
+                out_colour = vec4(out_colour.r, out_colour.g * 1.2, out_colour.b, 1.0);
             }
             """,
         )
@@ -90,7 +90,7 @@ class glContext:
                 precision mediump float;
                 uniform sampler2D tex;
 
-                out vec4 color;
+                out vec4 colour;
                 in vec2 uvs;
                 void main() {
                     vec2 center = vec2(0.5, 0.5);
@@ -100,19 +100,15 @@ class glContext:
 
                     vec2 v_text2 = center+off_center;
 
-                    color = vec4(texture(tex, v_text2).rgb, 1.0);
-
-                    if(fract(v_text2.y * float(textureSize(tex,0).y))>0.75)
-                      color.rgb*=0.5;
-
                     if (v_text2.x > 1.0 || v_text2.x < 0.0 ||
                         v_text2.y > 1.0 || v_text2.y < 0.0){
-                        color=vec4(0.0, 0.0, 0.0, 1.0);
+                        colour=vec4(0.0, 0.0, 0.0, 1.0);
                     } else {
-                        color = vec4(texture(tex, v_text2).rgb, 1.0);
-                        float fv = fract(v_text2.y * float(textureSize(tex,0).y));
-                        fv=min(1.0, 0.8+0.5*min(fv, 1.0-fv));
-                        color.rgb*=fv;
+                        colour = vec4(texture(tex, v_text2).rgb, 1.0);
+                        float fv = fract(v_text2.y * float(textureSize(tex,0).x));
+                        fv=min(1.0, 0.7+0.5*min(fv, 1.0-fv));
+                        colour.rgb*=fv;
+                        colour = vec4(colour.r, colour.g * 1.2, colour.b, 1.0);
                     }
                 }
             """,
@@ -138,10 +134,10 @@ class glContext:
                 #version 330 core
                 uniform sampler2D tex;
                 in vec2 uvs;
-                layout (location = 0) out vec4 out_color;
+                layout (location = 0) out vec4 out_colour;
 
                 void main() {
-                    out_color = texture(tex, uvs);
+                    out_colour = texture(tex, uvs);
                 }
             """,
         )
