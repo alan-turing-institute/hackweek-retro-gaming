@@ -63,11 +63,13 @@ class MainMenuState(GameState):
                 self.game.change_state(self.play_game_state)
 
     def draw(self, surface: Surface) -> None:
-        self.font.centre(surface, MENU_TITLE, 48)
+
         surface.blit(
             scale_by(self.background, MENU_BACKGROUND_SCALE_FACTOR),
             MENU_BACKGROUND_POSITION,
         )
+        self.font.centre(surface, MENU_TITLE, 48)
+
         count: int = 0
         y = surface.get_rect().height - len(self.menu_items) * 160
 
