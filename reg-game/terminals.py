@@ -1,26 +1,24 @@
 from random import randint
-import pygame
+from typing import Any, Optional
 
+import pygame
 from config import (
+    FIXING_SCORE,
+    HACKING_COUNTDOWN,
+    NUMBER_OF_TERMINALS,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    UNHACKABLE_COUNTDOWN,
-    TERMINAL_IMAGE_COMPUTER_ON,
     TERMINAL_IMAGE_COMPUTER_OFF,
+    TERMINAL_IMAGE_COMPUTER_ON,
     TERMINAL_SIZE,
-    HACKING_COUNTDOWN,
-    FIXING_SCORE,
-    NUMBER_OF_TERMINALS,
+    UNHACKABLE_COUNTDOWN,
 )
-from framework import State, StateMachine
-from pygame import Surface, image
-from regplayer import PlayerModel
+from framework import Game, GameState, State, StateMachine
 from interstitial import InterstitialState
-from framework import Game, GameState
-from regplayer import PlayerController
-from sounds import SoundEffectPlayer
-from typing import Optional, Any
 from pipe_game import PipeGameState
+from pygame import Surface, image
+from regplayer import PlayerController, PlayerModel
+from sounds import SoundEffectPlayer
 
 
 class ActiveState(State):
@@ -120,10 +118,6 @@ class BrokenState(State):
         self.live_lost_state: InterstitialState = live_lost_state
 
     def entry_actions(self) -> None:
-        print(f"Entering broken: {self.player_model.lives=}")
-        print(f"Entering broken: {self.live_lost_state.lives=}")
-
-
         self.player_model.lives -= 1
         self.game.change_state(self.live_lost_state)
 
@@ -183,7 +177,6 @@ class TerminalController:
         play_game_state: GameState | None,
         game_over_state: GameState | None,
     ) -> None:
-
         offset: int = 80
         self.terminals: list[TerminalModel] = [
             TerminalModel("top-left", (offset, offset)),

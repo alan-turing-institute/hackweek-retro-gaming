@@ -30,10 +30,12 @@ class HackerCollisionController:
                     enemy.PLAYER_SIZE[1],
                     terminal,
                 ):
-                    terminal.hacker_at_terminal = hacker
-                    if hacker.at_terminal:
-                        continue
-                    hacker.at_terminal = True
+                    # if hacker.at_terminal:
+                    #     continue
+                    # hacker.at_terminal = True
+                    if terminal.hacker_at_terminal is None:
+                        terminal.hacker_at_terminal = hacker
+                        hacker.active_terminal = terminal
 
                 if self.collides_with_terminal(
                     self.player_controller.player_model.x,
