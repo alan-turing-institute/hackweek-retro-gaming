@@ -13,7 +13,7 @@ from config import (
     TERMINAL_SIZE,
     UNHACKABLE_COUNTDOWN,
 )
-from framework import Game, GameState, State, StateMachine
+from framework import Game, GameState, EntityState, EntityStateMachine
 from interstitial import InterstitialState
 from pipe_game import PipeGameState
 from pygame import Surface, image
@@ -21,12 +21,19 @@ from regplayer import PlayerController, PlayerModel
 from sounds import SoundEffectPlayer
 
 
-class ActiveState(State):
+class ActiveState(EntityState):
     def __init__(self, terminal: "TerminalModel"):
         super().__init__("active")
         self.terminal_model = terminal
 
+    def entry_actions(self):
+        pass
+
     def check_conditions(self) -> str | None:
+
+        print(
+            f"Active state {self.terminal_model.hacker_at_terminal=} {self.terminal_model.player_at_terminal=}"
+        )
         if (
             self.terminal_model.hacker_at_terminal is not None
             and self.terminal_model.player_at_terminal is None
@@ -35,7 +42,7 @@ class ActiveState(State):
         return None
 
 
-class HackingState(State):
+class HackingState(EntityState):
     def __init__(self, terminal: "TerminalModel"):
         super().__init__("hacking")
         self.terminal_model = terminal
@@ -63,16 +70,18 @@ class HackingState(State):
         return None
 
 
-class FixingState(State):
+class FixingState(EntityState):
     def __init__(
         self,
         terminal: "TerminalModel",
+        player: PlayerModel,
         game: Game,
         play_game_state: GameState,
         game_over_state: GameState,
     ):
         super().__init__("fixing")
         self.terminal_model: TerminalModel = terminal
+        self.player_model: PlayerModel = player
 
         mini_game_state: PipeGameState = PipeGameState(
             game=game,
@@ -92,6 +101,7 @@ class FixingState(State):
             and self.terminal_model.player_at_terminal is not None
             and self.terminal_model.hacking_failed
         ):
+            self.player_model.score += FIXING_SCORE
             return "unhackable"
 
         if (
@@ -108,7 +118,7 @@ class FixingState(State):
         self.game.change_state(self.get_ready_state)
 
 
-class BrokenState(State):
+class BrokenState(EntityState):
     def __init__(
         self,
         terminal: "TerminalModel",
@@ -128,7 +138,7 @@ class BrokenState(State):
         return "unhackable"
 
 
-class UnHackableState(State):
+class UnHackableState(EntityState):
     def __init__(self, terminal: "TerminalModel", player_model: PlayerModel):
         super().__init__("unhackable")
         self.terminal_model = terminal
@@ -140,7 +150,6 @@ class UnHackableState(State):
 
     def entry_actions(self) -> None:
         self.countdown = UNHACKABLE_COUNTDOWN
-        self.player_model.score += FIXING_SCORE
         print(f"State changed to UnHackable. Player score: {self.player_model.score}")
 
     def check_conditions(self) -> str | None:
@@ -161,7 +170,7 @@ class TerminalModel:
         self.hacking_failed: bool = False
         self.fixing_failed: bool = True
 
-        self.state_machine = StateMachine()
+        self.state_machine = EntityStateMachine()
 
     def set_status(self, new_state: str):
         self.state_machine.set_state(new_state)
@@ -196,6 +205,7 @@ class TerminalController:
             terminal.state_machine.add_state(
                 FixingState(
                     terminal=terminal,
+                    player=player_controller.player_model,
                     game=game,
                     play_game_state=play_game_state,
                     game_over_state=game_over_state,
@@ -223,6 +233,8 @@ class TerminalController:
 
     def update(self, game_time: int, *args, **kwargs):
         for terminal in self.terminals:
+            # TODO: Remove later
+            print(f"{terminal.state_machine.active_state.name=}")
             terminal.state_machine.think(game_time)
 
 

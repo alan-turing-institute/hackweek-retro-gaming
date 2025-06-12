@@ -5,8 +5,9 @@ from config import (
     N_ENEMIES,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
+    ENEMY_SPEED,
 )
-from framework import State, StateMachine
+from framework import EntityState, EntityStateMachine
 
 # from enemy_statemachine import StateMachine, HackingState
 from pygame.surface import Surface
@@ -30,10 +31,10 @@ class MaisyModel:
         self.width = 48
         self.height = 48
         self.active_terminal: None | TerminalModel = None
-        self.brain = StateMachine()
+        self.brain = EntityStateMachine()
         self.brain.add_state(HackingState(self))
         self.brain.add_state(WanderingState(self))
-        self.speed = 3
+        self.speed = ENEMY_SPEED
 
 
 class MaisyController:
@@ -180,7 +181,7 @@ class MaisyView:
             )
 
 
-class HackingState(State):
+class HackingState(EntityState):
     def __init__(self, hacker_model: "MaisyModel"):
         super().__init__("hacking")
         self.hacker_model = hacker_model
@@ -202,7 +203,7 @@ class HackingState(State):
         self.hacker_model.dy = 0
 
     def exit_actions(self):
-        self.hacker_model.active_terminal = None
+        # self.hacker_model.active_terminal = None
         self.hacker_model.x = SCREEN_WIDTH / 2
         self.hacker_model.y = SCREEN_HEIGHT / 2
         self.hacker_model.dx = random.choice([-1, 1])
@@ -210,7 +211,7 @@ class HackingState(State):
         return None
 
 
-class WanderingState(State):
+class WanderingState(EntityState):
     def __init__(self, hacker_model: "MaisyModel"):
         super().__init__("wandering")
         self.hacker_model = hacker_model
@@ -271,7 +272,7 @@ class WanderingState(State):
         pass
 
 
-class SearchingState(State):
+class SearchingState(EntityState):
     def __init__(self, hacker_model: "MaisyModel"):
         super().__init__("searching")
         self.hacker_model = hacker_model

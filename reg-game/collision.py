@@ -30,17 +30,14 @@ class HackerCollisionController:
                     enemy.PLAYER_SIZE[1],
                     terminal,
                 ):
-                    # if hacker.at_terminal:
-                    #     continue
-                    # hacker.at_terminal = True
-                    if (
-                        terminal.hacker_at_terminal is None
-                    ):  # and terminal.state_machine.active_state.name == "available":
-                        print(
-                            f"Collision happened: {terminal.state_machine.active_state.name=}"
-                        )
-                        terminal.hacker_at_terminal = hacker
-                        hacker.active_terminal = terminal
+                    print(
+                        f"Collision happened: {terminal.state_machine.active_state.name=}"
+                    )
+                    terminal.hacker_at_terminal = hacker
+                    hacker.active_terminal = terminal
+                else:
+                    terminal.hacker_at_terminal = None
+                    hacker.active_terminal = None
 
                 if self.collides_with_terminal(
                     self.player_controller.player_model.x,
@@ -50,6 +47,8 @@ class HackerCollisionController:
                     terminal,
                 ):
                     terminal.player_at_terminal = self.player_controller.player_model
+                else:
+                    terminal.player_at_terminal = None
 
     def player_collide(self, maisy_model: MaisyModel) -> bool:
         player_model: PlayerModel = self.player_controller.player_model
