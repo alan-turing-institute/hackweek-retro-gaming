@@ -26,6 +26,7 @@ class MaisyModel:
         self.height = 48
         self.active_terminal: None | TerminalModel = None
         self.active_sandbox: None | SandboxModel = None
+        self.active_sandbox_name: str = ("",)
         self.sandbox_controller: None | SandboxController = None
         self.brain = EntityStateMachine()
         self.brain.add_state(HackingState(self))
@@ -283,6 +284,9 @@ class WanderingState(EntityState):
         ):
             return "hacking"
         if self.hacker_model.active_sandbox is not None:
+            self.hacker_model.active_sandbox_name = (
+                self.hacker_model.active_sandbox.name
+            )
             return "in_sandbox"
         return None
 
@@ -320,9 +324,10 @@ class SandboxState(EntityState):
         self.hacker_model.x += 40
         self.hacker_model.y += 40
         self.hacker_model.sandbox_controller.remove_sandbox(
-            self.hacker_model.active_sandbox.name
+            self.hacker_model.active_sandbox_name
         )
         self.hacker_model.active_sandbox = None
+        self.hacker_model.active_sandbox_name = ""
 
 
 class SearchingState(EntityState):
