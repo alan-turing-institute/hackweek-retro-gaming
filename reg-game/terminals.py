@@ -4,6 +4,7 @@ from typing import Any, Optional
 import pygame
 from config import (
     FIXING_SCORE,
+    HACKED_PENALTY,
     HACKING_COUNTDOWN,
     NUMBER_OF_TERMINALS,
     SCREEN_HEIGHT,
@@ -13,7 +14,7 @@ from config import (
     TERMINAL_SIZE,
     UNHACKABLE_COUNTDOWN,
 )
-from framework import Game, GameState, EntityState, EntityStateMachine
+from framework import EntityState, EntityStateMachine, Game, GameState
 from interstitial import InterstitialState
 from pipe_game import PipeGameState
 from pygame import Surface, image
@@ -30,10 +31,9 @@ class ActiveState(EntityState):
         pass
 
     def check_conditions(self) -> str | None:
-
-        print(
-            f"Active state {self.terminal_model.hacker_at_terminal=} {self.terminal_model.player_at_terminal=}"
-        )
+        # print(
+        #     f"Active state {self.terminal_model.hacker_at_terminal=} {self.terminal_model.player_at_terminal=}"
+        # )
         if (
             self.terminal_model.hacker_at_terminal is not None
             and self.terminal_model.player_at_terminal is None
@@ -128,6 +128,7 @@ class BrokenState(EntityState):
     def entry_actions(self) -> None:
         self.player_model.lives -= 1
         self.terminal_model.fixing_failed = False
+        self.player_model.score -= HACKED_PENALTY
 
         time_out: InterstitialState = InterstitialState(
             self.game,
@@ -140,7 +141,7 @@ class BrokenState(EntityState):
         print(f"State changed to Broken. Player lives left: {self.player_model.lives}")
 
     def check_conditions(self) -> str | None:
-        print("Going to unhackable")
+        # print("Going to unhackable")
 
         return "unhackable"
 
@@ -245,8 +246,8 @@ class TerminalController:
     def update(self, game_time: int, *args, **kwargs):
         for terminal in self.terminals:
             # TODO: Remove later
-            if terminal.state_machine.active_state is not None:
-                print(f"{terminal.state_machine.active_state.name=}")
+            # if terminal.state_machine.active_state is not None:
+            #     print(f"{terminal.state_machine.active_state.name=}")
 
             terminal.state_machine.think(game_time)
 

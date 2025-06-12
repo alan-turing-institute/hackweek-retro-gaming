@@ -33,7 +33,7 @@ class InterstitialState(GameState):
         if len(messages) > 1:
             for i, message in enumerate(messages):
                 self.font.centre(
-                    surface, message, surface.get_rect().height / 2 + i * 20
+                    surface, message, -40 + surface.get_rect().height / 2 + i * 20
                 )
         else:
             self.font.centre(surface, self.message, surface.get_rect().height / 2)

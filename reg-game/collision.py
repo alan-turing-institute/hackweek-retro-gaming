@@ -26,11 +26,11 @@ class HackerCollisionController:
             # Check if hacker collides with a sandbox
             for sandbox in self.player_controller.sandbox_controller.sandbox_models:
                 if self.collides_with_sandbox(
-                    hacker.x,
-                    hacker.y,
-                    enemy.PLAYER_SIZE[0],
-                    enemy.PLAYER_SIZE[1],
-                    sandbox,
+                    position_x=hacker.x,
+                    position_y=hacker.y,
+                    width=enemy.PLAYER_SIZE[0],
+                    height=enemy.PLAYER_SIZE[1],
+                    sandbox_model=sandbox,
                 ):
                     if sandbox.hacker_at_sandbox is None:
                         sandbox.hacker_at_sandbox = hacker
@@ -38,33 +38,32 @@ class HackerCollisionController:
                             self.player_controller.sandbox_controller
                         )
                         hacker.active_sandbox = sandbox
-                    break
+                    else:
+                        sandbox.hacker_at_sandbox = None
+                        hacker.active_sandbox = None
 
             for terminal in self.terminal_controller.terminals:
                 # Check if the hacker collides with the terminal
                 if self.collides_with_terminal(
-                    hacker.x,
-                    hacker.y,
-                    enemy.PLAYER_SIZE[0],
-                    enemy.PLAYER_SIZE[1],
-                    terminal,
+                    position_x=hacker.x,
+                    position_y=hacker.y,
+                    width=enemy.PLAYER_SIZE[0],
+                    height=enemy.PLAYER_SIZE[1],
+                    terminal_model=terminal,
                 ):
-                    print(
-                        f"Collision happened: {terminal.state_machine.active_state.name=}"
-                    )
                     terminal.hacker_at_terminal = hacker
                     hacker.active_terminal = terminal
-                else:
+                elif hacker.active_terminal == terminal:
                     terminal.hacker_at_terminal = None
                     hacker.active_terminal = None
 
                 # Check if the player collides with the terminal
                 if self.collides_with_terminal(
-                    self.player_controller.player_model.x,
-                    self.player_controller.player_model.y,
-                    PLAYER_SIZE[0],
-                    PLAYER_SIZE[1],
-                    terminal,
+                    position_x=self.player_controller.player_model.x,
+                    position_y=self.player_controller.player_model.y,
+                    width=PLAYER_SIZE[0],
+                    height=PLAYER_SIZE[1],
+                    terminal_model=terminal,
                 ):
                     terminal.player_at_terminal = self.player_controller.player_model
                 else:
