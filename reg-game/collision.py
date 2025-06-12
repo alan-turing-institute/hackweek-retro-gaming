@@ -38,7 +38,7 @@ class HackerCollisionController:
                             self.player_controller.sandbox_controller
                         )
                         hacker.active_sandbox = sandbox
-                    else:
+                    elif hacker.active_sandbox == sandbox:
                         sandbox.hacker_at_sandbox = None
                         hacker.active_sandbox = None
 
