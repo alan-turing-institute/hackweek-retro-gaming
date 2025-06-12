@@ -42,8 +42,8 @@ class PlayGameState(GameState):
         self.terminal_controller: TerminalController = TerminalController(
             self.player_controller,
             self.game,
-            game_over_state=self.game_over_state,
             play_game_state=self,
+            game_over_state=self.game_over_state,
         )
         self.collision_controller = HackerCollisionController(
             self.game,
