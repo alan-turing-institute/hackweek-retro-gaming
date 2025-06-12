@@ -40,7 +40,10 @@ class PlayGameState(GameState):
 
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
         self.terminal_controller: TerminalController = TerminalController(
-            self.player_controller, self.game, self.game_over_state, self
+            self.player_controller,
+            self.game,
+            game_over_state=self.game_over_state,
+            play_game_state=self,
         )
         self.collision_controller = HackerCollisionController(
             self.game,

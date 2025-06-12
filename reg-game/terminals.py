@@ -10,6 +10,7 @@ from config import (
     TERMINAL_SIZE,
     HACKING_COUNTDOWN,
     FIXING_SCORE,
+    NUMBER_OF_TERMINALS,
 )
 from framework import State, StateMachine
 from pygame import Surface, image
@@ -119,8 +120,19 @@ class BrokenState(State):
         self.live_lost_state: InterstitialState = live_lost_state
 
     def entry_actions(self) -> None:
+        print(f"Entering broken: {self.player_model.lives=}")
+        print(f"Entering broken: {self.live_lost_state.lives=}")
+
+
         self.player_model.lives -= 1
         self.game.change_state(self.live_lost_state)
+
+        print("State changed")
+
+    def check_conditions(self) -> str | None:
+        print("Going to unhackable")
+
+        return "unhackable"
 
 
 class UnHackableState(State):
@@ -181,6 +193,8 @@ class TerminalController:
                 "bottom-right", (SCREEN_WIDTH - offset, SCREEN_HEIGHT - offset)
             ),
         ]
+
+        self.terminals = self.terminals[:NUMBER_OF_TERMINALS]
 
         live_lost_state: InterstitialState = InterstitialState(
             game,
