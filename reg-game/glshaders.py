@@ -64,7 +64,57 @@ class glContext:
                 ivec2 at = ivec2(gl_FragCoord.x, (1. - gl_FragCoord.y / 600) * 600);
                 float grain = hash13(vec3(gl_FragCoord.x, (1. - (gl_FragCoord.y / 600)) * 600 , time)) * 0.5 + 0.5;
                 out_color = texelFetch(tex, at, 0) * grain;
+                out_color = vec4(out_color.r, out_color.g * 1.2, out_color.b, 1.0);
             }
+            """,
+        )
+
+    # https://blubberquark.tumblr.com/post/185013752945/using-moderngl-for-post-processing-shaders-with
+    def pipegame_shader(self):
+        """
+        Create a shader that applies a pipe game effect to the texture.
+        """
+        return self.ctx.program(
+            vertex_shader="""
+            #version 330 core
+            in vec2 vert;
+            in vec2 texcoord;
+            out vec2 uvs;
+            void main() {
+                gl_Position = vec4(vert, 0.0, 1.0);
+                uvs = texcoord;
+            }
+            """,
+            fragment_shader="""
+                #version 330 core
+                precision mediump float;
+                uniform sampler2D tex;
+
+                out vec4 color;
+                in vec2 uvs;
+                void main() {
+                    vec2 center = vec2(0.5, 0.5);
+                    vec2 off_center = uvs - center;
+
+                    off_center *= 1.0 + 0.9 * pow(abs(off_center.yx), vec2(2.5));
+
+                    vec2 v_text2 = center+off_center;
+
+                    color = vec4(texture(tex, v_text2).rgb, 1.0);
+
+                    if(fract(v_text2.y * float(textureSize(tex,0).y))>0.75)
+                      color.rgb*=0.5;
+
+                    if (v_text2.x > 1.0 || v_text2.x < 0.0 ||
+                        v_text2.y > 1.0 || v_text2.y < 0.0){
+                        color=vec4(0.0, 0.0, 0.0, 1.0);
+                    } else {
+                        color = vec4(texture(tex, v_text2).rgb, 1.0);
+                        float fv = fract(v_text2.y * float(textureSize(tex,0).y));
+                        fv=min(1.0, 0.8+0.5*min(fv, 1.0-fv));
+                        color.rgb*=fv;
+                    }
+                }
             """,
         )
 
@@ -99,6 +149,8 @@ class glContext:
     def render(self, current_state):
         if current_state == "PlayGameState":
             self.program = self.filmgrain_shader()
+        elif current_state == "PipeGameState":
+            self.program = self.pipegame_shader()
         else:
             self.program = self.passthrough_shader()
 
