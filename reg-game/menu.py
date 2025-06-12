@@ -7,6 +7,8 @@ from config import (
     MENU_FONT_IMG,
     MENU_ITEMS,
     MENU_TITLE,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
 )
 from framework import Game, GameState
 from pygame.image import load
@@ -26,6 +28,9 @@ class MainMenuState(GameState):
         self.input_tick: int = 0
         self.menu_items: tuple[str, ...] = MENU_ITEMS
         self.background: Surface = load(MENU_BACKGROUND_PATH).convert()
+        self.background = pygame.transform.scale(
+            self.background, size=(SCREEN_WIDTH, SCREEN_HEIGHT)
+        )
 
     def set_play_state(self, state) -> None:
         self.play_game_state = state

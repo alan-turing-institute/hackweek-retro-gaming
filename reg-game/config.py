@@ -15,7 +15,7 @@ class Attribution:
 british_library: Attribution = Attribution(
     url="https://imagesonline.bl.uk/asset/14880/",
     license="British Library",
-    local_path=Path("img/british-library-14880.jpg"),
+    local_path=Path("img/Microscheme.png"),
 )
 
 regina: Attribution = Attribution(
@@ -37,7 +37,7 @@ MENU_BACKGROUND_PATH: Path = british_library.local_path
 MENU_BACKGROUND_POSITION: tuple[int, int] = (0, 0)
 MENU_BACKGROUND_SCALE_FACTOR: float = 1.0
 
-MENU_ITEMS: tuple[str, ...] = ("Start", "Resume", "Quit")
+MENU_ITEMS: tuple[str, ...] = ("Start", "Quit")
 
 MAIN_GAME_MAX_TIME: int = 60000
 MINI_GAME_MAX_TIME: int = 15000
