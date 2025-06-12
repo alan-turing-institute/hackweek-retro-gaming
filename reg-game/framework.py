@@ -9,7 +9,7 @@ from pygame.surface import Surface
 from pygame.time import Clock
 
 
-class State:
+class EntityState:
     def __init__(self, name: str):
         self.name: str = name
 
@@ -26,12 +26,12 @@ class State:
         pass
 
 
-class StateMachine:
+class EntityStateMachine:
     def __init__(self) -> None:
-        self.states: dict[str, State] = {}
-        self.active_state: State | None = None
+        self.states: dict[str, EntityState] = {}
+        self.active_state: EntityState | None = None
 
-    def add_state(self, state: "State"):
+    def add_state(self, state: "EntityState"):
         self.states[state.name] = state
 
     def think(self, game_time) -> None:

@@ -2,14 +2,12 @@ import random
 import time
 
 import pygame
-from config import SCREEN_HEIGHT, SCREEN_WIDTH
+from config import SCREEN_HEIGHT, SCREEN_WIDTH, MINI_GAME_MAX_TIME
 from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame.surface import Surface
 from sounds import SoundEffectPlayer
 from spritesheet import SpriteSheet
-
-# from terminals import TerminalModel
 
 BOARD_SIZE = 6
 if BOARD_SIZE < 3:
@@ -653,7 +651,7 @@ class PipeGameState(GameState):
         play_game_state: GameState | None = None,
         board_size: int = BOARD_SIZE,
         draw_manual: bool = False,
-        max_time: int = 15000,
+        max_time: int = MINI_GAME_MAX_TIME,
     ):
         if board_size < 3:
             raise ValueError("Board size must be at least 3x3 for a playable game.")
@@ -669,6 +667,8 @@ class PipeGameState(GameState):
         self.current_terminal = current_terminal
 
     def on_enter(self, previous_state: GameState | None):
+        self.game_time = 0
+        self.failed = False
         self.board = Board(self.board_size, self.draw_manual)
         self.game_won = False
         self.sound_effect_player.play_hacking_sound()
@@ -713,32 +713,30 @@ class PipeGameState(GameState):
             time.sleep(2)
             self.end_game()
 
-    def end_game(self):
+    def end_game(self) -> None:
+        self.sound_effect_player.play_hacking_over()
+
         if self.failed:
-            # set terminal fixing failed
-            # change state of the terminal
             self.current_terminal.fixing_failed = True
-            self.sound_effect_player.play_hacking_over()
-            return
+            message = "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!"
+        else:
+            self.current_terminal.hacking_failed = True
+            self.current_terminal.hacker_at_terminal.brain.set_state("wandering")
+            message = "Hacker stopped!\n\nKeep our machines safe!"
 
         if self.play_game_state is not None:
-            # change state of the machine (to inactive)
-            self.current_terminal.hacking_failed = True
-
-            # change the state of the hackers to wandering (random)
-            for hacker in self.play_game_state.maisy_controller.hacker_models:
-                if hacker.brain.active_state.name == "fighting":
-                    hacker.brain.set_state("wandering")
-
-            self.sound_effect_player.play_hacking_over()
-            get_ready_state: InterstitialState = InterstitialState(
-                self.game, "Hacker stopped!", 4500, self.play_game_state
-            )
-            self.game.change_state(get_ready_state)
-            return
+            print("Pipe game completed, returning to play game state.")
+        else:
+            print("Pipe game completed, ending game.")
 
         game_over_state: InterstitialState = InterstitialState(
-            self.game, "You won!", 4500, self.game_over_state
+            game=self.game,
+            message=message,
+            wait_time_ms=4500,
+            next_state=(
+                self.play_game_state
+                if self.play_game_state is not None
+                else self.game_over_state
+            ),
         )
         self.game.change_state(game_over_state)
-        return

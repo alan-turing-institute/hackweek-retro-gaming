@@ -23,7 +23,6 @@ class PlayGameState(GameState):
         self.controllers: list | None = None
         self.renderers: list | None = None
         self.player_controller: PlayerController | None = None
-
         self.game_over_state: GameState | None = game_over_state
 
         self.initialise()
@@ -42,8 +41,8 @@ class PlayGameState(GameState):
         self.terminal_controller: TerminalController = TerminalController(
             self.player_controller,
             self.game,
-            game_over_state=self.game_over_state,
             play_game_state=self,
+            game_over_state=self.game_over_state,
         )
         self.collision_controller = HackerCollisionController(
             self.game,
@@ -55,9 +54,7 @@ class PlayGameState(GameState):
         background_renderer = BackgroundView("img/industrial_floor.png")
 
         player_renderer = PlayerView(self.player_controller, PLAYER_SPRITE_SHEET_PATH)
-        maisy_renderer = MaisyView(
-            self.maisy_controller, "img/pixel_character_pale_yellow.png"
-        )
+        maisy_renderer = MaisyView(self.maisy_controller, "img/maisy_model_lr.png")
         lives_renderer = PlayerLivesView(
             self.player_controller, LIVES_SPRITE_SHEET_PATH
         )
