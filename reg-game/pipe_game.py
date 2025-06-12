@@ -713,7 +713,7 @@ class PipeGameState(GameState):
             time.sleep(2)
             self.end_game()
 
-    def end_game(self):
+    def end_game(self) -> None:
         self.sound_effect_player.play_hacking_over()
 
         if self.failed:

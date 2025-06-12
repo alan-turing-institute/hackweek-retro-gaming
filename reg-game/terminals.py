@@ -115,14 +115,28 @@ class BrokenState(EntityState):
         self,
         terminal: "TerminalModel",
         player_model: PlayerModel,
+        game: Game,
+        play_game_state: GameState,
     ):
         super().__init__("broken")
         self.terminal_model: TerminalModel = terminal
         self.player_model: PlayerModel = player_model
 
+        self.game: Game = game
+        self.play_game_state: GameState = play_game_state
+
     def entry_actions(self) -> None:
         self.player_model.lives -= 1
         self.terminal_model.fixing_failed = False
+
+        time_out: InterstitialState = InterstitialState(
+            self.game,
+            "Time run out! The terminal was hacked",
+            2000,
+            self.play_game_state,
+        )
+        self.game.change_state(time_out)
+
         print(f"State changed to Broken. Player lives left: {self.player_model.lives}")
 
     def check_conditions(self) -> str | None:
@@ -207,7 +221,10 @@ class TerminalController:
             )
             terminal.state_machine.add_state(
                 BrokenState(
-                    terminal=terminal, player_model=player_controller.player_model
+                    terminal=terminal,
+                    player_model=player_controller.player_model,
+                    game=game,
+                    play_game_state=play_game_state,
                 )
             )
             terminal.state_machine.add_state(
@@ -228,7 +245,9 @@ class TerminalController:
     def update(self, game_time: int, *args, **kwargs):
         for terminal in self.terminals:
             # TODO: Remove later
-            print(f"{terminal.state_machine.active_state.name=}")
+            if terminal.state_machine.active_state is not None:
+                print(f"{terminal.state_machine.active_state.name=}")
+
             terminal.state_machine.think(game_time)
 
 
