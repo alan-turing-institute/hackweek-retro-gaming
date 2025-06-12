@@ -107,7 +107,7 @@ class PlayGameState(GameState):
             game_over_state = InterstitialState(
                 game=self.game,
                 message=message,
-                wait_time_ms=5000,
+                wait_time_ms=10000,
                 next_state=self.game_over_state,
             )
             self.game.change_state(game_over_state)
