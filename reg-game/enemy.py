@@ -188,24 +188,25 @@ class HackingState(State):
 
     def do_actions(self, game_time):
         self.game_time += game_time
+        # print(self.hacker_model.active_terminal.state_machine.active_state.name)
 
     def check_conditions(self) -> str | None:
-        # print(f"At Hacking Checking conditions {self.game_time=}")
         if self.game_time > 10000:
-            # print("TIME UP")
             return "wandering"
         return None
 
     def entry_actions(self):
-        # print("Starting hacking")
+        print("Starting hacking")
         self.game_time = 0
         self.hacker_model.dx = 0
         self.hacker_model.dy = 0
 
     def exit_actions(self):
-        self.hacker_model.at_terminal = False
-        self.hacker_model.x += 40
-        self.hacker_model.y += 40
+        self.hacker_model.active_terminal = None
+        self.hacker_model.x = SCREEN_WIDTH / 2
+        self.hacker_model.y = SCREEN_HEIGHT / 2
+        self.hacker_model.dx = random.choice([-1, 1])
+        self.hacker_model.dy = random.choice([-1, 1])
         return None
 
 
@@ -218,10 +219,8 @@ class WanderingState(State):
     def do_actions(self, game_time):
         # Change direction sometimes
         if random.random() < 0.02:
-            self.hacker_model.dx = random.choice([-1, 0, 1])
-            self.hacker_model.dy = random.choice([-1, 0, 1])
-        if self.hacker_model.dx == 0 and self.hacker_model.dy == 0:
-            self.hacker_model.dx = -1
+            self.hacker_model.dx = random.choice([-1, 1])
+            self.hacker_model.dy = random.choice([-1, 1])
         # Actually move
         self.hacker_model.x += self.hacker_model.dx * self.hacker_model.speed
         self.hacker_model.y += self.hacker_model.dy * self.hacker_model.speed
@@ -252,6 +251,8 @@ class WanderingState(State):
                 0, min(SCREEN_HEIGHT - self.hacker_model.height, self.hacker_model.y)
             )
 
+        # print(f"Positions = {self.hacker_model.x=}, {self.hacker_model.y=}")
+
     def check_conditions(self) -> str | None:
         # print(f"At wandering {self.hacker_model.at_terminal=}")
         if self.hacker_model.active_terminal is not None:
@@ -259,10 +260,14 @@ class WanderingState(State):
         return None
 
     def entry_actions(self):
+        print("Entered wandering")
+        print(
+            f"{self.hacker_model.dx=}, {self.hacker_model.dy=}, {self.hacker_model.speed}"
+        )
         pass
 
     def exit_actions(self):
-        # print("Exititing wandering")
+        print("Exititing wandering")
         pass
 
 

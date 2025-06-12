@@ -33,7 +33,12 @@ class HackerCollisionController:
                     # if hacker.at_terminal:
                     #     continue
                     # hacker.at_terminal = True
-                    if terminal.hacker_at_terminal is None:
+                    if (
+                        terminal.hacker_at_terminal is None
+                    ):  # and terminal.state_machine.active_state.name == "available":
+                        print(
+                            f"Collision happened: {terminal.state_machine.active_state.name=}"
+                        )
                         terminal.hacker_at_terminal = hacker
                         hacker.active_terminal = terminal
 
