@@ -1,7 +1,7 @@
 import random
 
 import pygame
-from config import N_ENEMIES, PLAYER_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
+from config import ENEMY_SPEED, N_ENEMIES, PLAYER_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import EntityState, EntityStateMachine
 
 # from enemy_statemachine import StateMachine, HackingState
@@ -31,7 +31,7 @@ class MaisyModel:
         self.brain.add_state(HackingState(self))
         self.brain.add_state(WanderingState(self))
         self.brain.add_state(SandboxState(self))
-        self.speed = 3
+        self.speed = ENEMY_SPEED
 
 
 class MaisyController:
@@ -210,6 +210,17 @@ class WanderingState(EntityState):
         self.hacker_model = hacker_model
         # self.terminals = terminals
 
+    def check_x_boundary(self):
+        return (
+            self.hacker_model.x > (SCREEN_WIDTH - int(0.5 * PLAYER_SPRITE_WIDTH) - 5)
+            or self.hacker_model.x < 5
+        )
+
+    def check_y_boundary(self):
+        return self.hacker_model.y < 5 or self.hacker_model.y > (
+            SCREEN_HEIGHT - int(0.5 * PLAYER_SPRITE_HEIGHT) - 5
+        )
+
     def do_actions(self, game_time):
         # Change direction sometimes
         if random.random() < 0.02:
@@ -220,30 +231,36 @@ class WanderingState(EntityState):
         self.hacker_model.y += self.hacker_model.dy * self.hacker_model.speed
 
         # Keep maisy in bounds and bounce
-        half_size = (
-            int(0.5 * self.hacker_model.width),
-            int(0.5 * self.hacker_model.height),
-        )
-        x_min = 0 - half_size[0]
-        x_max = SCREEN_WIDTH - self.hacker_model.width
-
-        y_min = 0 - half_size[1]
-        y_max = SCREEN_HEIGHT - half_size[1]
-        if self.hacker_model.x < x_min or self.hacker_model.x > x_max:
+        if self.check_x_boundary():
             self.hacker_model.dx *= -1
-            if self.hacker_model.x < 0:
-                self.hacker_model.x = max(
-                    0, min(SCREEN_WIDTH - self.hacker_model.width, self.hacker_model.x)
-                )
-            else:
-                self.hacker_model.x = max(
-                    0, min(SCREEN_WIDTH + self.hacker_model.width, self.hacker_model.x)
-                )
-        if self.hacker_model.y < y_min or self.hacker_model.y > y_max:
+
+        if self.check_y_boundary():
             self.hacker_model.dy *= -1
-            self.hacker_model.y = max(
-                0, min(SCREEN_HEIGHT - self.hacker_model.height, self.hacker_model.y)
-            )
+
+        # half_size = (
+        #     int(0.5 * self.hacker_model.width),
+        #     int(0.5 * self.hacker_model.height),
+        # )
+        # x_min = 0 - half_size[0]
+        # x_max = SCREEN_WIDTH - self.hacker_model.width
+
+        # y_min = 0 - half_size[1]
+        # y_max = SCREEN_HEIGHT - half_size[1]
+        # if self.hacker_model.x < x_min or self.hacker_model.x > x_max:
+        #     self.hacker_model.dx *= -1
+        #     if self.hacker_model.x < 0:
+        #         self.hacker_model.x = max(
+        #             0, min(SCREEN_WIDTH - self.hacker_model.width, self.hacker_model.x)
+        #         )
+        #     else:
+        #         self.hacker_model.x = max(
+        #             0, min(SCREEN_WIDTH + self.hacker_model.width, self.hacker_model.x)
+        #         )
+        # if self.hacker_model.y < y_min or self.hacker_model.y > y_max:
+        #     self.hacker_model.dy *= -1
+        #     self.hacker_model.y = max(
+        #         0, min(SCREEN_HEIGHT - self.hacker_model.height, self.hacker_model.y)
+        #     )
 
         # print(f"Positions = {self.hacker_model.x=}, {self.hacker_model.y=}")
 
