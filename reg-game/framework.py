@@ -174,6 +174,7 @@ class Game:
             frame_tex = self.surf_to_texture(self.main_window)
             frame_tex.use(0)
             self.ctx.render(type(self.current_state).__name__)
+
             pygame.display.flip()
             frame_tex.release()
             self.fps_clock.tick(30)
