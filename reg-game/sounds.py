@@ -2,39 +2,26 @@ from pygame import mixer
 
 
 class MusicPlayer:
-    def __init__(self):
+    def __init__(self, filename: str = "sound/reggame-v2.mp3"):
         """
         Initializes the MusicPlayer instance.
         """
-        self.game_theme = mixer.music.load("sound/reggame-v2.mp3")
-        self.is_playing: bool = False
-        self.volume: float = 0.3
+        # self.game_theme = mixer.music.load(filename)
+        self.volume: float = 0.4
 
-    def start(self):
+    def start(self, filename: str = "sound/reggame-v2.mp3"):
         """
         Starts playing the background music.
         """
-        if not self.is_playing:
-            mixer.music.set_volume(self.volume)
-            mixer.music.play(-1)
-            self.is_playing = True
+        mixer.music.load(filename)
+        mixer.music.set_volume(self.volume)
+        mixer.music.play(-1)
 
     def stop(self):
         """
         Stops the background music.
         """
-        if self.is_playing:
-            mixer.music.stop()
-            self.is_playing = False
-
-    def toggle(self):
-        """
-        Toggles the background music on or off.
-        """
-        if self.is_playing:
-            self.stop()
-        else:
-            self.start()
+        mixer.music.stop()
 
 
 class SoundEffectPlayer:
@@ -44,14 +31,16 @@ class SoundEffectPlayer:
         """
         self.hacker_alert: mixer.Sound = mixer.Sound("sound/hackeralert.ogg")
         self.hacker_alert.set_volume(0.5)
-        self.sandbox_sound: mixer.Sound = mixer.Sound("sound/playershoot.wav")
+        self.sandbox_sound: mixer.Sound = mixer.Sound("sound/sandpit.wav")
         self.sandbox_sound.set_volume(0.5)
         self.hacking_sound: mixer.Sound = mixer.Sound("sound/hackingnoise-shorter.wav")
         self.hacking_sound.set_volume(0.05)
-        self.hacking_over: mixer.Sound = mixer.Sound("sound/hackingover.wav")
-        self.hacking_over.set_volume(0.4)
+        self.hacking_won: mixer.Sound = mixer.Sound("sound/hackingover.wav")
+        self.hacking_won.set_volume(0.4)
+        self.hacking_lost: mixer.Sound = mixer.Sound("sound/shutdown.wav")
+        self.hacking_won.set_volume(0.4)
         self.rotate_pipe_sound: mixer.Sound = mixer.Sound("sound/pipe_rotation.wav")
-        self.rotate_pipe_sound.set_volume(.8)
+        self.rotate_pipe_sound.set_volume(0.8)
 
     def play_sandbox_sound(self):
         """
@@ -81,7 +70,13 @@ class SoundEffectPlayer:
         """
         Plays the hacking over sound effect.
         """
-        self.hacking_over.play()
+        self.hacking_won.play()
+
+    def play_hacking_lost(self):
+        """
+        Plays the hacking over sound effect.
+        """
+        self.hacking_lost.play()
 
     def play_rotate_pipe_sound(self):
         """

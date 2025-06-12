@@ -717,12 +717,12 @@ class PipeGameState(GameState):
             self.end_game()
 
     def end_game(self) -> None:
-        self.sound_effect_player.play_hacking_over()
-
         if self.failed:
+            self.sound_effect_player.play_hacking_lost()
             self.current_terminal.fixing_failed = True
             message = "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!"
         else:
+            self.sound_effect_player.play_hacking_over()
             self.current_terminal.hacking_failed = True
             self.current_terminal.hacker_at_terminal.brain.set_state("wandering")
             message = "Hacker stopped!\n\nKeep our machines safe!"

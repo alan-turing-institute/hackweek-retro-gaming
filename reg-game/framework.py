@@ -7,6 +7,7 @@ from pygame import Color
 from pygame.locals import QUIT
 from pygame.surface import Surface
 from pygame.time import Clock
+from sounds import MusicPlayer
 
 
 class EntityState:
@@ -125,6 +126,7 @@ class Game:
         self.ctx: glContext = glContext()
         self.background: Color = Color(0, 0, 0)
         self.current_state: GameState | None = None
+        self.music_player: MusicPlayer = MusicPlayer()
 
     def change_state(self, new_state: GameState | None):
         """
@@ -142,6 +144,9 @@ class Game:
 
         old_state = self.current_state
         self.current_state = new_state
+        print(type(new_state).__name__)
+        if type(new_state).__name__ == "MainMenuState":
+            self.music_player.start("sound/reggame-v2.mp3")
         new_state.on_enter(old_state)
 
     def run(self, initial_state: GameState | None):

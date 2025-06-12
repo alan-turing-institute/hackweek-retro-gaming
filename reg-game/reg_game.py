@@ -36,7 +36,6 @@ class PlayGameState(GameState):
 
     def initialise(self) -> None:
         self.music_player = MusicPlayer()
-        self.music_player.start()
         self.maisy_controller = MaisyController()
         self.player_controller = PlayerController(x=PLAYER_X, y=PLAYER_Y)
         self.terminal_controller = TerminalController(
@@ -89,6 +88,7 @@ class PlayGameState(GameState):
             or self.player_controller.player_model.lives == 0
         ):
             print("Ending the game")
+            self.music_player.start("sound/winmusic.mp3")
             self.game_time = 0
             if self.player_controller.player_model.lives == 0:
                 # all machines have been compromised
