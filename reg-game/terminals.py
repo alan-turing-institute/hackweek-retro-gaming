@@ -17,6 +17,9 @@ from regplayer import PlayerModel
 from interstitial import InterstitialState
 from framework import Game, GameState
 from regplayer import PlayerController
+from sounds import SoundEffectPlayer
+from typing import Optional, Any
+from pipe_game import PipeGameState
 
 
 class ActiveState(State):
@@ -39,11 +42,14 @@ class HackingState(State):
         self.terminal_model = terminal
         self.countdown: int = HACKING_COUNTDOWN
 
+        self.sound_effect_player: SoundEffectPlayer = SoundEffectPlayer()
+
     def do_actions(self, game_time):
         self.countdown -= game_time
 
     def entry_actions(self) -> None:
         self.countdown = HACKING_COUNTDOWN
+        self.sound_effect_player.play_hacker_alert()
 
     def check_conditions(self) -> str | None:
         if self.countdown <= 0:
@@ -60,11 +66,21 @@ class HackingState(State):
 
 class FixingState(State):
     def __init__(
-        self, terminal: "TerminalModel", get_ready_state: InterstitialState, game: Game
+        self,
+        terminal: "TerminalModel",
+        game: Game,
+        game_over_state: InterstitialState | None,
     ):
         super().__init__("fixing")
         self.terminal_model: TerminalModel = terminal
-        self.get_ready_state: InterstitialState = get_ready_state
+
+        mini_game_state: PipeGameState = PipeGameState(
+            game=game, current_terminal=terminal, game_over_state=game_over_state
+        )
+        self.get_ready_state: InterstitialState = InterstitialState(
+            game, "Stop the hacker!", 2000, mini_game_state
+        )
+
         self.game: Game = game
 
     def check_conditions(self) -> str | None:
@@ -133,7 +149,7 @@ class TerminalModel:
         self.name = name
         self.location: tuple[int, int] = location
         self.player_at_terminal: PlayerModel | None = None
-        self.hacker_at_terminal = None
+        self.hacker_at_terminal: Optional[Any] = None
 
         self.hacking_failed: bool = False
         self.fixing_failed: bool = True
@@ -152,8 +168,8 @@ class TerminalController:
         self,
         player_controller: PlayerController,
         game: Game,
-        mini_game_state: GameState | None,
         play_game_state: GameState | None,
+        game_over_state: GameState | None,
     ) -> None:
 
         offset: int = 80
@@ -166,10 +182,6 @@ class TerminalController:
             ),
         ]
 
-        get_ready_state: InterstitialState = InterstitialState(
-            game, "Stop the hacker!", 2000, mini_game_state
-        )
-
         live_lost_state: InterstitialState = InterstitialState(
             game,
             "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!",
@@ -181,7 +193,9 @@ class TerminalController:
             terminal.state_machine.add_state(ActiveState(terminal))
             terminal.state_machine.add_state(HackingState(terminal))
             terminal.state_machine.add_state(
-                FixingState(terminal, get_ready_state, game)
+                FixingState(
+                    terminal=terminal, game_over_state=game_over_state, game=game
+                )
             )
             terminal.state_machine.add_state(
                 BrokenState(
