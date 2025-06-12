@@ -728,10 +728,10 @@ class PipeGameState(GameState):
             print("Pipe game completed, ending game.")
 
         game_over_state: InterstitialState = InterstitialState(
-            self.game,
-            message,
-            4500,
-            (
+            game=self.game,
+            message=message,
+            wait_time_ms=4500,
+            next_state=(
                 self.play_game_state
                 if self.play_game_state is not None
                 else self.game_over_state
