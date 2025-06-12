@@ -34,6 +34,7 @@ class glContext:
     def filmgrain_shader(self):
         """
         Create a shader that applies film grain effect to the texture.
+        https://github.com/moderngl/moderngl/tree/main/examples
         """
         return self.ctx.program(
             vertex_shader="""
@@ -69,10 +70,10 @@ class glContext:
             """,
         )
 
-    # https://blubberquark.tumblr.com/post/185013752945/using-moderngl-for-post-processing-shaders-with
     def pipegame_shader(self):
         """
         Create a shader that applies a pipe game effect to the texture.
+        https://blubberquark.tumblr.com/post/185013752945/using-moderngl-for-post-processing-shaders-with
         """
         return self.ctx.program(
             vertex_shader="""
@@ -96,7 +97,7 @@ class glContext:
                     vec2 center = vec2(0.5, 0.5);
                     vec2 off_center = uvs - center;
 
-                    off_center *= 1.0 + 0.9 * pow(abs(off_center.yx), vec2(2.5));
+                    off_center *= 1.0 + 0.95 * pow(abs(off_center.yx), vec2(2.5));
 
                     vec2 v_text2 = center+off_center;
 
