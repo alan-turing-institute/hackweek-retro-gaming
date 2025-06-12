@@ -11,6 +11,7 @@ from framework import State, StateMachine
 # from enemy_statemachine import StateMachine, HackingState
 from pygame.surface import Surface
 from spritesheet import SpriteSheet
+from terminals import TerminalModel
 
 PLAYER_SIZE: tuple[int, int] = (96, 96)
 
@@ -28,7 +29,7 @@ class MaisyModel:
         self.dy = random.randint(-2, 2)
         self.width = 48
         self.height = 48
-        self.at_terminal = False
+        self.active_terminal: None | TerminalModel = None
         self.brain = StateMachine()
         self.brain.add_state(HackingState(self))
         self.brain.add_state(WanderingState(self))
@@ -253,7 +254,7 @@ class WanderingState(State):
 
     def check_conditions(self) -> str | None:
         # print(f"At wandering {self.hacker_model.at_terminal=}")
-        if self.hacker_model.at_terminal:
+        if self.hacker_model.active_terminal is not None:
             return "hacking"
         return None
 

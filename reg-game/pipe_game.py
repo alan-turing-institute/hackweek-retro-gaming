@@ -9,6 +9,8 @@ from pygame.surface import Surface
 from sounds import SoundEffectPlayer
 from spritesheet import SpriteSheet
 
+# from terminals import TerminalModel
+
 BOARD_SIZE = 6
 if BOARD_SIZE < 3:
     raise ValueError("Board size must be at least 3x3 for a playable game.")
@@ -646,6 +648,7 @@ class PipeGameState(GameState):
     def __init__(
         self,
         game: Game,
+        current_terminal,
         game_over_state: GameState | None = None,
         play_game_state: GameState | None = None,
         board_size: int = BOARD_SIZE,
@@ -663,6 +666,7 @@ class PipeGameState(GameState):
         self.game_time = 0
         self.max_time = max_time
         self.failed = False
+        self.current_terminal = current_terminal
 
     def on_enter(self, previous_state: GameState | None):
         self.board = Board(self.board_size, self.draw_manual)
@@ -712,20 +716,14 @@ class PipeGameState(GameState):
     def end_game(self):
         if self.failed:
             # set terminal fixing failed
-            if self.play_game_state is None:
-                # change state of the terminal
-                for terminal in self.game.terminal_controller.terminals:
-                    if terminal.state_machine.active_state.name == "fixing":
-                        terminal.fixing_failed = True
-
+            # change state of the terminal
+            self.current_terminal.fixing_failed = True
             self.sound_effect_player.play_hacking_over()
             return
 
         if self.play_game_state is not None:
             # change state of the machine (to inactive)
-            for terminal in self.play_game_state.terminal_controller.terminals:
-                if terminal.state_machine.active_state.name == "fixing":
-                    terminal.hacking_failed = True
+            self.current_terminal.hacking_failed = True
 
             # change the state of the hackers to wandering (random)
             for hacker in self.play_game_state.maisy_controller.hacker_models:
