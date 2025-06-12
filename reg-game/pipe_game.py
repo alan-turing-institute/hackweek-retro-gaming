@@ -2,7 +2,7 @@ import random
 import time
 
 import pygame
-from config import SCREEN_HEIGHT, SCREEN_WIDTH, MINI_GAME_MAX_TIME
+from config import MINI_GAME_MAX_TIME, SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import Game, GameState
 from interstitial import InterstitialState
 from pygame.surface import Surface
@@ -707,10 +707,13 @@ class PipeGameState(GameState):
             mouse_x, mouse_y = pygame.mouse.get_pos()
             self.board.draw_hover_highlight(surface, mouse_x, mouse_y)
 
-        pygame.display.flip()
-
         if self.failed or self.game_won:
-            time.sleep(2)
+            t_end = time.time() + 2
+            while time.time() < t_end:
+                frame_tex = self.game.surf_to_texture(surface)
+                frame_tex.use(0)
+                self.game.ctx.render("PipeGameState")
+                pygame.display.flip()
             self.end_game()
 
     def end_game(self) -> None:
