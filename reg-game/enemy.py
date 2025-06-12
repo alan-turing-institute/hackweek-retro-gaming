@@ -2,10 +2,18 @@ import random
 
 import pygame
 from config import (
+    ENEMY_SPEED,
     N_ENEMIES,
+    NME_FACING_DOWN_OFFSET,
+    NME_FACING_LEFT_OFFSET,
+    NME_FACING_RIGHT_OFFSET,
+    NME_FACING_UP_OFFSET,
+    NME_NUMBER_OF_SPRITES,
+    NME_SIZE,
+    NME_SPRITE_HEIGHT,
+    NME_SPRITE_WIDTH,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    ENEMY_SPEED,
 )
 from framework import EntityState, EntityStateMachine
 
@@ -52,6 +60,85 @@ class MaisyController:
     def update(self, _game_time, *args, **kwargs):
         for hacker in self.hacker_models:
             hacker.brain.think(game_time=_game_time)
+
+
+class NewMaisyView:
+    def __init__(
+        self, hacker_controller: MaisyController, sprite_sheet_path: str
+    ) -> None:
+        self.hackers = hacker_controller
+
+        self.sprite_sheet: SpriteSheet = SpriteSheet(sprite_sheet_path)
+        self.moving_frames_right: list[Surface] = self.sprite_sheet.get_frames_in_row(
+            row_offset=NME_FACING_RIGHT_OFFSET,
+            sprite_width=NME_SPRITE_WIDTH,
+            sprite_height=NME_SPRITE_HEIGHT,
+            number_of_sprites=NME_NUMBER_OF_SPRITES,
+            target_size=NME_SIZE,
+        )
+
+        self.moving_frames_left: list[Surface] = self.sprite_sheet.get_frames_in_row(
+            row_offset=NME_FACING_LEFT_OFFSET,
+            sprite_width=NME_SPRITE_WIDTH,
+            sprite_height=NME_SPRITE_HEIGHT,
+            number_of_sprites=NME_NUMBER_OF_SPRITES,
+            target_size=NME_SIZE,
+        )
+
+        self.moving_frames_up: list[Surface] = self.sprite_sheet.get_frames_in_row(
+            row_offset=NME_FACING_UP_OFFSET,
+            sprite_width=NME_SPRITE_WIDTH,
+            sprite_height=NME_SPRITE_HEIGHT,
+            number_of_sprites=NME_NUMBER_OF_SPRITES,
+            target_size=NME_SIZE,
+        )
+
+        self.moving_frames_down: list[Surface] = self.sprite_sheet.get_frames_in_row(
+            row_offset=NME_FACING_DOWN_OFFSET,
+            sprite_width=NME_SPRITE_WIDTH,
+            sprite_height=NME_SPRITE_HEIGHT,
+            number_of_sprites=NME_NUMBER_OF_SPRITES,
+            target_size=NME_SIZE,
+        )
+
+        self.image: Surface = self.moving_frames_right[0]
+
+    def render(self, surface: Surface):
+        for hacker in self.hackers.hacker_models:
+            list_index: int = 0
+            if hacker.dx > 0:
+                list_index = int(self.player_controller.player_model.x) % len(
+                    self.moving_frames_right
+                )
+                self.image = self.moving_frames_right[list_index]
+            elif self.player_controller.player_model.direction == "LEFT":
+                list_index = int(self.player_controller.player_model.x) % len(
+                    self.moving_frames_left
+                )
+                self.image = self.moving_frames_left[list_index]
+            elif self.player_controller.player_model.direction == "UP":
+                list_index = int(self.player_controller.player_model.y) % len(
+                    self.moving_frames_up
+                )
+                self.image = self.moving_frames_up[list_index]
+            elif self.player_controller.player_model.direction == "DOWN":
+                list_index = int(self.player_controller.player_model.y) % len(
+                    self.moving_frames_down
+                )
+                self.image = self.moving_frames_down[list_index]
+
+            self.image = pygame.transform.scale(self.image, PLAYER_SIZE)
+            surface.blit(
+                self.image,
+                (
+                    self.player_controller.player_model.x,
+                    self.player_controller.player_model.y,
+                    PLAYER_SPRITE_WIDTH,
+                    PLAYER_SPRITE_HEIGHT,
+                ),
+            )
+
+    pass
 
 
 class MaisyView:

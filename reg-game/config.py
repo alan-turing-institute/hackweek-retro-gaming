@@ -51,6 +51,15 @@ PLAYER_FACING_LEFT_OFFSET: int = 1
 PLAYER_FACING_UP_OFFSET: int = 3
 PLAYER_FACING_DOWN_OFFSET: int = 0
 
+NME_SIZE: tuple[int, int] = (64, 64)
+NME_SPRITE_SHEET_PATH: str = str(enemy.local_path)
+NME_SPRITE_HEIGHT: int = 128
+NME_SPRITE_WIDTH: int = 128
+NME_FACING_RIGHT_OFFSET: int = 2
+NME_FACING_LEFT_OFFSET: int = 1
+NME_FACING_UP_OFFSET: int = 3
+NME_FACING_DOWN_OFFSET: int = 0
+
 SANDBOX_IMAGE_PATH: str = "img/moving_pikes.png"
 SANDBOXES_AVAILABLE: int = 3
 SANDBOX_IMAGE_WIDTH: int = 32
@@ -63,6 +72,7 @@ FIXING_SCORE: int = 10
 
 
 PLAYER_NUMBER_OF_SPRITES: int = 4
+NME_NUMBER_OF_SPRITES: int = 4
 
 TERMINAL_SIZE: tuple[int, int] = (64, 64)
 NUMBER_OF_TERMINALS: int = 1  # TODO: Edit later.
@@ -83,7 +93,7 @@ LIVES_MESSAGE_X: int = 160
 LIVES_MESSAGE_Y: int = 30
 
 N_ENEMIES: int = 1
-ENEMY_SPEED: int = 20  # TODO: Edit later
+ENEMY_SPEED: int = 3  # TODO: Edit later
 
 # ENEMY_SIZE: tuple[int, int] = (96, 96)
 ENEMY_SPRITESHEET_X: int = 0
