@@ -130,6 +130,9 @@ class Game:
 
         old_state = self.current_state
         self.current_state = new_state
+        print(type(new_state).__name__)
+        if type(new_state).__name__ == "MainMenuState":
+            self.music_player.start("sound/reggame-v2.mp3")
         new_state.on_enter(old_state)
 
     def run(self, initial_state: GameState | None):
@@ -137,7 +140,6 @@ class Game:
         Main game loop. Handles event management, state update and display.
         """
         self.change_state(initial_state)
-        self.music_player.start("sound/reggame-v2.mp3")
 
         while True:
             # position of a mouse click (needed for some games which rely on mouse click inputs)

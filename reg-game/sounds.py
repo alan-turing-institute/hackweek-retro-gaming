@@ -6,8 +6,8 @@ class MusicPlayer:
         """
         Initializes the MusicPlayer instance.
         """
-        self.game_theme = mixer.music.load(filename)
-        self.volume: float = 0.3
+        # self.game_theme = mixer.music.load(filename)
+        self.volume: float = 0.4
 
     def start(self, filename: str = "sound/reggame-v2.mp3"):
         """
