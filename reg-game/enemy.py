@@ -155,8 +155,8 @@ class MaisyView:
         ]
 
     def render(self, surface: Surface):
-        for hackerview in self.hackers.hacker_models:
-            if hackerview.dx >= 0:
+        for hacker in self.hackers.hacker_models:
+            if hacker.dx >= 0:
                 self.image = self.facing_right
                 # self.image = self.walking_frames_right[0]
             else:
@@ -166,8 +166,8 @@ class MaisyView:
             surface.blit(
                 self.image,
                 (
-                    hackerview.x,
-                    hackerview.y,
+                    hacker.x,
+                    hacker.y,
                     PLAYER_SPRITE_WIDTH,
                     PLAYER_SPRITE_HEIGHT,
                 ),
