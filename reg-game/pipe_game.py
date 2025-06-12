@@ -9,8 +9,6 @@ from pygame.surface import Surface
 from sounds import SoundEffectPlayer
 from spritesheet import SpriteSheet
 
-# from terminals import TerminalModel
-
 BOARD_SIZE = 6
 if BOARD_SIZE < 3:
     raise ValueError("Board size must be at least 3x3 for a playable game.")
@@ -714,31 +712,29 @@ class PipeGameState(GameState):
             self.end_game()
 
     def end_game(self):
+        self.sound_effect_player.play_hacking_over()
+
         if self.failed:
-            # set terminal fixing failed
-            # change state of the terminal
             self.current_terminal.fixing_failed = True
-            self.sound_effect_player.play_hacking_over()
-            return
+            message = "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!"
+        else:
+            self.current_terminal.hacking_failed = True
+            self.current_terminal.hacker_at_terminal.brain.set_state("wandering")
+            message = "Hacker stopped!\n\nKeep our machines safe!"
 
         if self.play_game_state is not None:
-            # change state of the machine (to inactive)
-            self.current_terminal.hacking_failed = True
-
-            # change the state of the hackers to wandering (random)
-            for hacker in self.play_game_state.maisy_controller.hacker_models:
-                if hacker.brain.active_state.name == "fighting":
-                    hacker.brain.set_state("wandering")
-
-            self.sound_effect_player.play_hacking_over()
-            get_ready_state: InterstitialState = InterstitialState(
-                self.game, "Hacker stopped!", 4500, self.play_game_state
-            )
-            self.game.change_state(get_ready_state)
-            return
+            print("Pipe game completed, returning to play game state.")
+        else:
+            print("Pipe game completed, ending game.")
 
         game_over_state: InterstitialState = InterstitialState(
-            self.game, "You won!", 4500, self.game_over_state
+            game=self.game,
+            message=message,
+            wait_time_ms=4500,
+            next_state=(
+                self.play_game_state
+                if self.play_game_state is not None
+                else self.game_over_state
+            ),
         )
         self.game.change_state(game_over_state)
-        return

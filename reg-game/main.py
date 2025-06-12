@@ -11,7 +11,6 @@ game_over_state: InterstitialState = InterstitialState(
     reg_game, "G A M E  O V E R !", 5000, main_menu_state
 )
 
-
 play_game_state: PlayGameState = PlayGameState(reg_game, game_over_state)
 
 prepare_for_challenge: InterstitialState = InterstitialState(
@@ -20,4 +19,4 @@ prepare_for_challenge: InterstitialState = InterstitialState(
 
 main_menu_state.set_play_state(prepare_for_challenge)
 
-reg_game.run(main_menu_state)
+reg_game.run(play_game_state)

@@ -65,7 +65,7 @@ FIXING_SCORE: int = 10
 PLAYER_NUMBER_OF_SPRITES: int = 4
 
 TERMINAL_SIZE: tuple[int, int] = (64, 64)
-NUMBER_OF_TERMINALS: int = 1
+NUMBER_OF_TERMINALS: int = 4
 TERMINAL_SPRITE_SHEET: str = "img/icon1.png"
 TERMINAL_IMAGE_SERVER: str = "img/server.png"
 TERMINAL_IMAGE_COMPUTER_ON: str = "img/computer2.png"

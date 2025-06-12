@@ -68,13 +68,17 @@ class FixingState(State):
         self,
         terminal: "TerminalModel",
         game: Game,
-        game_over_state: InterstitialState | None,
+        play_game_state: GameState,
+        game_over_state: GameState,
     ):
         super().__init__("fixing")
         self.terminal_model: TerminalModel = terminal
 
         mini_game_state: PipeGameState = PipeGameState(
-            game=game, current_terminal=terminal, game_over_state=game_over_state
+            game=game,
+            current_terminal=terminal,
+            play_game_state=play_game_state,
+            game_over_state=game_over_state,
         )
         self.get_ready_state: InterstitialState = InterstitialState(
             game, "Stop the hacker!", 2000, mini_game_state
@@ -100,6 +104,7 @@ class FixingState(State):
         return None
 
     def entry_actions(self) -> None:
+        print("Entering Fixing State")
         self.game.change_state(self.get_ready_state)
 
 
@@ -108,20 +113,14 @@ class BrokenState(State):
         self,
         terminal: "TerminalModel",
         player_model: PlayerModel,
-        live_lost_state: InterstitialState,
-        game: Game,
     ):
         super().__init__("broken")
         self.terminal_model: TerminalModel = terminal
         self.player_model: PlayerModel = player_model
-        self.game: Game = game
-        self.live_lost_state: InterstitialState = live_lost_state
 
     def entry_actions(self) -> None:
         self.player_model.lives -= 1
-        self.game.change_state(self.live_lost_state)
-
-        print("State changed")
+        print(f"State changed to Broken. Player lives left: {self.player_model.lives}")
 
     def check_conditions(self) -> str | None:
         print("Going to unhackable")
@@ -130,21 +129,23 @@ class BrokenState(State):
 
 
 class UnHackableState(State):
-    def __init__(self, terminal: "TerminalModel", player: PlayerModel):
+    def __init__(self, terminal: "TerminalModel", player_model: PlayerModel):
         super().__init__("unhackable")
         self.terminal_model = terminal
         self.countdown: int = UNHACKABLE_COUNTDOWN
-        self.player: PlayerModel = player
+        self.player_model: PlayerModel = player_model
 
     def do_actions(self, game_time):
         self.countdown -= game_time
 
     def entry_actions(self) -> None:
         self.countdown = UNHACKABLE_COUNTDOWN
-        self.player.score += FIXING_SCORE
+        self.player_model.score += FIXING_SCORE
+        print(f"State changed to UnHackable. Player score: {self.player_model.score}")
 
     def check_conditions(self) -> str | None:
         if self.countdown <= 0:
+            print("Unhackable state countdown finished, going back to active")
             return "active"
 
         return None
@@ -174,8 +175,8 @@ class TerminalController:
         self,
         player_controller: PlayerController,
         game: Game,
-        play_game_state: GameState | None,
-        game_over_state: GameState | None,
+        play_game_state: GameState,
+        game_over_state: GameState,
     ) -> None:
         offset: int = 80
         self.terminals: list[TerminalModel] = [
@@ -189,28 +190,26 @@ class TerminalController:
 
         self.terminals = self.terminals[:NUMBER_OF_TERMINALS]
 
-        live_lost_state: InterstitialState = InterstitialState(
-            game,
-            "MACHINE COMPROMISED!!!\n\nYou did not stop the hacker in time!",
-            4500,
-            play_game_state,
-        )
-
         for terminal in self.terminals:
             terminal.state_machine.add_state(ActiveState(terminal))
             terminal.state_machine.add_state(HackingState(terminal))
             terminal.state_machine.add_state(
                 FixingState(
-                    terminal=terminal, game_over_state=game_over_state, game=game
+                    terminal=terminal,
+                    game=game,
+                    play_game_state=play_game_state,
+                    game_over_state=game_over_state,
                 )
             )
             terminal.state_machine.add_state(
                 BrokenState(
-                    terminal, player_controller.player_model, live_lost_state, game
+                    terminal=terminal, player_model=player_controller.player_model
                 )
             )
             terminal.state_machine.add_state(
-                UnHackableState(terminal, player_controller.player_model)
+                UnHackableState(
+                    terminal=terminal, player_model=player_controller.player_model
+                )
             )
 
             terminal.state_machine.set_state("active")
