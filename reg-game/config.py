@@ -63,11 +63,10 @@ UNHACKABLE_COUNTDOWN: int = 3000
 HACKING_COUNTDOWN: int = 10000  # Should be 10000
 FIXING_SCORE: int = 10
 
-
 PLAYER_NUMBER_OF_SPRITES: int = 4
 
 TERMINAL_SIZE: tuple[int, int] = (64, 64)
-NUMBER_OF_TERMINALS: int = 1  # TODO: Edit later.
+NUMBER_OF_TERMINALS: int = 4  # TODO: Edit later.
 TERMINAL_SPRITE_SHEET: str = "img/icon1.png"
 TERMINAL_IMAGE_SERVER: str = "img/server.png"
 TERMINAL_IMAGE_COMPUTER_ON: str = "img/computer2.png"
@@ -84,7 +83,7 @@ LIVES_SPRITE_HEIGHT: int = 64
 LIVES_MESSAGE_X: int = 160
 LIVES_MESSAGE_Y: int = 30
 
-N_ENEMIES: int = 1
+N_ENEMIES: int = 3
 ENEMY_SPEED: int = 20  # TODO: Edit later
 
 # ENEMY_SIZE: tuple[int, int] = (96, 96)
