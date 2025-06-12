@@ -8,6 +8,7 @@ from config import (
     LIVES_SPRITE_HEIGHT,
     LIVES_SPRITE_WIDTH,
     PLAYER_FACING_DOWN_OFFSET,
+    PLAYER_FACING_LEFT_OFFSET,
     PLAYER_FACING_RIGHT_OFFSET,
     PLAYER_FACING_UP_OFFSET,
     PLAYER_NUMBER_OF_SPRITES,
@@ -83,7 +84,7 @@ class MovingFrames:
     sprite_sheet: SpriteSheet
 
     character_right_offset: int = PLAYER_FACING_RIGHT_OFFSET
-    character_left_offset: int = PLAYER_FACING_RIGHT_OFFSET
+    character_left_offset: int = PLAYER_FACING_LEFT_OFFSET
     character_up_offset: int = PLAYER_FACING_UP_OFFSET
     character_down_offset: int = PLAYER_FACING_DOWN_OFFSET
 

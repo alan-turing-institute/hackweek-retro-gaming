@@ -6,6 +6,7 @@ from config import (
     PLAYER_SPRITE_SHEET_PATH,
     SANDBOX_IMAGE_PATH,
     SCREEN_WIDTH,
+    enemy,
 )
 from enemy import MaisyController, MaisyView
 from framework import Game, GameState
@@ -56,9 +57,7 @@ class PlayGameState(GameState):
         background_renderer = BackgroundView("img/industrial_floor.png")
 
         player_renderer = PlayerView(self.player_controller, PLAYER_SPRITE_SHEET_PATH)
-        maisy_renderer = MaisyView(
-            self.maisy_controller, "img/pixel_character_pale_yellow.png"
-        )
+        maisy_renderer = MaisyView(self.maisy_controller, str(enemy.local_path))
         lives_renderer = PlayerLivesView(
             self.player_controller, LIVES_SPRITE_SHEET_PATH
         )
