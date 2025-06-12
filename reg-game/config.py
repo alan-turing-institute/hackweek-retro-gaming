@@ -15,7 +15,7 @@ class Attribution:
 british_library: Attribution = Attribution(
     url="https://imagesonline.bl.uk/asset/14880/",
     license="British Library",
-    local_path=Path("img/Microscheme.png"),
+    local_path=Path("img/spacefield_a-000.png"),
 )
 
 regina: Attribution = Attribution(

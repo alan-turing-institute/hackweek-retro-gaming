@@ -2,6 +2,14 @@ from bitmapfont import BitmapFont
 from config import MENU_FONT_IMG
 from framework import Game, GameState
 from pygame import Surface
+from config import (
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    MENU_BACKGROUND_PATH,
+    MENU_BACKGROUND_POSITION,
+)
+import pygame
+from pygame.image import load
 
 
 class InterstitialState(GameState):
@@ -18,6 +26,11 @@ class InterstitialState(GameState):
         self.message: str = message
         self.wait_timer: int = wait_time_ms
 
+        self.background: Surface = load(MENU_BACKGROUND_PATH).convert()
+        self.background = pygame.transform.scale(
+            self.background, size=(SCREEN_WIDTH, SCREEN_HEIGHT)
+        )
+
     def update(self, game_time: int, *args, **kwargs):
         """
         Waits until the timer runs down. When timer reaches zero, game moves to the next state.
@@ -29,6 +42,9 @@ class InterstitialState(GameState):
             self.game.change_state(self.next_state)
 
     def draw(self, surface: Surface):
+
+        surface.blit(self.background, MENU_BACKGROUND_POSITION)
+
         messages = self.message.split("\n")
         if len(messages) > 1:
             for i, message in enumerate(messages):
