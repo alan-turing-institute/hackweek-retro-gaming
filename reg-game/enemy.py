@@ -38,8 +38,8 @@ class MaisyController:
     def __init__(self):
         self.hacker_models = [
             MaisyModel(
-                x=random.randint(0, SCREEN_WIDTH),
-                y=random.randint(0, int(0.25 * SCREEN_HEIGHT)),
+                x=SCREEN_WIDTH / 2 + random.randint(-100, 100),
+                y=SCREEN_HEIGHT / 2 + random.randint(-100, 100),
             )
             for _ in range(N_ENEMIES)
         ]
