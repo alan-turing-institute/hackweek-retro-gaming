@@ -23,7 +23,6 @@ class PlayGameState(GameState):
         self.controllers: list | None = None
         self.renderers: list | None = None
         self.player_controller: PlayerController | None = None
-
         self.game_over_state: GameState | None = game_over_state
 
         self.initialise()

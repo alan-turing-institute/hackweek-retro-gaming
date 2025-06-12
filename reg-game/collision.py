@@ -1,9 +1,10 @@
 import enemy
-from config import PLAYER_SIZE, TERMINAL_SIZE
+from config import PLAYER_SIZE, SANDBOX_IMAGE_HEIGHT, SANDBOX_IMAGE_WIDTH, TERMINAL_SIZE
 from enemy import MaisyController, MaisyModel
 from framework import Game
 from pygame import Rect
 from regplayer import PlayerController, PlayerModel
+from sandbox import SandboxModel
 from terminals import TerminalController, TerminalModel
 
 
@@ -21,8 +22,26 @@ class HackerCollisionController:
         self.terminal_controller: TerminalController = terminal_controller
 
     def update(self, game_time: int, *args, **kwargs) -> None:
-        for terminal in self.terminal_controller.terminals:
-            for hacker in self.maisy_controller.hacker_models:
+        for hacker in self.maisy_controller.hacker_models:
+            # Check if hacker collides with a sandbox
+            for sandbox in self.player_controller.sandbox_controller.sandbox_models:
+                if self.collides_with_sandbox(
+                    hacker.x,
+                    hacker.y,
+                    enemy.PLAYER_SIZE[0],
+                    enemy.PLAYER_SIZE[1],
+                    sandbox,
+                ):
+                    if sandbox.hacker_at_sandbox is None:
+                        sandbox.hacker_at_sandbox = hacker
+                        hacker.sandbox_controller = (
+                            self.player_controller.sandbox_controller
+                        )
+                        hacker.active_sandbox = sandbox
+                    break
+
+            for terminal in self.terminal_controller.terminals:
+                # Check if the hacker collides with the terminal
                 if self.collides_with_terminal(
                     hacker.x,
                     hacker.y,
@@ -39,6 +58,7 @@ class HackerCollisionController:
                     terminal.hacker_at_terminal = None
                     hacker.active_terminal = None
 
+                # Check if the player collides with the terminal
                 if self.collides_with_terminal(
                     self.player_controller.player_model.x,
                     self.player_controller.player_model.y,
@@ -60,9 +80,9 @@ class HackerCollisionController:
         enemy_width, enemy_height = enemy.PLAYER_SIZE
         maisy_rect: Rect = Rect(maisy_model.x, maisy_model.y, enemy_width, enemy_height)
 
-        result: bool = player_rect.colliderect(maisy_rect)
+        collision: bool = player_rect.colliderect(maisy_rect)
 
-        return result
+        return collision
 
     def collides_with_terminal(
         self,
@@ -83,5 +103,23 @@ class HackerCollisionController:
         )
 
         collision: bool = entity_rect.colliderect(terminal_rect)
+
+        return collision
+
+    def collides_with_sandbox(
+        self,
+        position_x: int,
+        position_y: int,
+        width: int,
+        height: int,
+        sandbox_model: SandboxModel,
+    ) -> bool:
+        entity_rect: Rect = Rect(position_x, position_y, width, height)
+
+        sandbox_rect: Rect = Rect(
+            sandbox_model.x, sandbox_model.y, SANDBOX_IMAGE_WIDTH, SANDBOX_IMAGE_HEIGHT
+        )
+
+        collision: bool = entity_rect.colliderect(sandbox_rect)
 
         return collision

@@ -5,12 +5,12 @@ from config import (
     N_ENEMIES,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
-    ENEMY_SPEED,
 )
 from framework import EntityState, EntityStateMachine
 
 # from enemy_statemachine import StateMachine, HackingState
 from pygame.surface import Surface
+from sandbox import SandboxController, SandboxModel
 from spritesheet import SpriteSheet
 from terminals import TerminalModel
 
@@ -31,10 +31,13 @@ class MaisyModel:
         self.width = 48
         self.height = 48
         self.active_terminal: None | TerminalModel = None
+        self.active_sandbox: None | SandboxModel = None
+        self.sandbox_controller: None | SandboxController = None
         self.brain = EntityStateMachine()
         self.brain.add_state(HackingState(self))
         self.brain.add_state(WanderingState(self))
-        self.speed = ENEMY_SPEED
+        self.brain.add_state(SandboxState(self))
+        self.speed = 3
 
 
 class MaisyController:
@@ -259,6 +262,8 @@ class WanderingState(EntityState):
         # print(f"At wandering {self.hacker_model.at_terminal=}")
         if self.hacker_model.active_terminal is not None:
             return "hacking"
+        if self.hacker_model.active_sandbox is not None:
+            return "in_sandbox"
         return None
 
     def entry_actions(self):
@@ -271,6 +276,33 @@ class WanderingState(EntityState):
     def exit_actions(self):
         print("Exititing wandering")
         pass
+
+
+class SandboxState(EntityState):
+    def __init__(self, hacker_model: "MaisyModel"):
+        super().__init__("in_sandbox")
+        self.hacker_model = hacker_model
+
+    def do_actions(self, game_time):
+        self.game_time += game_time
+
+    def check_conditions(self) -> str | None:
+        if self.game_time > 10000:
+            return "wandering"
+        return None
+
+    def entry_actions(self):
+        self.game_time = 0
+        self.hacker_model.dx = 0
+        self.hacker_model.dy = 0
+
+    def exit_actions(self):
+        self.hacker_model.x += 40
+        self.hacker_model.y += 40
+        self.hacker_model.sandbox_controller.remove_sandbox(
+            self.hacker_model.active_sandbox.name
+        )
+        self.hacker_model.active_sandbox = None
 
 
 class SearchingState(EntityState):
