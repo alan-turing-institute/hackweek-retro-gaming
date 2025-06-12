@@ -31,7 +31,7 @@ enemy: Attribution = Attribution(
     local_path=Path("img/24by24ModernRPGGuy.png"),
 )
 
-MENU_TITLE: str = "REGINA'S QUEST!!"
+MENU_TITLE: str = "REGINA'S QUEST"
 MENU_FONT_IMG: Path = Path("img/fasttracker2-style_12x12.png")
 MENU_BACKGROUND_PATH: Path = british_library.local_path
 MENU_BACKGROUND_POSITION: tuple[int, int] = (0, 0)
@@ -39,7 +39,7 @@ MENU_BACKGROUND_SCALE_FACTOR: float = 1.0
 
 MENU_ITEMS: tuple[str, ...] = ("Start", "Quit")
 
-MAIN_GAME_MAX_TIME: int = 20000
+MAIN_GAME_MAX_TIME: int = 30000
 MINI_GAME_MAX_TIME: int = 15000
 
 SCREEN_WIDTH: int = 800
