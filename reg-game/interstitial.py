@@ -10,11 +10,17 @@ from config import (
 )
 import pygame
 from pygame.image import load
+from pathlib import Path
 
 
 class InterstitialState(GameState):
     def __init__(
-        self, game: Game, message: str, wait_time_ms: int, next_state: GameState | None
+        self,
+        game: Game,
+        message: str,
+        wait_time_ms: int,
+        next_state: GameState | None,
+        background_path: Path | str = MENU_BACKGROUND_PATH,
     ) -> None:
         """
         :param game: Game instance.
@@ -26,7 +32,7 @@ class InterstitialState(GameState):
         self.message: str = message
         self.wait_timer: int = wait_time_ms
 
-        self.background: Surface = load(MENU_BACKGROUND_PATH).convert()
+        self.background: Surface = load(background_path).convert()
         self.background = pygame.transform.scale(
             self.background, size=(SCREEN_WIDTH, SCREEN_HEIGHT)
         )
