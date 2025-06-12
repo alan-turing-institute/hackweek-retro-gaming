@@ -55,9 +55,7 @@ class PlayGameState(GameState):
         background_renderer = BackgroundView("img/industrial_floor.png")
 
         player_renderer = PlayerView(self.player_controller, PLAYER_SPRITE_SHEET_PATH)
-        maisy_renderer = MaisyView(
-            self.maisy_controller, "img/pixel_character_pale_yellow.png"
-        )
+        maisy_renderer = MaisyView(self.maisy_controller, "img/maisy_model_lr.png")
         lives_renderer = PlayerLivesView(
             self.player_controller, LIVES_SPRITE_SHEET_PATH
         )

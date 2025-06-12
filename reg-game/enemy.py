@@ -1,20 +1,13 @@
 import random
 
 import pygame
-from config import (
-    N_ENEMIES,
-    SCREEN_HEIGHT,
-    SCREEN_WIDTH,
-    ENEMY_SPEED,
-)
+from config import ENEMY_SPEED, N_ENEMIES, PLAYER_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
 from framework import EntityState, EntityStateMachine
 
 # from enemy_statemachine import StateMachine, HackingState
 from pygame.surface import Surface
 from spritesheet import SpriteSheet
 from terminals import TerminalModel
-
-PLAYER_SIZE: tuple[int, int] = (96, 96)
 
 PLAYER_SPRITESHEET_X: int = 0
 PLAYER_SPRITESHEET_Y: int = 0
@@ -65,6 +58,9 @@ class MaisyView:
 
         self.walking_frames_left: list[Surface] = self.get_walking_frames_left()
         self.walking_frames_right: list[Surface] = self.get_walking_frames_right()
+
+        self.facing_left: Surface = self.get_left_facing()
+        self.facing_right: Surface = self.get_right_facing()
         # self.moving_frames_right: list[Surface] = self.sprite_sheet.get_frames_in_row(
         #     row_offset=2,
         #     sprite_width=ENEMY_SPRITE_WIDTH,
@@ -130,17 +126,16 @@ class MaisyView:
     #         ),
     #     )
 
-    def get_walking_frames_left(self) -> list[Surface]:
-        row_offset: int = 2
+    def get_left_facing(self) -> Surface:
+        sprite_surface = self.sprite_sheet.get_image(512, 0, 512, 512)
+        return pygame.transform.scale(sprite_surface, size=PLAYER_SIZE)
 
-        sprite_surfaces: list[Surface] = [
-            self.sprite_sheet.get_image(
-                x=PLAYER_SPRITESHEET_X,
-                y=PLAYER_SPRITE_HEIGHT * row_offset,
-                width=PLAYER_SPRITE_WIDTH,
-                height=PLAYER_SPRITE_HEIGHT,
-            )
-        ]
+    def get_right_facing(self) -> Surface:
+        sprite_surface = self.sprite_sheet.get_image(0, 0, 512, 512)
+        return pygame.transform.scale(sprite_surface, size=PLAYER_SIZE)
+
+    def get_walking_frames_left(self) -> list[Surface]:
+        sprite_surfaces: list[Surface] = [self.sprite_sheet.get_image(512, 0, 512, 512)]
 
         return [
             pygame.transform.scale(surface, size=PLAYER_SIZE)
@@ -148,16 +143,7 @@ class MaisyView:
         ]
 
     def get_walking_frames_right(self) -> list[Surface]:
-        row_offset: int = 3
-
-        sprite_surfaces: list[Surface] = [
-            self.sprite_sheet.get_image(
-                x=PLAYER_SPRITESHEET_X,
-                y=PLAYER_SPRITE_HEIGHT * row_offset,
-                width=PLAYER_SPRITE_WIDTH,
-                height=PLAYER_SPRITE_HEIGHT,
-            )
-        ]
+        sprite_surfaces: list[Surface] = [self.sprite_sheet.get_image(0, 0, 512, 512)]
 
         return [
             pygame.transform.scale(surface, size=PLAYER_SIZE)
@@ -167,9 +153,11 @@ class MaisyView:
     def render(self, surface: Surface):
         for hackerview in self.hackers.hacker_models:
             if hackerview.dx >= 0:
-                self.image = self.walking_frames_right[0]
+                self.image = self.facing_right
+                # self.image = self.walking_frames_right[0]
             else:
-                self.image = self.walking_frames_left[0]
+                # self.image = self.walking_frames_left[0]
+                self.image = self.facing_left
 
             surface.blit(
                 self.image,
