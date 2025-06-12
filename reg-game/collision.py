@@ -42,8 +42,6 @@ class HackerCollisionController:
                         sandbox.hacker_at_sandbox = None
                         hacker.active_sandbox = None
 
-                    break
-
             for terminal in self.terminal_controller.terminals:
                 # Check if the hacker collides with the terminal
                 if self.collides_with_terminal(
@@ -70,8 +68,6 @@ class HackerCollisionController:
                     terminal.player_at_terminal = self.player_controller.player_model
                 else:
                     terminal.player_at_terminal = None
-
-                break
 
     def player_collide(self, maisy_model: MaisyModel) -> bool:
         player_model: PlayerModel = self.player_controller.player_model

@@ -35,7 +35,7 @@ class PlayerModel:
 
         self.lives: int = NUMBER_OF_LIVES
         self.score: int = 0
-        self.speed: int = 100
+        self.speed: int = 200
 
         self.direction: str = "RIGHT"
 
