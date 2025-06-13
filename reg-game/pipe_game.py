@@ -184,7 +184,7 @@ class Pipe:
         if self.pipe_image_green:
             self.pipe_image_green = pygame.transform.rotate(self.pipe_image_green, -90)
 
-        print(f"Rotated pipe of type '{self.type}' to {self.rotation} degrees.")
+        # print(f"Rotated pipe of type '{self.type}' to {self.rotation} degrees.")
 
     def draw(self, surface: Surface, x: int, y: int):
         """Draws the pipe segment on the given surface."""

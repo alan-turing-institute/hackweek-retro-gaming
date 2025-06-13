@@ -106,7 +106,7 @@ class FixingState(EntityState):
         return None
 
     def entry_actions(self) -> None:
-        print("Entering Fixing State")
+        # print("Entering Fixing State")
         self.game.change_state(self.get_ready_state)
 
 

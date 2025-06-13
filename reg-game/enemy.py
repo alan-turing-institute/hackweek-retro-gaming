@@ -292,9 +292,9 @@ class WanderingState(EntityState):
 
     def entry_actions(self):
         # print("Entered wandering")
-        print(
-            f"{self.hacker_model.dx=}, {self.hacker_model.dy=}, {self.hacker_model.speed}"
-        )
+        # print(
+        #     f"{self.hacker_model.dx=}, {self.hacker_model.dy=}, {self.hacker_model.speed}"
+        # )
         pass
 
     def exit_actions(self):
