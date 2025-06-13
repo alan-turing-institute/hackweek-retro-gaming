@@ -49,7 +49,7 @@ class MaisyController:
 
     def update(self, _game_time, *args, **kwargs):
         for hacker in self.hacker_models:
-            print(f"{hacker.brain.active_state.name=}")
+            # print(f"{hacker.brain.active_state.name=}")
             hacker.brain.think(game_time=_game_time)
 
 
@@ -193,7 +193,7 @@ class HackingState(EntityState):
         return None
 
     def entry_actions(self):
-        print("Starting hacking")
+        # print("Starting hacking")
         self.game_time = 0
         self.hacker_model.dx = 0
         self.hacker_model.dy = 0
@@ -271,11 +271,11 @@ class WanderingState(EntityState):
         # print(f"At wandering {self.hacker_model.at_terminal=}")
 
         # TODO: Remove later
-        if self.hacker_model.active_terminal is not None:
-            print(f"Hacker ->{self.hacker_model.active_terminal=}")
-            print(
-                f"Hacker ->{self.hacker_model.active_terminal.state_machine.active_state.name=}"
-            )
+        # if self.hacker_model.active_terminal is not None:
+        #     print(f"Hacker ->{self.hacker_model.active_terminal=}")
+        #     print(
+        #         f"Hacker ->{self.hacker_model.active_terminal.state_machine.active_state.name=}"
+        #     )
 
         if (
             self.hacker_model.active_terminal is not None
@@ -291,14 +291,14 @@ class WanderingState(EntityState):
         return None
 
     def entry_actions(self):
-        print("Entered wandering")
+        # print("Entered wandering")
         print(
             f"{self.hacker_model.dx=}, {self.hacker_model.dy=}, {self.hacker_model.speed}"
         )
         pass
 
     def exit_actions(self):
-        print("Exititing wandering")
+        # print("Exititing wandering")
         pass
 
 
