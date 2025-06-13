@@ -1,6 +1,6 @@
 # Regina's Quest
 
-<img align="right" width="300" height="300" src="./reg-game/img/regina_sticker.png">
+<img align="right" width="400" height="300" src="./reg-game/img/regina_steam_title.png">
 
 To run the game with [uv](https://docs.astral.sh/uv/):
 
