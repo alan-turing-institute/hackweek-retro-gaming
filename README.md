@@ -21,6 +21,8 @@ source .venv/bin/activate
 uv run main.py
 ```
 
+4. Turn up the sound!
+
 ## How to play
 
 <img align="right" width="500" height="400" src="./reg-game/img/regina_quest_start.png">
